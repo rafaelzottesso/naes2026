@@ -1,0 +1,15 @@
+# Instalar o Django 5
+pip install django==5.2.12
+
+# Rodar o projeto
+python manage.py runserver
+
+# Conferir o models e preparar o SQL para o banco
+python manage.py makemigrations
+
+# Usar o SQL criado para efetivamente atualizar o banco
+python manage.py migrate
+
+# Criar um superusuário no banco: admin/admin
+python manage.py createsuperuser
+
