@@ -6,9 +6,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
 </head>
 <body>
-    <h3>Sistema de Campeonato</h3>
+    
+    <div id="menu-superior">
+        <ul>
+            <li><a href="{% url "index" %}">Página inicial</a></li>
+            <li><a href="{% url "sobre" %}">Sobre</a></li>
+            <li><a href="{% url "contato" %}">Contato</a></li>
+        </ul>
+    </div>
+
+    {% block menuLateral %}
+    <div class="menu-lateral">
+        <ul>
+            <li>Bem vindo</li>
+            <li>Cadastro</li>
+            <li>Login</li>
+        </ul>
+    </div>
+    {% endblock menuLateral %}
+
+    <div class="conteudo">
+
+        {% block conteudo %}
+        <h3>Bem vind ao sistema</h3>
+        <p>uahs dua hsidsa hdiusa hiusa hdsad h</p>
+        {% endblock conteudo %}
+
+    </div>
+
+    <div class="rodape">
+        <p>Desenvolvido por Rafael Zotteso</p>
+    </div>
+    
 </body>
 </html>
