@@ -1,0 +1,83 @@
+{% extends "website/modelo.html" %}
+
+{% load static %}
+
+{% block hero %}
+<!-- Hero compacto para home -->
+<section class="hero py-5">
+  <div class="hero-noise"></div>
+  <div class="container py-5">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <span class="badge bg-petrol-subtle text-primary fw-semibold px-3 py-2 rounded-pill mb-3 d-inline-block" style="font-size:.75rem; letter-spacing:.05em;">
+          <i class="bi bi-controller me-1"></i> IFPR E-Sports
+        </span>
+        <h1 class="display-4 fw-display text-white mb-3">Gerencie campeonatos<br><span style="color:var(--petrol-lighter)">de forma simples</span></h1>
+        <p class="text-white-75 mb-4" style="max-width:560px; line-height:1.6">Crie torneios, inscreva jogadores e equipes por modalidade, acompanhe resultados e fortaleça a comunidade de jogos eletrônicos do IFPR.</p>
+        <div class="d-flex gap-3">
+          <a href="{% url "sobre" %}" class="btn btn-light fw-semibold px-4 rounded-2"><i class="bi bi-info-circle me-1"></i>Sobre o projeto</a>
+          <a href="{% url "contato" %}" class="btn btn-auth px-4 rounded-2"><i class="bi bi-envelope me-1"></i>Fale conosco</a>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="card-petrol p-4 rounded-2xl text-center" style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)">
+          <div style="font-size:3rem">🎮</div>
+          <h5 class="fw-display text-white mt-3">Participe dos torneios</h5>
+          <p class="text-white-50 mb-3">Inscreva sua equipe por modalidade e acompanhe o progresso ao vivo.</p>
+          <a href="{% url "index" %}" class="btn btn-primary btn-sm">Ver Campeonatos</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock hero %}
+
+{% block conteudo %}
+
+<!-- Seção rápida de recursos -->
+<section class="py-5 bg-surface-alt">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="fw-display mb-2">Recursos Principais</h2>
+      <p class="text-secondary">Ferramentas essenciais para organizar campeonatos e inscrever jogadores e equipes.</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-petrol p-4 h-100 text-center">
+          <div class="feature-icon bg-primary bg-opacity-10 mx-auto mb-3"><i class="bi bi-calendar-check fs-4 text-primary"></i></div>
+          <h5 class="fw-display mb-2">Criar Torneios</h5>
+          <p class="text-secondary mb-0">Defina modalidades, regras e chaves de disputa.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-petrol p-4 h-100 text-center">
+          <div class="feature-icon bg-success bg-opacity-10 mx-auto mb-3"><i class="bi bi-people-fill fs-4 text-success"></i></div>
+          <h5 class="fw-display mb-2">Inscrição de Equipes</h5>
+          <p class="text-secondary mb-0">Jogadores inscrevem suas equipes em modalidades distintas.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-petrol p-4 h-100 text-center">
+          <div class="feature-icon bg-info bg-opacity-10 mx-auto mb-3"><i class="bi bi-bar-chart-line fs-4 text-info"></i></div>
+          <h5 class="fw-display mb-2">Resultados & Rankings</h5>
+          <p class="text-secondary mb-0">Acompanhe placares, tabelas e evolução dos jogadores.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA simples -->
+<section class="py-5 bg-petrol">
+  <div class="container text-center">
+    <h3 class="fw-display text-white mb-2">Pronto para competir?</h3>
+    <p class="text-white-75 mb-3" style="max-width:600px; margin:0 auto">Crie ou participe de campeonatos organizados pelo IFPR e faça parte da comunidade.</p>
+    <div class="d-flex justify-content-center gap-3">
+      <a href="{% url "contato" %}" class="btn btn-light px-4 rounded-2 fw-semibold"><i class="bi bi-envelope me-1"></i>Entrar em contato</a>
+      <a href="{% url "sobre" %}" class="btn btn-auth px-4 rounded-2"><i class="bi bi-info-circle me-1"></i>Saiba mais</a>
+    </div>
+  </div>
+</section>
+
+{% endblock conteudo %}

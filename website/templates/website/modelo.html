@@ -1,44 +1,715 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR" data-bs-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Template Moderno — Azul Petróleo</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- Estilo personalizado -->
+  <link rel="stylesheet" href="{% static "css/estilo.css" %}">
+
 </head>
 <body>
-    
-    <div id="menu-superior">
-        <ul>
-            <li><a href="{% url "index" %}">Página inicial</a></li>
-            <li><a href="{% url "sobre" %}">Sobre</a></li>
-            <li><a href="{% url "contato" %}">Contato</a></li>
+
+  <!-- ═══════════════════════════════════
+       NAVBAR FIXA
+  ════════════════════════════════════ -->
+  <nav class="navbar navbar-expand-lg navbar-petrol fixed-top">
+    <div class="container">
+
+      <!-- Brand -->
+      <a class="navbar-brand" href="#">
+        <span class="brand-dot"></span>
+        Petróleo UI
+      </a>
+
+      <!-- Toggler -->
+      <button class="navbar-toggler" type="button"
+              data-bs-toggle="collapse" data-bs-target="#navMain"
+              aria-controls="navMain" aria-expanded="false" aria-label="Menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Nav links — centralizados via mx-auto -->
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav mx-auto gap-1">
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url "index" %}">
+                <i class="bi bi-house me-1"></i>Início
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url "sobre" %}">
+                <i class="bi bi-info-circle me-1"></i>Sobre
+            </a>
+          </li>
+
+          <!-- Dropdown: Produtos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-grid me-1"></i>Produtos
+            </a>
+            <ul class="dropdown-menu shadow">
+              <li><span class="dropdown-header">Plataforma</span></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-layers me-2"></i>Visão Geral</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-cpu me-2"></i>Analytics</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-shield-check me-2"></i>Segurança</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><span class="dropdown-header">Integrações</span></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-plug me-2"></i>API & Webhooks</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-boxes me-2"></i>Marketplace</a></li>
+            </ul>
+          </li>
+
+
+          {% comment %} <!-- Dropdown: Soluções -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-lightbulb me-1"></i>Soluções
+            </a>
+            <ul class="dropdown-menu shadow">
+              <li><a class="dropdown-item" href="#"><i class="bi bi-building me-2"></i>Empresas</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-person-badge me-2"></i>Freelancers</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-mortarboard me-2"></i>Educação</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="bi bi-book me-1"></i>Docs</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="bi bi-currency-dollar me-1"></i>Preços</a>
+          </li> {% endcomment %}
+
+
         </ul>
+
+        <!-- Auth — alinhado ao fim -->
+        <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+
+          <!-- ESTADO: não autenticado -->
+          <div id="authGuest" class="d-flex gap-2">
+            <a href="#" class="btn-auth btn" data-bs-toggle="modal" data-bs-target="#modalLogin">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Entrar
+            </a>
+            <a href="#" class="btn btn-primary btn-sm px-3 fw-semibold rounded-2">
+              Cadastrar-se
+            </a>
+          </div>
+
+          <!-- ESTADO: autenticado (toggle via JS para demo) -->
+          <div id="authUser" class="d-none dropdown">
+            <div class="user-chip" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="user-avatar">JD</div>
+              <span class="user-chip-name d-none d-md-inline">João D.</span>
+              <i class="bi bi-chevron-down text-white-50" style="font-size:.65rem"></i>
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end shadow mt-2">
+              <li><span class="dropdown-header">Conta</span></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Meu Perfil</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configurações</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-bell me-2"></i>Notificações <span class="badge bg-danger ms-auto">3</span></a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><span class="dropdown-header">Workspace</span></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-briefcase me-2"></i>Meus Projetos</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-people me-2"></i>Equipe</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-graph-up me-2"></i>Relatórios</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item text-danger" href="#" onclick="toggleAuth(); return false;"><i class="bi bi-box-arrow-left me-2"></i>Sair</a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
     </div>
+  </nav>
 
-    {% block menuLateral %}
-    <div class="menu-lateral">
-        <ul>
-            <li>Bem vindo</li>
-            <li>Cadastro</li>
-            <li>Login</li>
-        </ul>
+  <!-- ═══════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════ -->
+  <main style="padding-top: 56px;">
+
+    {% block hero %}
+    <!-- ── Hero ── -->
+    <section class="hero py-5 py-lg-6">
+      <div class="hero-noise"></div>
+      <div class="container py-4 py-lg-5 position-relative">
+        <div class="row align-items-center gy-4">
+          <div class="col-lg-6">
+            <span class="badge bg-petrol-subtle text-primary fw-semibold px-3 py-2 rounded-pill mb-3 d-inline-block" style="font-size:.75rem; letter-spacing:.05em;">
+              <i class="bi bi-stars me-1"></i> Lançamento v2.0
+            </span>
+            <h1 class="display-4 fw-display text-white mb-3">
+              Design moderno,<br>
+              <span style="color: var(--petrol-lighter);">experiência fluida.</span>
+            </h1>
+            <p class="mb-4" style="color: rgba(255,255,255,.7); font-size:1.1rem; max-width:480px;">
+              Um template Bootstrap 5 completo com paleta de azul petróleo, componentes customizados e estrutura pronta para produção.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+              <button class="btn btn-light fw-semibold px-4 rounded-2" onclick="toggleAuth()">
+                <i class="bi bi-play-fill me-1"></i>Simular Login
+              </button>
+              <a href="#componentes" class="btn btn-auth px-4 rounded-2">
+                Ver Componentes
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-6 d-none d-lg-flex justify-content-end">
+            <!-- Decorative card mockup -->
+            <div class="p-4 rounded-2xl" style="background:rgba(255,255,255,.07); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.12); width:340px;">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <div style="width:10px;height:10px;border-radius:50%;background:#c0394b;opacity:.8"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#d4840a;opacity:.8"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#2d9e6b;opacity:.8"></div>
+              </div>
+              <div class="mb-2 rounded-1" style="height:10px;background:rgba(255,255,255,.15);width:60%"></div>
+              <div class="mb-4 rounded-1" style="height:8px;background:rgba(255,255,255,.08);width:85%"></div>
+              <div class="d-flex gap-2 mb-3">
+                <div class="flex-fill p-3 rounded-xl" style="background:rgba(255,255,255,.1)">
+                  <div style="height:8px;background:rgba(255,255,255,.3);border-radius:4px;width:40%;margin-bottom:6px"></div>
+                  <div style="height:20px;background:rgba(255,255,255,.5);border-radius:4px;width:70%"></div>
+                </div>
+                <div class="flex-fill p-3 rounded-xl" style="background:rgba(45,158,107,.25)">
+                  <div style="height:8px;background:rgba(255,255,255,.3);border-radius:4px;width:40%;margin-bottom:6px"></div>
+                  <div style="height:20px;background:rgba(255,255,255,.5);border-radius:4px;width:70%"></div>
+                </div>
+              </div>
+              <div class="rounded-xl p-3" style="background:rgba(255,255,255,.06)">
+                <div style="height:7px;background:rgba(255,255,255,.15);border-radius:3px;width:100%;margin-bottom:5px"></div>
+                <div style="height:7px;background:rgba(255,255,255,.1);border-radius:3px;width:80%;margin-bottom:5px"></div>
+                <div style="height:7px;background:rgba(255,255,255,.07);border-radius:3px;width:90%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endblock hero %}
+
+
+    {% block conteudo %}
+    <!-- ── Paleta de Cores ── -->
+    <section id="componentes" class="py-5 bg-surface-alt">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="fw-display mb-2">Paleta de Cores</h2>
+          <p class="text-secondary">Cores semânticas harmonizadas com o azul petróleo</p>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <!-- Petróleo -->
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="rounded-xl overflow-hidden shadow-sm">
+              <div style="background:var(--petrol-darker);height:60px"></div>
+              <div style="background:var(--cp-primary);height:60px"></div>
+              <div style="background:var(--petrol-light);height:40px"></div>
+              <div style="background:var(--petrol-lighter);height:30px"></div>
+              <div class="p-2 bg-white" style="font-size:.7rem;font-weight:600;color:var(--text-muted)">Primary<br><span style="color:var(--cp-primary)">#1B6B7B</span></div>
+            </div>
+          </div>
+          <!-- Success -->
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="rounded-xl overflow-hidden shadow-sm">
+              <div style="background:#1a5e40;height:60px"></div>
+              <div style="background:var(--cp-success);height:60px"></div>
+              <div style="background:#5ec99a;height:40px"></div>
+              <div style="background:#a7dfc6;height:30px"></div>
+              <div class="p-2 bg-white" style="font-size:.7rem;font-weight:600;color:var(--text-muted)">Success<br><span style="color:var(--cp-success)">#2D9E6B</span></div>
+            </div>
+          </div>
+          <!-- Info -->
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="rounded-xl overflow-hidden shadow-sm">
+              <div style="background:#1c3f6e;height:60px"></div>
+              <div style="background:var(--cp-info);height:60px"></div>
+              <div style="background:#6ba8e0;height:40px"></div>
+              <div style="background:#a8c9ef;height:30px"></div>
+              <div class="p-2 bg-white" style="font-size:.7rem;font-weight:600;color:var(--text-muted)">Info<br><span style="color:var(--cp-info)">#3A7FC1</span></div>
+            </div>
+          </div>
+          <!-- Warning -->
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="rounded-xl overflow-hidden shadow-sm">
+              <div style="background:#6b3e04;height:60px"></div>
+              <div style="background:var(--cp-warning);height:60px"></div>
+              <div style="background:#e8a840;height:40px"></div>
+              <div style="background:#f0c97a;height:30px"></div>
+              <div class="p-2 bg-white" style="font-size:.7rem;font-weight:600;color:var(--text-muted)">Warning<br><span style="color:var(--cp-warning)">#D4840A</span></div>
+            </div>
+          </div>
+          <!-- Danger -->
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="rounded-xl overflow-hidden shadow-sm">
+              <div style="background:#5e141e;height:60px"></div>
+              <div style="background:var(--cp-danger);height:60px"></div>
+              <div style="background:#de7585;height:40px"></div>
+              <div style="background:#e8a0aa;height:30px"></div>
+              <div class="p-2 bg-white" style="font-size:.7rem;font-weight:600;color:var(--text-muted)">Danger<br><span style="color:var(--cp-danger)">#C0394B</span></div>
+            </div>
+          </div>
+          <!-- Secondary -->
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="rounded-xl overflow-hidden shadow-sm">
+              <div style="background:#2e4850;height:60px"></div>
+              <div style="background:var(--cp-secondary);height:60px"></div>
+              <div style="background:#8aadb5;height:40px"></div>
+              <div style="background:#c5d8dc;height:30px"></div>
+              <div class="p-2 bg-white" style="font-size:.7rem;font-weight:600;color:var(--text-muted)">Secondary<br><span style="color:var(--cp-secondary)">#5A7A82</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Botões ── -->
+    <section class="py-5 bg-surface">
+      <div class="container">
+        <h4 class="fw-display mb-4">Botões</h4>
+
+        <div class="mb-4">
+          <p class="text-secondary fw-semibold mb-3" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em">Sólidos</p>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-primary rounded-2">Primary</button>
+            <button class="btn btn-success rounded-2">Success</button>
+            <button class="btn btn-info rounded-2">Info</button>
+            <button class="btn btn-warning rounded-2">Warning</button>
+            <button class="btn btn-danger rounded-2">Danger</button>
+            <button class="btn btn-secondary rounded-2">Secondary</button>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <p class="text-secondary fw-semibold mb-3" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em">Outline</p>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-primary rounded-2">Primary</button>
+            <button class="btn btn-outline-success rounded-2">Success</button>
+            <button class="btn btn-outline-info rounded-2">Info</button>
+            <button class="btn btn-outline-warning rounded-2">Warning</button>
+            <button class="btn btn-outline-danger rounded-2">Danger</button>
+            <button class="btn btn-outline-secondary rounded-2">Secondary</button>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-secondary fw-semibold mb-3" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em">Tamanhos & Ícones</p>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <button class="btn btn-primary btn-sm rounded-2"><i class="bi bi-plus me-1"></i>Pequeno</button>
+            <button class="btn btn-primary rounded-2"><i class="bi bi-plus me-1"></i>Padrão</button>
+            <button class="btn btn-primary btn-lg rounded-2"><i class="bi bi-plus me-1"></i>Grande</button>
+            <button class="btn btn-outline-primary rounded-2" disabled>Desabilitado</button>
+            <button class="btn btn-primary rounded-2 d-flex align-items-center gap-2">
+              <span class="spinner-border spinner-border-sm" role="status"></span>Carregando
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Alertas ── -->
+    <section class="py-5 bg-surface-alt">
+      <div class="container">
+        <h4 class="fw-display mb-4">Alertas</h4>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="alert alert-primary rounded-xl d-flex align-items-start gap-3 mb-0">
+              <i class="bi bi-info-circle-fill fs-5 mt-1" style="color:var(--cp-primary)"></i>
+              <div><strong>Informação.</strong> Este é um alerta primário com conteúdo de exemplo.</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="alert alert-success rounded-xl d-flex align-items-start gap-3 mb-0">
+              <i class="bi bi-check-circle-fill fs-5 mt-1" style="color:var(--cp-success)"></i>
+              <div><strong>Sucesso!</strong> Operação realizada com êxito.</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="alert alert-warning rounded-xl d-flex align-items-start gap-3 mb-0">
+              <i class="bi bi-exclamation-triangle-fill fs-5 mt-1" style="color:var(--cp-warning)"></i>
+              <div><strong>Atenção.</strong> Verifique os dados antes de continuar.</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="alert alert-danger rounded-xl d-flex align-items-start gap-3 mb-0">
+              <i class="bi bi-x-circle-fill fs-5 mt-1" style="color:var(--cp-danger)"></i>
+              <div><strong>Erro!</strong> Algo deu errado. Tente novamente.</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="alert alert-info rounded-xl d-flex align-items-start gap-3 mb-0">
+              <i class="bi bi-lightbulb-fill fs-5 mt-1" style="color:var(--cp-info)"></i>
+              <div><strong>Dica.</strong> Você pode personalizar estes alertas facilmente.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Badges & Cards ── -->
+    <section class="py-5 bg-surface">
+      <div class="container">
+        <div class="row g-5">
+
+          <!-- Badges -->
+          <div class="col-md-6">
+            <h4 class="fw-display mb-4">Badges</h4>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <span class="badge bg-primary rounded-pill">Primary</span>
+              <span class="badge bg-success rounded-pill">Success</span>
+              <span class="badge bg-info rounded-pill">Info</span>
+              <span class="badge bg-warning rounded-pill">Warning</span>
+              <span class="badge bg-danger rounded-pill">Danger</span>
+              <span class="badge bg-secondary rounded-pill">Secondary</span>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge rounded-pill border border-primary text-primary bg-transparent">Outline</span>
+              <span class="badge rounded-pill border border-success text-success bg-transparent">Outline</span>
+              <span class="badge rounded-pill border border-danger text-danger bg-transparent">Outline</span>
+              <span class="badge rounded-pill" style="background:var(--petrol-subtle);color:var(--petrol-dark)">Sutil</span>
+            </div>
+          </div>
+
+          <!-- Texto e links -->
+          <div class="col-md-6">
+            <h4 class="fw-display mb-4">Cores de Texto & Links</h4>
+            <p class="text-primary fw-semibold">Link primário — azul petróleo</p>
+            <p class="text-success fw-semibold">Texto de sucesso — verde jade</p>
+            <p class="text-info fw-semibold">Texto informativo — azul safira</p>
+            <p class="text-warning fw-semibold">Texto de aviso — âmbar</p>
+            <p class="text-danger fw-semibold">Texto de erro — vermelho vinho</p>
+            <p class="text-secondary mb-0">Texto secundário / mutado</p>
+          </div>
+
+          <!-- Feature Cards -->
+          <div class="col-12">
+            <h4 class="fw-display mb-4">Cards de Funcionalidades</h4>
+            <div class="row g-4">
+              <div class="col-sm-6 col-lg-3">
+                <div class="card-petrol p-4 h-100">
+                  <div class="feature-icon bg-petrol-subtle text-primary mb-3">
+                    <i class="bi bi-shield-check"></i>
+                  </div>
+                  <h6 class="fw-display mb-2">Segurança</h6>
+                  <p class="text-secondary mb-3" style="font-size:.875rem">Proteção avançada com criptografia de ponta a ponta.</p>
+                  <a href="#" class="text-primary fw-semibold" style="font-size:.875rem">Saiba mais <i class="bi bi-arrow-right"></i></a>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="card-petrol p-4 h-100">
+                  <div class="feature-icon mb-3 rounded-xl" style="background:#e5f6ef;color:var(--cp-success)">
+                    <i class="bi bi-graph-up-arrow"></i>
+                  </div>
+                  <h6 class="fw-display mb-2">Analytics</h6>
+                  <p class="text-secondary mb-3" style="font-size:.875rem">Relatórios em tempo real com insights inteligentes.</p>
+                  <a href="#" class="fw-semibold" style="font-size:.875rem;color:var(--cp-success)">Saiba mais <i class="bi bi-arrow-right"></i></a>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="card-petrol p-4 h-100">
+                  <div class="feature-icon mb-3 rounded-xl" style="background:#e8f1fb;color:var(--cp-info)">
+                    <i class="bi bi-plug"></i>
+                  </div>
+                  <h6 class="fw-display mb-2">Integrações</h6>
+                  <p class="text-secondary mb-3" style="font-size:.875rem">Conecte com mais de 200 ferramentas e plataformas.</p>
+                  <a href="#" class="fw-semibold" style="font-size:.875rem;color:var(--cp-info)">Saiba mais <i class="bi bi-arrow-right"></i></a>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="card-petrol p-4 h-100 border-start border-4 border-warning">
+                  <div class="feature-icon mb-3 rounded-xl" style="background:#fdf3e3;color:var(--cp-warning)">
+                    <i class="bi bi-bell"></i>
+                  </div>
+                  <h6 class="fw-display mb-2">Notificações</h6>
+                  <p class="text-secondary mb-3" style="font-size:.875rem">Alertas configuráveis por canal e prioridade.</p>
+                  <a href="#" class="fw-semibold" style="font-size:.875rem;color:var(--cp-warning)">Saiba mais <i class="bi bi-arrow-right"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulário -->
+          <div class="col-lg-8">
+            <h4 class="fw-display mb-4">Formulário</h4>
+            <div class="card-petrol p-4">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold" style="font-size:.85rem">Nome completo</label>
+                  <input type="text" class="form-control rounded-2" placeholder="João da Silva" style="border-color:var(--border-color)">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold" style="font-size:.85rem">E-mail</label>
+                  <input type="email" class="form-control rounded-2 is-valid" placeholder="joao@email.com" style="border-color:var(--border-color)">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold" style="font-size:.85rem">Categoria</label>
+                  <select class="form-select rounded-2" style="border-color:var(--border-color)">
+                    <option>Selecionar...</option>
+                    <option>Empresa</option>
+                    <option>Freelancer</option>
+                    <option>Educação</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold" style="font-size:.85rem">Telefone</label>
+                  <input type="text" class="form-control rounded-2 is-invalid" placeholder="(11) 99999-9999" style="border-color:var(--border-color)">
+                  <div class="invalid-feedback">Número inválido.</div>
+                </div>
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="termos" checked>
+                    <label class="form-check-label" for="termos" style="font-size:.875rem">
+                      Concordo com os <a href="#" class="text-primary fw-semibold">Termos de Uso</a> e <a href="#" class="text-primary fw-semibold">Política de Privacidade</a>.
+                    </label>
+                  </div>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                  <button class="btn btn-primary rounded-2 fw-semibold px-4">Enviar</button>
+                  <button class="btn btn-outline-secondary rounded-2">Cancelar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress & Misc -->
+          <div class="col-lg-4">
+            <h4 class="fw-display mb-4">Progresso & Misc</h4>
+            <div class="card-petrol p-4">
+              <p class="fw-semibold mb-1" style="font-size:.85rem">Armazenamento</p>
+              <div class="progress rounded-pill mb-3" style="height:8px;background:var(--surface-alt)">
+                <div class="progress-bar bg-primary" style="width:68%"></div>
+              </div>
+              <p class="fw-semibold mb-1" style="font-size:.85rem">Performance</p>
+              <div class="progress rounded-pill mb-3" style="height:8px;background:var(--surface-alt)">
+                <div class="progress-bar bg-success" style="width:82%"></div>
+              </div>
+              <p class="fw-semibold mb-1" style="font-size:.85rem">Alertas</p>
+              <div class="progress rounded-pill mb-4" style="height:8px;background:var(--surface-alt)">
+                <div class="progress-bar bg-warning" style="width:35%"></div>
+              </div>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-petrol-subtle text-primary border border-primary" style="font-size:.8rem;padding:.45rem .8rem"><i class="bi bi-check2 me-1"></i>Ativo</span>
+                <span class="badge bg-petrol-subtle text-secondary border" style="font-size:.8rem;padding:.45rem .8rem;border-color:var(--border-color)!important"><i class="bi bi-pause me-1"></i>Pausado</span>
+                <span class="badge" style="font-size:.8rem;padding:.45rem .8rem;background:var(--petrol-subtle);color:var(--petrol-dark);border:1px solid var(--petrol-muted)"><i class="bi bi-clock me-1"></i>Pendente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA ── -->
+    <section class="py-5 bg-petrol">
+      <div class="container text-center py-3">
+        <h2 class="fw-display text-white mb-3">Pronto para começar?</h2>
+        <p class="mb-4" style="color:rgba(255,255,255,.75);max-width:500px;margin:0 auto 1.5rem">
+          Explore todos os componentes e personalize conforme a identidade do seu projeto.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <button class="btn btn-light fw-semibold px-4 rounded-2">Criar conta grátis</button>
+          <button class="btn btn-auth px-4 rounded-2">Ver documentação</button>
+        </div>
+      </div>
+    </section>
+    {% endblock conteudo %}
+
+  </main>
+
+  <!-- ═══════════════════════════════════
+       FOOTER
+  ════════════════════════════════════ -->
+  <footer class="py-5">
+    <div class="container">
+      <div class="row g-4 pb-4">
+        <div class="col-lg-4">
+          <div class="footer-brand mb-2"><span style="color:var(--petrol-lighter)">●</span> Petróleo UI</div>
+          <p style="max-width:280px;line-height:1.7">Template Bootstrap 5 moderno com paleta de azul petróleo. Responsivo, minimalista e pronto para produção.</p>
+          <div class="footer-social d-flex gap-2 mt-3">
+            <a href="#"><i class="bi bi-github"></i></a>
+            <a href="#"><i class="bi bi-twitter-x"></i></a>
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+            <a href="#"><i class="bi bi-discord"></i></a>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="footer-heading">Produto</div>
+          <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+            <li><a href="#">Funcionalidades</a></li>
+            <li><a href="#">Preços</a></li>
+            <li><a href="#">Changelog</a></li>
+            <li><a href="#">Roadmap</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="footer-heading">Empresa</div>
+          <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+            <li><a href="#">Sobre nós</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Carreiras</a></li>
+            <li><a href="#">Contato</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="footer-heading">Recursos</div>
+          <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+            <li><a href="#">Documentação</a></li>
+            <li><a href="#">API Reference</a></li>
+            <li><a href="#">Componentes</a></li>
+            <li><a href="#">Templates</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="footer-heading">Legal</div>
+          <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+            <li><a href="#">Privacidade</a></li>
+            <li><a href="#">Termos de Uso</a></li>
+            <li><a href="#">Cookies</a></li>
+            <li><a href="#">Licença</a></li>
+          </ul>
+        </div>
+      </div>
+      <hr />
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 pt-2">
+        <span style="font-size:.8rem">© 2026 Petróleo UI. Todos os direitos reservados.</span>
+        <div class="d-flex gap-3" style="font-size:.8rem">
+          <a href="#">Status</a>
+          <a href="#">Suporte</a>
+          <a href="#">Acessibilidade</a>
+        </div>
+      </div>
     </div>
-    {% endblock menuLateral %}
+  </footer>
 
-    <div class="conteudo">
-
-        {% block conteudo %}
-        <h3>Bem vind ao sistema</h3>
-        <p>uahs dua hsidsa hdiusa hiusa hdsad h</p>
-        {% endblock conteudo %}
-
+  <!-- ═══════════════════════════════════
+       MODAL LOGIN/CADASTRO
+  ════════════════════════════════════ -->
+  <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-2xl border-0 shadow-lg overflow-hidden">
+        <div class="modal-body p-0">
+          <!-- Tabs -->
+          <ul class="nav nav-pills p-3 pb-0 gap-1" id="authTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-semibold px-4 rounded-2" id="login-tab"
+                      data-bs-toggle="tab" data-bs-target="#login" type="button">
+                Entrar
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-semibold px-4 rounded-2" id="register-tab"
+                      data-bs-toggle="tab" data-bs-target="#register" type="button">
+                Cadastrar
+              </button>
+            </li>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button>
+          </ul>
+          <div class="tab-content p-4 pt-3">
+            <!-- Login -->
+            <div class="tab-pane fade show active" id="login" role="tabpanel">
+              <p class="text-secondary mb-4" style="font-size:.875rem">Acesse sua conta para continuar.</p>
+              <div class="mb-3">
+                <label class="form-label fw-semibold" style="font-size:.85rem">E-mail</label>
+                <input type="email" class="form-control rounded-2" placeholder="seu@email.com">
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-semibold d-flex justify-content-between" style="font-size:.85rem">
+                  Senha <a href="#" class="text-primary" style="font-weight:400">Esqueci a senha</a>
+                </label>
+                <input type="password" class="form-control rounded-2" placeholder="••••••••">
+              </div>
+              <button class="btn btn-primary w-100 rounded-2 fw-semibold py-2" onclick="simulateLogin()">
+                Entrar na conta
+              </button>
+            </div>
+            <!-- Cadastro -->
+            <div class="tab-pane fade" id="register" role="tabpanel">
+              <p class="text-secondary mb-4" style="font-size:.875rem">Crie sua conta gratuitamente.</p>
+              <div class="mb-3">
+                <label class="form-label fw-semibold" style="font-size:.85rem">Nome completo</label>
+                <input type="text" class="form-control rounded-2" placeholder="João da Silva">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold" style="font-size:.85rem">E-mail</label>
+                <input type="email" class="form-control rounded-2" placeholder="seu@email.com">
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-semibold" style="font-size:.85rem">Senha</label>
+                <input type="password" class="form-control rounded-2" placeholder="••••••••">
+              </div>
+              <button class="btn btn-primary w-100 rounded-2 fw-semibold py-2" onclick="simulateLogin()">
+                Criar conta
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="rodape">
-        <p>Desenvolvido por Rafael Zotteso</p>
-    </div>
-    
+  <!-- jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ─── Nav pills color override
+    document.querySelectorAll('#authTab .nav-link').forEach(el => {
+      el.style.setProperty('--bs-nav-pills-link-active-bg', 'var(--cp-primary)');
+    });
+
+    // ─── Toggle auth state (demo)
+    function toggleAuth() {
+      const guest = document.getElementById('authGuest');
+      const user  = document.getElementById('authUser');
+      guest.classList.toggle('d-none');
+      user.classList.toggle('d-none');
+
+      // close modal if open
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalLogin'));
+      if (modal) modal.hide();
+    }
+
+    function simulateLogin() {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalLogin'));
+      if (modal) modal.hide();
+      document.getElementById('authGuest').classList.add('d-none');
+      document.getElementById('authUser').classList.remove('d-none');
+    }
+
+    // ─── Nav active highlight on scroll (basic)
+    $(document).ready(function () {
+      // Smooth scroll for anchor links
+      $('a[href^="#"]').on('click', function (e) {
+        const target = $(this.getAttribute('href'));
+        if (target.length) {
+          e.preventDefault();
+          $('html, body').stop().animate({ scrollTop: target.offset().top - 70 }, 450, 'swing');
+        }
+      });
+
+      // Nav pills active color
+      $('#authTab').on('show.bs.tab', function (e) {
+        $(e.target).css('background-color', 'var(--cp-primary)');
+        $(e.relatedTarget).css('background-color', '');
+      });
+    });
+  </script>
 </body>
 </html>

@@ -2,12 +2,311 @@
 
 {% load static %}
 
-{% block menuLateral %}
-
-{% endblock menuLateral %}
-
-
+{% block hero %}
+<!-- ── Hero: Sobre ── -->
+<section class="hero py-5 py-lg-6">
+  <div class="hero-noise"></div>
+  <div class="container py-4 py-lg-5 position-relative">
+    <div class="row align-items-center gy-4">
+      <div class="col-lg-8">
+        <span class="badge bg-petrol-subtle text-primary fw-semibold px-3 py-2 rounded-pill mb-3 d-inline-block" style="font-size:.75rem; letter-spacing:.05em;">
+          <i class="bi bi-controller me-1"></i> Competição & Comunidade
+        </span>
+        <h1 class="display-3 fw-display text-white mb-3">
+          Elevando o E-Sports<br>
+          <span style="color: var(--petrol-lighter);">no IFPR</span>
+        </h1>
+        <p class="mb-4" style="color: rgba(255,255,255,.8); font-size:1.05rem; max-width:580px; line-height:1.8">
+          Uma plataforma completa para gerenciar campeonatos de jogos eletrônicos. Crie torneios, inscreva equipes, organize modalidades e conecte talentos. Tudo em um só lugar.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{% url "index" %}" class="btn btn-light fw-semibold px-4 rounded-2">
+            <i class="bi bi-arrow-right me-1"></i>Explorar Campeonatos
+          </a>
+          <a href="{% url "contato" %}" class="btn btn-auth px-4 rounded-2">
+            <i class="bi bi-envelope me-1"></i>Entrar em Contato
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 d-none d-lg-flex justify-content-end">
+        <!-- Decorative card mockup -->
+        <div class="p-4 rounded-2xl" style="background:rgba(45,158,107,.15); backdrop-filter:blur(12px); border:2px solid rgba(45,158,107,.3); width:280px;">
+          <div class="text-center">
+            <div style="font-size:3rem; margin-bottom:1rem">🎮</div>
+            <p style="color:rgba(255,255,255,.9); font-weight:600; margin-bottom:.5rem">Gerenciar Campeonatos</p>
+            <p style="color:rgba(255,255,255,.6); font-size:.85rem; margin-bottom:1rem">Crie e organize torneios com facilidade</p>
+            <div class="d-flex gap-2 justify-content-center">
+              <span class="badge bg-success rounded-pill">Teams</span>
+              <span class="badge bg-info rounded-pill">Scores</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock hero %}
 
 {% block conteudo %}
-<h3>Página Sobre nós</h3>
+
+<!-- ── Missão e Visão ── -->
+<section class="py-5 py-lg-6 bg-surface">
+  <div class="container">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-6">
+        <h2 class="fw-display mb-3">Nossa Missão</h2>
+        <p class="text-secondary mb-4" style="font-size:1.05rem; line-height:1.8;">
+          Conectar gamers do IFPR em uma comunidade vibrante, promovendo competições justas e inclusivas que revelam novos talentos em esportes eletrônicos.
+        </p>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="d-flex gap-3">
+              <div class="feature-icon bg-primary bg-opacity-10">
+                <i class="bi bi-trophy text-primary fs-5"></i>
+              </div>
+              <div>
+                <h6 class="fw-semibold mb-1">Competições Justas</h6>
+                <p class="text-secondary mb-0" style="font-size:.9rem">Sistema equitativo para todos</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="d-flex gap-3">
+              <div class="feature-icon bg-success bg-opacity-10">
+                <i class="bi bi-people-fill text-success fs-5"></i>
+              </div>
+              <div>
+                <h6 class="fw-semibold mb-1">Comunidade Ativa</h6>
+                <p class="text-secondary mb-0" style="font-size:.9rem">Conheça outros players</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card-petrol p-5 bg-gradient" style="background: linear-gradient(135deg, var(--petrol-subtle) 0%, #e8f1fb 100%);">
+          <div class="text-center">
+            <div style="font-size:4rem; margin-bottom:1.5rem">🚀</div>
+            <h3 class="fw-display mb-2" style="color:var(--petrol-dark)">Transformando Talentos</h3>
+            <p style="color:var(--text-muted); line-height:1.7">
+              Somos uma plataforma dedicada a reveladores e nurturadores de novos talentos em games dentro do Instituto Federal do Paraná.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Recursos Principais ── -->
+<section class="py-5 py-lg-6 bg-surface-alt">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-display mb-3">O Que Você Pode Fazer</h2>
+      <p class="text-secondary" style="font-size:1.05rem; max-width:500px; margin:0 auto">
+        Tudo que você precisa para gerenciar e participar de campeonatos de e-sports
+      </p>
+    </div>
+    
+    <div class="row g-4">
+      <!-- Card 1 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card-petrol p-4 h-100 text-center">
+          <div class="feature-icon bg-primary bg-opacity-10 mx-auto mb-3">
+            <i class="bi bi-calendar-check fs-4 text-primary"></i>
+          </div>
+          <h5 class="fw-display mb-2">Criar Campeonatos</h5>
+          <p class="text-secondary mb-0" style="font-size:.9rem">
+            Organize torneios com diferentes modalidades e regras personalizadas
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card-petrol p-4 h-100 text-center">
+          <div class="feature-icon bg-success bg-opacity-10 mx-auto mb-3">
+            <i class="bi bi-person-plus-fill fs-4 text-success"></i>
+          </div>
+          <h5 class="fw-display mb-2">Inscrever Jogadores</h5>
+          <p class="text-secondary mb-0" style="font-size:.9rem">
+            Registre seus companheiros e forme equipes para competir
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card-petrol p-4 h-100 text-center">
+          <div class="feature-icon bg-info bg-opacity-10 mx-auto mb-3">
+            <i class="bi bi-bar-chart-line fs-4 text-info"></i>
+          </div>
+          <h5 class="fw-display mb-2">Acompanhar Resultados</h5>
+          <p class="text-secondary mb-0" style="font-size:.9rem">
+            Visualize placar, rankings e desempenho em tempo real
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card-petrol p-4 h-100 text-center">
+          <div class="feature-icon bg-warning bg-opacity-10 mx-auto mb-3">
+            <i class="bi bi-chat-dots-fill fs-4 text-warning"></i>
+          </div>
+          <h5 class="fw-display mb-2">Conectar Comunidade</h5>
+          <p class="text-secondary mb-0" style="font-size:.9rem">
+            Conheça gamers, forma alianças e cresça junto à comunidade
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Como Funciona ── -->
+<section class="py-5 py-lg-6 bg-surface">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-display mb-3">Começar é Fácil</h2>
+    </div>
+    
+    <div class="row g-4 align-items-stretch">
+      <!-- Passo 1 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card-petrol p-4 h-100 border-start border-4 border-primary">
+          <div class="badge bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:40px; height:40px; font-weight:700">1</div>
+          <h5 class="fw-display mb-2">Crie sua Conta</h5>
+          <p class="text-secondary mb-0" style="font-size:.9rem">
+            Registre-se rapidamente e acesse a plataforma
+          </p>
+        </div>
+      </div>
+
+      <!-- Passo 2 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card-petrol p-4 h-100 border-start border-4 border-success">
+          <div class="badge bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:40px; height:40px; font-weight:700">2</div>
+          <h5 class="fw-display mb-2">Escolha um Torneio</h5>
+          <p class="text-secondary mb-0" style="font-size:.9rem">
+            Explore campeonatos abertos para participar
+          </p>
+        </div>
+      </div>
+
+      <!-- Passo 3 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card-petrol p-4 h-100 border-start border-4 border-info">
+          <div class="badge bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:40px; height:40px; font-weight:700">3</div>
+          <h5 class="fw-display mb-2">Inscreva sua Equipe</h5>
+          <p class="text-secondary mb-0" style="font-size:.9rem">
+            Reúna seus companheiros e registre-se
+          </p>
+        </div>
+      </div>
+
+      <!-- Passo 4 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card-petrol p-4 h-100 border-start border-4 border-warning">
+          <div class="badge bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:40px; height:40px; font-weight:700">4</div>
+          <h5 class="fw-display mb-2">Compita e Vença</h5>
+          <p class="text-secondary mb-0" style="font-size:.9rem">
+            Participe do torneio e prove seu talento
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Números & Impacto ── -->
+<section class="py-5 py-lg-6 bg-petrol">
+  <div class="container">
+    <div class="row text-center g-4">
+      <div class="col-sm-6 col-lg-3">
+        <div>
+          <h3 class="fw-display text-white mb-1" style="font-size:2.5rem">8+</h3>
+          <p style="color:rgba(255,255,255,.7); font-size:.95rem">Campeonatos Anuais</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div>
+          <h3 class="fw-display text-white mb-1" style="font-size:2.5rem">200+</h3>
+          <p style="color:rgba(255,255,255,.7); font-size:.95rem">Jogadores Inscritos</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div>
+          <h3 class="fw-display text-white mb-1" style="font-size:2.5rem">15+</h3>
+          <p style="color:rgba(255,255,255,.7); font-size:.95rem">Jogos Diferentes</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div>
+          <h3 class="fw-display text-white mb-1" style="font-size:2.5rem">∞</h3>
+          <p style="color:rgba(255,255,255,.7); font-size:.95rem">Possibilidades</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Sobre o IFPR ── -->
+<section class="py-5 py-lg-6 bg-surface-alt">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <h2 class="fw-display mb-3">Parte do IFPR</h2>
+        <p class="text-secondary mb-4" style="font-size:1.05rem; line-height:1.8;">
+          O Instituto Federal do Paraná é uma instituição de ensino públicadedicada à formação profissional e tecnológica. Esta plataforma de e-sports reforça nosso compromisso com inovação, inclusão e desenvolvimento de talentos.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge bg-petrol-subtle text-primary border border-primary" style="font-size:.85rem; padding:.55rem 1rem">
+            <i class="bi bi-mortarboard me-1"></i>Educação
+          </span>
+          <span class="badge bg-petrol-subtle text-primary border border-primary" style="font-size:.85rem; padding:.55rem 1rem">
+            <i class="bi bi-lightning-charge me-1"></i>Inovação
+          </span>
+          <span class="badge bg-petrol-subtle text-primary border border-primary" style="font-size:.85rem; padding:.55rem 1rem">
+            <i class="bi bi-handshake me-1"></i>Comunidade
+          </span>
+          <span class="badge bg-petrol-subtle text-primary border border-primary" style="font-size:.85rem; padding:.55rem 1rem">
+            <i class="bi bi-star me-1"></i>Excelência
+          </span>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card-petrol p-5">
+          <blockquote class="mb-0" style="border-left:4px solid var(--cp-primary); padding-left:1.5rem;">
+            <p class="fw-semibold mb-3 text-primary" style="font-size:1.1rem">
+              "A tecnologia e o esporte eletrônico representam o futuro da educação profissional."
+            </p>
+            <footer class="text-secondary" style="font-size:.9rem">
+              — IFPR — Instituto Federal do Paraná
+            </footer>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA Final ── -->
+<section class="py-5 py-lg-6 bg-petrol-darker">
+  <div class="container text-center">
+    <h2 class="fw-display text-white mb-3">Pronto para Jogar?</h2>
+    <p class="mb-4" style="color:rgba(255,255,255,.75); font-size:1.05rem; max-width:500px; margin:0 auto">
+      Inscreva-se agora e participe dos maiores campeonatos de e-sports do IFPR.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{% url "index" %}" class="btn btn-light fw-semibold px-5 rounded-2">
+        <i class="bi bi-play-fill me-1"></i>Explorar Agora
+      </a>
+      <a href="{% url "contato" %}" class="btn btn-auth px-5 rounded-2">
+        <i class="bi bi-question-circle me-1"></i>Dúvidas?
+      </a>
+    </div>
+  </div>
+</section>
+
 {% endblock conteudo %}
