@@ -19,7 +19,9 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
     # Importar urls dos apps
     path("", include("website.urls")),
+    path("campeonato/", include("campeonato.urls")),
 
 ]
