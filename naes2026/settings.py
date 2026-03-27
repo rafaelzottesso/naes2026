@@ -42,8 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Ativar meus apps
-    "website.apps.WebsiteConfig",
+    'website.apps.WebsiteConfig',
     'campeonato.apps.CampeonatoConfig',
+
+    # Ativar o crispy forms para renderiar os forms
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -137,7 +141,15 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [ BASE_DIR / "static" ]
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Configurações do crispy-forms e do crispy-bootstrap5
+# https://pypi.org/project/crispy-bootstrap5/
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"

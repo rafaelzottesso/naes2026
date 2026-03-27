@@ -1,0 +1,24 @@
+{% extends "website/modelo.html" %}
+
+{% block hero %}
+{% endblock hero %}
+
+{% block conteudo %}
+<section class="py-5 py-lg-6 bg-surface">
+  <div class="container">
+    <h3 class="text-center border-bottom pb-2 mb-4">{{ titulo }}</h3>
+
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <p class="mb-0 fs-5">{{ object }}</p>
+            <hr>
+            <p class="text-muted mb-0">ID: {{ object.pk }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock conteudo %}
