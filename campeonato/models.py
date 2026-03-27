@@ -9,12 +9,19 @@ class Campus(models.Model):
     def __str__(self):
         return f"{self.nome}"
     
+    class Meta:
+        verbose_name_plural = "Campi"
+        ordering = ['nome']
+    
     
 class Modalidade(models.Model):
     nome = models.CharField(max_length=60, help_text="Exemplo: LOL, CS, Fifa, etc.")
 
     def __str__(self):
         return f"{self.nome}"
+    
+    class Meta:
+        ordering = ['nome']
     
 
 class Etapa(models.Model):
