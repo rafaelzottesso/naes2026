@@ -12,7 +12,7 @@
     <h3 class="text-center border-bottom pb-2 mb-4">{{ titulo }}</h3>
 
     <div class="row justify-content-center">
-      <div class="col-md-6">
+      <div class="col-md-{{ largura|default:"6" }}">
         <form method="post">
 
             {% csrf_token %}
@@ -20,7 +20,7 @@
             {{ form|crispy }}
 
 
-            {% if botao == "Sim, excluir!"%}
+            {% if botao == "Sim, excluir!" %}
 
               <h4>Deseja realmente excluir este item?</h4>
 
@@ -31,11 +31,19 @@
               <button type="submit" class="btn btn-danger">
                   {{ botao }}
               </button>
+
             {% else %}
+
               <button type="submit" class="btn btn-primary">
                   {{ botao }}
               </button>
+
             {% endif %}
+
+            <a href="#" class="btn btn-outline-secondary" onclick="window.history.back()">
+              <i class="bi bi-arrow-left me-2"></i>
+              Voltar
+            </a>
             
         </form>
       </div>

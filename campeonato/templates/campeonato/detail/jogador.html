@@ -1,0 +1,39 @@
+{% extends "website/modelo.html" %}
+
+{% block hero %}
+{% endblock hero %}
+
+{% block conteudo %}
+<section class="py-5 py-lg-6 bg-surface">
+  <div class="container">
+    <h3 class="text-center border-bottom pb-2 mb-4">
+      Detalhes do Jogador
+    </h3>
+
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
+
+          <div class="card-body"> 
+            <p class="mb-0 fs-5"><strong>{{ object.nome }}</strong></p>
+            <hr>
+            <p class="mb-2"><strong>ID Jogador:</strong> {{ object.id_jogador }}</p>
+            <p class="mb-2"><strong>Campus:</strong> {{ object.campus.nome }}</p>
+            <p class="mb-2"><strong>Usuário:</strong> {{ object.usuario.username }}</p>
+            <p class="mb-2"><strong>Cadastrado em:</strong> {{ object.cadastrado_em|date:"d/m/Y H:i" }}</p>
+            <p class="text-muted mb-0">ID: {{ object.pk }}</p>
+          </div>
+
+          <div class="card-footer text-center">
+            <a href="#" class="btn btn-outline-secondary" onclick="window.history.back()">
+              <i class="bi bi-arrow-left me-2"></i>
+              Voltar
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock conteudo %}

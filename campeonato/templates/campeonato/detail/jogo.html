@@ -1,0 +1,54 @@
+{% extends "website/modelo.html" %}
+
+{% block hero %}
+{% endblock hero %}
+
+{% block conteudo %}
+<section class="py-5 py-lg-6 bg-surface">
+  <div class="container">
+    <h3 class="text-center border-bottom pb-2 mb-4">
+      Detalhes do Jogo
+    </h3>
+
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm">
+
+          <div class="card-body"> 
+            <p class="mb-3 fs-5 text-center">
+              <strong>{{ object.time_1.nome_time }}</strong> 
+              <span class="text-muted mx-2">vs</span> 
+              <strong>{{ object.time_2.nome_time }}</strong>
+            </p>
+            <hr>
+            {% if object.resultado %}
+            <p class="mb-2 text-center fs-6"><strong>Resultado: {{ object.resultado }}</strong></p>
+            {% endif %}
+            {% if object.vencedor %}
+            <p class="mb-2 text-center"><strong>Vencedor:</strong> 
+              <span class="badge bg-success">{{ object.vencedor.nome_time }}</span>
+            </p>
+            {% endif %}
+            <hr>
+            <p class="mb-2"><strong>Etapa:</strong> {{ object.etapa.nome }}</p>
+            <p class="mb-2"><strong>Modalidade:</strong> {{ object.modalidade.nome }}</p>
+            {% if object.data_hora %}
+            <p class="mb-2"><strong>Data/Hora:</strong> {{ object.data_hora|date:"d/m/Y H:i" }}</p>
+            {% endif %}
+            <p class="mb-2"><strong>Cadastrado por:</strong> {{ object.cadastrado_por.username }}</p>
+            <p class="text-muted mb-0">ID: {{ object.pk }}</p>
+          </div>
+
+          <div class="card-footer text-center">
+            <a href="#" class="btn btn-outline-secondary" onclick="window.history.back()">
+              <i class="bi bi-arrow-left me-2"></i>
+              Voltar
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock conteudo %}

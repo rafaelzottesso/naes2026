@@ -1,4 +1,5 @@
-from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 # Buscar a rota da url pelo name dela (urls.py)
@@ -11,7 +12,7 @@ class CampusCreate(CreateView):
     model = Campus
     fields = ['nome']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('campus-list')
     extra_context = {
         'titulo': 'Cadastro de Campus',
         'botao': 'Criar Campus'
@@ -22,7 +23,7 @@ class CampusUpdate(UpdateView):
     model = Campus
     fields = ['nome']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('campus-list')
     extra_context = {
         'titulo': 'Editar dados do Campus',
         'botao': 'Atualizar Campus'
@@ -32,7 +33,7 @@ class CampusUpdate(UpdateView):
 class CampusDelete(DeleteView):
     model = Campus
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('campus-list')
     extra_context = {
         'titulo': 'Excluir Campus',
         'botao': 'Sim, excluir!'
@@ -41,18 +42,14 @@ class CampusDelete(DeleteView):
 
 class CampusList(ListView):
     model = Campus
-    template_name = 'campeonato/list.html'
-    extra_context = {
-        'titulo': 'Lista de Campi'
-    }
+    template_name = 'campeonato/list/campus.html'
+    paginate_by = 20
 
 
 class CampusDetail(DetailView):
     model = Campus
-    template_name = 'campeonato/detail.html'
-    extra_context = {
-        'titulo': 'Detalhes do Campus'
-    }
+    template_name = 'campeonato/detail/campus.html'
+
 
 
 #########################################################
@@ -92,18 +89,12 @@ class ModalidadeDelete(DeleteView):
 
 class ModalidadeList(ListView):
     model = Modalidade
-    template_name = 'campeonato/list.html'
-    extra_context = {
-        'titulo': 'Lista de Modalidades'
-    }
+    template_name = 'campeonato/list/modalidade.html'
 
 
 class ModalidadeDetail(DetailView):
     model = Modalidade
-    template_name = 'campeonato/detail.html'
-    extra_context = {
-        'titulo': 'Detalhes da Modalidade'
-    }
+    template_name = 'campeonato/detail/modalidade.html'
 
 #########################################################
 
@@ -115,7 +106,8 @@ class EtapaCreate(CreateView):
     success_url = reverse_lazy('index')
     extra_context = {
         'titulo': 'Cadastro de Etapa',
-        'botao': 'Criar Etapa'
+        'botao': 'Criar Etapa',
+        'largura': 8
     }
 
 
@@ -142,18 +134,12 @@ class EtapaDelete(DeleteView):
 
 class EtapaList(ListView):
     model = Etapa
-    template_name = 'campeonato/list.html'
-    extra_context = {
-        'titulo': 'Lista de Etapas'
-    }
+    template_name = 'campeonato/list/etapa.html'
 
 
 class EtapaDetail(DetailView):
     model = Etapa
-    template_name = 'campeonato/detail.html'
-    extra_context = {
-        'titulo': 'Detalhes da Etapa'
-    }
+    template_name = 'campeonato/detail/etapa.html'
 
 
 class JogadorCreate(CreateView):
@@ -190,18 +176,12 @@ class JogadorDelete(DeleteView):
 
 class JogadorList(ListView):
     model = Jogador
-    template_name = 'campeonato/list.html'
-    extra_context = {
-        'titulo': 'Lista de Jogadores'
-    }
+    template_name = 'campeonato/list/jogador.html'
 
 
 class JogadorDetail(DetailView):
     model = Jogador
-    template_name = 'campeonato/detail.html'
-    extra_context = {
-        'titulo': 'Detalhes do Jogador'
-    }
+    template_name = 'campeonato/detail/jogador.html'
 
 ##########################################################
 
@@ -240,18 +220,12 @@ class CampeonatoDelete(DeleteView):
 
 class CampeonatoList(ListView):
     model = Campeonato
-    template_name = 'campeonato/list.html'
-    extra_context = {
-        'titulo': 'Lista de Campeonatos'
-    }
+    template_name = 'campeonato/list/campeonato.html'
 
 
 class CampeonatoDetail(DetailView):
     model = Campeonato
-    template_name = 'campeonato/detail.html'
-    extra_context = {
-        'titulo': 'Detalhes do Campeonato'
-    }
+    template_name = 'campeonato/detail/campeonato.html'
 
 
 class InscricaoCreate(CreateView):
@@ -288,18 +262,12 @@ class InscricaoDelete(DeleteView):
 
 class InscricaoList(ListView):
     model = Inscricao
-    template_name = 'campeonato/list.html'
-    extra_context = {
-        'titulo': 'Lista de Inscrições'
-    }
+    template_name = 'campeonato/list/inscricao.html'
 
 
 class InscricaoDetail(DetailView):
     model = Inscricao
-    template_name = 'campeonato/detail.html'
-    extra_context = {
-        'titulo': 'Detalhes da Inscrição'
-    }
+    template_name = 'campeonato/detail/inscricao.html'
 
 
 class JogoCreate(CreateView):
@@ -336,15 +304,9 @@ class JogoDelete(DeleteView):
 
 class JogoList(ListView):
     model = Jogo
-    template_name = 'campeonato/list.html'
-    extra_context = {
-        'titulo': 'Lista de Jogos'
-    }
+    template_name = 'campeonato/list/jogo.html'
 
 
 class JogoDetail(DetailView):
     model = Jogo
-    template_name = 'campeonato/detail.html'
-    extra_context = {
-        'titulo': 'Detalhes do Jogo'
-    }
+    template_name = 'campeonato/detail/jogo.html'
