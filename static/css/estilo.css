@@ -57,7 +57,7 @@
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      font-size: 15px;
+      font-size: 20px;
       line-height: 1.65;
     }
 
@@ -150,7 +150,7 @@
     .navbar-petrol .nav-link {
       color: rgba(255,255,255,.72) !important;
       font-weight: 500;
-      font-size: .875rem;
+      font-size: 1.1rem;
       padding: .45rem .75rem !important;
       border-radius: .375rem;
       transition: color .18s, background .18s;
@@ -176,7 +176,7 @@
     .navbar-petrol .dropdown-item {
       border-radius: .45rem;
       padding: .5rem .85rem;
-      font-size: .875rem;
+      font-size: 1rem;
       color: var(--text-body);
       font-weight: 500;
       transition: background .15s, color .15s;
