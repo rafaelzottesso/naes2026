@@ -1,0 +1,79 @@
+{% extends "website/modelo.html" %}
+
+{% block hero %}
+{% endblock hero %}
+
+{% block conteudo %}
+<section class="py-5 py-lg-6 bg-surface">
+  <div class="container">
+    <h3 class="text-center border-bottom pb-2 mb-4">
+      <span>Lista de Modalidades cadastradas</span>
+
+      <span class="float-end">
+        <a href="{% url "modalidade-create" %}" class="btn btn-success btn-sm">
+          <i class="bi bi-plus-lg"></i>
+        </a>
+
+      </span>
+    </h3>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for modalidade in object_list %}
+            <tr>
+              <td>{{ modalidade.pk }}</td>
+              <td>{{ modalidade.nome }}</td>
+              <td class="text-center">
+                <div class="dropdown">
+                  <a href="#" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </a>
+                  <ul class="dropdown-menu">
+
+                    <li><a class="dropdown-item" href="{% url "modalidade-detail" modalidade.pk %}">
+                      <i class="bi bi-zoom-in me-2"></i>
+                      Ver
+                    </a></li>
+
+                    <li><a class="dropdown-item" href="{% url "modalidade-update" modalidade.pk %}">
+                      <i class="bi bi-pencil-square text-primary me-2"></i>
+                      Editar
+                    </a></li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li><a class="dropdown-item text-danger" href="{% url "modalidade-delete" modalidade.pk %}">
+                      <i class="bi bi-trash3 me-2"></i>
+                      Excluir
+                    </a></li>
+
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" class="text-center text-muted">
+                Nenhuma modalidade cadastrada
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock conteudo %}
