@@ -1,44 +1,57 @@
-{% extends "website/modelo.html" %}
+{% extends "website/modelo2.html" %}
 
-{% block hero %}
-{% endblock hero %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'campeonato-list' %}">Campeonatos</a></li>
+<li class="breadcrumb-item active" aria-current="page">Detalhes</li>
+{% endblock breadcrumb %}
 
-{% block conteudo %}
-<section class="py-5 py-lg-6 bg-surface">
-  <div class="container">
-    <h3 class="text-center border-bottom pb-2 mb-4">
-      Detalhes do Campeonato
-    </h3>
-
-    <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-7">
-        <div class="card shadow-sm">
-
-          <div class="card-body"> 
-            <p class="mb-0 fs-5"><strong>{{ object.nome }}</strong></p>
-            <hr>
-            <p class="mb-2"><strong>Campus:</strong> {{ object.campus.nome }}</p>
-            <p class="mb-2"><strong>Data:</strong> {{ object.data|date:"d/m/Y" }}</p>
-            <p class="mb-2"><strong>Data de Inscrição:</strong> {{ object.data_inscricao|date:"d/m/Y H:i" }}</p>
-            <p class="mb-2"><strong>Modalidades:</strong> 
-              {% for modalidade in object.modalidades.all %}
-                <span class="badge bg-primary">{{ modalidade.nome }}</span>
-              {% endfor %}
-            </p>
-            <p class="mb-2"><strong>Cadastrado por:</strong> {{ object.cadastrado_por.username }}</p>
-            <p class="text-muted mb-0">ID: {{ object.pk }}</p>
-          </div>
-
-          <div class="card-footer text-center">
-            <a href="#" class="btn btn-outline-secondary" onclick="window.history.back()">
-              <i class="bi bi-arrow-left me-2"></i>
-              Voltar
-            </a>
-          </div>
-
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-gradient-primary text-white py-3">
+                <h4 class="mb-0 fs-5 stencil d-flex align-items-center"><i class="bi bi-trophy me-2 fs-4"></i>Detalhes do Campeonato</h4>
+            </div>
+            <div class="card-body p-4">
+                <p class="mb-3 fs-5"><strong>Nome:</strong> {{ object.nome }}</p>
+                <hr class="text-muted">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Campus</p>
+                        <p class="mb-0">{{ object.campus.nome }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Data Realização</p>
+                        <p class="mb-0">{{ object.data|date:"d/m/Y" }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Período de Inscrição</p>
+                        <p class="mb-0">{{ object.data_inscricao|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Modalidades</p>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% for modalidade in object.modalidades.all %}
+                                <span class="badge bg-primary">{{ modalidade.nome }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Registrado por</p>
+                        <p class="mb-0">{{ object.cadastrado_por.username }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Identificador</p>
+                        <p class="mb-0 font-monospace text-muted">#{{ object.pk }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light p-3 text-center">
+                <a href="#" class="btn btn-outline-secondary px-4" onclick="window.history.back()">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</section>
-{% endblock conteudo %}
+</div>
+{% endblock content %}

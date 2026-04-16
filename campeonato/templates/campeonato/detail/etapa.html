@@ -1,37 +1,40 @@
-{% extends "website/modelo.html" %}
+{% extends "website/modelo2.html" %}
 
-{% block hero %}
-{% endblock hero %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'etapa-list' %}">Etapas</a></li>
+<li class="breadcrumb-item active" aria-current="page">Detalhes</li>
+{% endblock breadcrumb %}
 
-{% block conteudo %}
-<section class="py-5 py-lg-6 bg-surface">
-  <div class="container">
-    <h3 class="text-center border-bottom pb-2 mb-4">
-      Detalhes da Etapa
-    </h3>
-
-    <div class="row justify-content-center">
-      <div class="col-md-7 col-lg-6">
-        <div class="card shadow-sm">
-
-          <div class="card-body"> 
-            <p class="mb-0 fs-5"><strong>{{ object.nome }}</strong></p>
-            <hr>
-            <p class="mb-2"><strong>Sequência:</strong> {{ object.sequencia }}</p>
-            <p class="mb-2"><strong>Quantidade de Jogos:</strong> {{ object.quantidade_jogos }}</p>
-            <p class="text-muted mb-0">ID: {{ object.pk }}</p>
-          </div>
-
-          <div class="card-footer text-center">
-            <a href="#" class="btn btn-outline-secondary" onclick="window.history.back()">
-              <i class="bi bi-arrow-left me-2"></i>
-              Voltar
-            </a>
-          </div>
-
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-gradient-primary text-white py-3">
+                <h4 class="mb-0 fs-5 stencil d-flex align-items-center"><i class="bi bi-calendar-event me-2 fs-4"></i>Detalhes da Etapa</h4>
+            </div>
+            <div class="card-body p-4">
+                <h4 class="mb-3">{{ object.nome }}</h4>
+                <hr class="text-muted">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Sequência</p>
+                        <p class="mb-0 fs-5">{{ object.sequencia }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Qtd. de Jogos</p>
+                        <p class="mb-0 fs-5">{{ object.quantidade_jogos }}</p>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <p class="text-muted small font-monospace">Referência: #{{ object.pk }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light p-3 text-center">
+                <a href="#" class="btn btn-outline-secondary px-4" onclick="window.history.back()">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</section>
-{% endblock conteudo %}
+</div>
+{% endblock content %}

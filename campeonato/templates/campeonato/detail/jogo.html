@@ -1,54 +1,74 @@
-{% extends "website/modelo.html" %}
+{% extends "website/modelo2.html" %}
 
-{% block hero %}
-{% endblock hero %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'jogo-list' %}">Jogos</a></li>
+<li class="breadcrumb-item active" aria-current="page">Detalhes</li>
+{% endblock breadcrumb %}
 
-{% block conteudo %}
-<section class="py-5 py-lg-6 bg-surface">
-  <div class="container">
-    <h3 class="text-center border-bottom pb-2 mb-4">
-      Detalhes do Jogo
-    </h3>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-gradient-primary text-white py-3">
+                <h4 class="mb-0 fs-5 stencil d-flex align-items-center justify-content-center"><i class="bi bi-controller me-2 fs-4"></i>Match Detail</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-around align-items-center mb-4 text-center">
+                    <div style="flex:1">
+                        <div class="bg-light rounded-pill p-3 mb-2 mx-auto" style="width:fit-content">
+                            <i class="bi bi-shield-fill fs-2"></i>
+                        </div>
+                        <h4 class="mb-0">{{ object.time_1.nome_time }}</h4>
+                        <span class="text-muted small">Time A</span>
+                    </div>
+                    <div class="px-4">
+                        <div class="display-6 fw-bold">VS</div>
+                    </div>
+                    <div style="flex:1">
+                        <div class="bg-light rounded-pill p-3 mb-2 mx-auto" style="width:fit-content">
+                            <i class="bi bi-shield-fill fs-2"></i>
+                        </div>
+                        <h4 class="mb-0">{{ object.time_2.nome_time }}</h4>
+                        <span class="text-muted small">Time B</span>
+                    </div>
+                </div>
 
-    <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-7">
-        <div class="card shadow-sm">
+                <hr class="text-muted opacity-25">
 
-          <div class="card-body"> 
-            <p class="mb-3 fs-5 text-center">
-              <strong>{{ object.time_1.nome_time }}</strong> 
-              <span class="text-muted mx-2">vs</span> 
-              <strong>{{ object.time_2.nome_time }}</strong>
-            </p>
-            <hr>
-            {% if object.resultado %}
-            <p class="mb-2 text-center fs-6"><strong>Resultado: {{ object.resultado }}</strong></p>
-            {% endif %}
-            {% if object.vencedor %}
-            <p class="mb-2 text-center"><strong>Vencedor:</strong> 
-              <span class="badge bg-success">{{ object.vencedor.nome_time }}</span>
-            </p>
-            {% endif %}
-            <hr>
-            <p class="mb-2"><strong>Etapa:</strong> {{ object.etapa.nome }}</p>
-            <p class="mb-2"><strong>Modalidade:</strong> {{ object.modalidade.nome }}</p>
-            {% if object.data_hora %}
-            <p class="mb-2"><strong>Data/Hora:</strong> {{ object.data_hora|date:"d/m/Y H:i" }}</p>
-            {% endif %}
-            <p class="mb-2"><strong>Cadastrado por:</strong> {{ object.cadastrado_por.username }}</p>
-            <p class="text-muted mb-0">ID: {{ object.pk }}</p>
-          </div>
+                {% if object.resultado %}
+                <div class="alert bg-primary-subtle border-0 text-center mb-4">
+                    <p class="text-muted small uppercase fw-bold mb-1">Resultado Final</p>
+                    <h3 class="mb-0">{{ object.resultado }}</h3>
+                    {% if object.vencedor %}
+                        <div class="mt-2">
+                            <span class="badge bg-success py-2 px-3 fw-normal">Vencedor: {{ object.vencedor.nome_time }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
 
-          <div class="card-footer text-center">
-            <a href="#" class="btn btn-outline-secondary" onclick="window.history.back()">
-              <i class="bi bi-arrow-left me-2"></i>
-              Voltar
-            </a>
-          </div>
-
+                <div class="row g-4 mt-2">
+                    <div class="col-sm-4">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Etapa</p>
+                        <p class="mb-0">{{ object.etapa.nome }}</p>
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Modalidade</p>
+                        <p class="mb-0">{{ object.modalidade.nome }}</p>
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Agendado para</p>
+                        <p class="mb-0">{% if object.data_hora %}{{ object.data_hora|date:"d/m/Y H:i" }}{% else %}-{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light p-3 d-flex justify-content-between align-items-center">
+                <span class="text-muted small font-monospace">MatchID: #{{ object.pk }}</span>
+                <a href="#" class="btn btn-outline-secondary px-4" onclick="window.history.back()">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</section>
-{% endblock conteudo %}
+</div>
+{% endblock content %}
