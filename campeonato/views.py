@@ -59,7 +59,7 @@ class ModalidadeCreate(CreateView):
     model = Modalidade
     fields = ['nome']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('modalidade-list')
     extra_context = {
         'titulo': 'Cadastro de Modalidade',
         'botao': 'Criar Modalidade'
@@ -70,7 +70,7 @@ class ModalidadeUpdate(UpdateView):
     model = Modalidade
     fields = ['nome']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('modalidade-list')
     extra_context = {
         'titulo': 'Editar dados da Modalidade',
         'botao': 'Atualizar Modalidade'
@@ -80,7 +80,7 @@ class ModalidadeUpdate(UpdateView):
 class ModalidadeDelete(DeleteView):
     model = Modalidade
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('modalidade-list')
     extra_context = {
         'titulo': 'Excluir Modalidade',
         'botao': 'Sim, excluir!'
@@ -103,7 +103,7 @@ class EtapaCreate(CreateView):
     model = Etapa
     fields = ['nome', 'sequencia', 'quantidade_jogos']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('etapa-list')
     extra_context = {
         'titulo': 'Cadastro de Etapa',
         'botao': 'Criar Etapa',
@@ -115,7 +115,7 @@ class EtapaUpdate(UpdateView):
     model = Etapa
     fields = ['nome', 'sequencia', 'quantidade_jogos']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('etapa-list')
     extra_context = {
         'titulo': 'Editar dados da Etapa',
         'botao': 'Atualizar Etapa'
@@ -125,7 +125,7 @@ class EtapaUpdate(UpdateView):
 class EtapaDelete(DeleteView):
     model = Etapa
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('etapa-list')
     extra_context = {
         'titulo': 'Excluir Etapa',
         'botao': 'Sim, excluir!'
@@ -146,7 +146,7 @@ class JogadorCreate(CreateView):
     model = Jogador
     fields = ['nome', 'id_jogador', 'campus', 'usuario']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('jogador-list')
     extra_context = {
         'titulo': 'Cadastro de Jogador',
         'botao': 'Criar Jogador'
@@ -157,7 +157,7 @@ class JogadorUpdate(UpdateView):
     model = Jogador
     fields = ['nome', 'id_jogador', 'campus', 'usuario']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('jogador-list')
     extra_context = {
         'titulo': 'Editar dados do Jogador',
         'botao': 'Atualizar Jogador'
@@ -167,7 +167,7 @@ class JogadorUpdate(UpdateView):
 class JogadorDelete(DeleteView):
     model = Jogador
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('jogador-list')
     extra_context = {
         'titulo': 'Excluir Jogador',
         'botao': 'Sim, excluir!'
@@ -190,7 +190,7 @@ class CampeonatoCreate(CreateView):
     model = Campeonato
     fields = ['nome', 'campus', 'data', 'data_inscricao', 'modalidades', 'cadastrado_por']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('campeonato-list')
     extra_context = {
         'titulo': 'Cadastro de Campeonato',
         'botao': 'Criar Campeonato'
@@ -201,7 +201,7 @@ class CampeonatoUpdate(UpdateView):
     model = Campeonato
     fields = ['nome', 'campus', 'data', 'data_inscricao', 'modalidades', 'cadastrado_por']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('campeonato-list')
     extra_context = {
         'titulo': 'Editar dados do Campeonato',
         'botao': 'Atualizar Campeonato'
@@ -211,7 +211,7 @@ class CampeonatoUpdate(UpdateView):
 class CampeonatoDelete(DeleteView):
     model = Campeonato
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('campeonato-list')
     extra_context = {
         'titulo': 'Excluir Campeonato',
         'botao': 'Sim, excluir!'
@@ -232,7 +232,7 @@ class InscricaoCreate(CreateView):
     model = Inscricao
     fields = ['nome_time', 'jogadores', 'campeonato', 'modalidade', 'inscrito_por']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('inscricao-list')
     extra_context = {
         'titulo': 'Cadastro de Inscrição',
         'botao': 'Criar Inscrição'
@@ -243,7 +243,7 @@ class InscricaoUpdate(UpdateView):
     model = Inscricao
     fields = ['nome_time', 'jogadores', 'campeonato', 'modalidade', 'confirmada', 'confirmada_em', 'inscrito_por']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('inscricao-list')
     extra_context = {
         'titulo': 'Editar dados da Inscrição',
         'botao': 'Atualizar Inscrição'
@@ -253,7 +253,7 @@ class InscricaoUpdate(UpdateView):
 class InscricaoDelete(DeleteView):
     model = Inscricao
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('inscricao-list')
     extra_context = {
         'titulo': 'Excluir Inscrição',
         'botao': 'Sim, excluir!'
@@ -274,7 +274,7 @@ class JogoCreate(CreateView):
     model = Jogo
     fields = ['time_1', 'time_2', 'data_hora', 'etapa', 'modalidade', 'vencedor', 'resultado', 'cadastrado_por']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('jogo-list')
     extra_context = {
         'titulo': 'Cadastro de Jogo',
         'botao': 'Criar Jogo'
@@ -285,7 +285,7 @@ class JogoUpdate(UpdateView):
     model = Jogo
     fields = ['time_1', 'time_2', 'data_hora', 'etapa', 'modalidade', 'vencedor', 'resultado', 'cadastrado_por']
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('jogo-list')
     extra_context = {
         'titulo': 'Editar dados do Jogo',
         'botao': 'Atualizar Jogo'
@@ -295,7 +295,7 @@ class JogoUpdate(UpdateView):
 class JogoDelete(DeleteView):
     model = Jogo
     template_name = 'campeonato/form.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('jogo-list')
     extra_context = {
         'titulo': 'Excluir Jogo',
         'botao': 'Sim, excluir!'

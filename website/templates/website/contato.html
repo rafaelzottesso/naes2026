@@ -1,16 +1,56 @@
-{% extends "website/modelo.html" %}
-
+{% extends "website/modelo2.html" %}
 {% load static %}
 
-{% block hero %}
+{% block title %}Arena - Contato{% endblock %}
 
-{% endblock hero %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Contato</li>
+{% endblock %}
 
-{% block conteudo %}
-<section class="py-5 py-lg-6 bg-surface">
-  <div class="container">
-    <h3>Dúvidas? Entre em contato</h3>
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-5">
+        <div class="text-center mb-4">
+          <div class="feature-icon mb-3 mx-auto" style="font-size: 3rem; color: var(--clr-primary);">
+            <i class="bi bi-envelope-at"></i>
+          </div>
+          <h2 class="saira-stencil" style="color: var(--clr-primary);">CONTATO</h2>
+          <p class="text-muted">Tem alguma dúvida ou sugestão? Entre em contato conosco.</p>
+        </div>
+        
+        <form>
+          <div class="mb-3">
+            <label for="name" class="form-label fw-bold">Nome</label>
+            <input type="text" class="form-control" id="name" placeholder="Seu nome completo">
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label fw-bold">E-mail</label>
+            <input type="email" class="form-control" id="email" placeholder="seu@email.com">
+          </div>
+          <div class="mb-3">
+            <label for="subject" class="form-label fw-bold">Assunto</label>
+            <select class="form-select" id="subject">
+              <option selected disabled>Selecione um assunto</option>
+              <option value="1">Dúvida Técnica</option>
+              <option value="2">Sugestão de Modalidade</option>
+              <option value="3">Problemas com Inscrição</option>
+              <option value="4">Outros</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label for="message" class="form-label fw-bold">Mensagem</label>
+            <textarea class="form-control" id="message" rows="4" placeholder="Como podemos ajudar?"></textarea>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg fw-bold">Enviar Mensagem</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
-</section>
-{% endblock conteudo %}
+</div>
+{% endblock %}
+
 

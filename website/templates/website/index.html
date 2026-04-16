@@ -1,83 +1,75 @@
-{% extends "website/modelo.html" %}
-
+{% extends "website/modelo2.html" %}
 {% load static %}
 
-{% block hero %}
-<!-- Hero compacto para home -->
-<section class="hero py-5">
-  <div class="hero-noise"></div>
-  <div class="container py-5">
-    <div class="row align-items-center">
-      <div class="col-lg-7">
-        <span class="badge bg-petrol-subtle text-primary fw-semibold px-3 py-2 rounded-pill mb-3 d-inline-block" style="font-size:.75rem; letter-spacing:.05em;">
-          <i class="bi bi-controller me-1"></i> IFPR E-Sports
-        </span>
-        <h1 class="display-4 fw-display text-white mb-3">Gerencie campeonatos<br><span style="color:var(--petrol-lighter)">de forma simples</span></h1>
-        <p class="text-white-75 mb-4" style="max-width:560px; line-height:1.6">Crie torneios, inscreva jogadores e equipes por modalidade, acompanhe resultados e fortaleça a comunidade de jogos eletrônicos do IFPR.</p>
-        <div class="d-flex gap-3">
-          <a href="{% url "sobre" %}" class="btn btn-light fw-semibold px-4 rounded-2"><i class="bi bi-info-circle me-1"></i>Sobre o projeto</a>
-          <a href="{% url "contato" %}" class="btn btn-auth px-4 rounded-2"><i class="bi bi-envelope me-1"></i>Fale conosco</a>
-        </div>
-      </div>
-      <div class="col-lg-5 d-none d-lg-block">
-        <div class="card-petrol p-4 rounded-2xl text-center" style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)">
-          <div style="font-size:3rem">🎮</div>
-          <h5 class="fw-display text-white mt-3">Participe dos torneios</h5>
-          <p class="text-white-50 mb-3">Inscreva sua equipe por modalidade e acompanhe o progresso ao vivo.</p>
-          <a href="{% url "index" %}" class="btn btn-primary btn-sm">Ver Campeonatos</a>
-        </div>
+{% block title %}Arena - Início{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Início</li>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-5">
+  
+  <div class="col-lg-8">
+    <div class="p-5 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, var(--clr-primary) 0%, #7b2ff7 100%); border: 1px solid var(--clr-border);">
+      <h1 class="display-4 stencil mb-3 text-white">BEM-VINDO À ARENA</h1>
+      <p class="lead mb-4 text-white text-opacity-75">A plataforma definitiva para gestão de campeonatos de E-Sports. Organize torneios, inscreva equipes e acompanhe resultados em tempo real.</p>
+      <div class="d-flex gap-3">
+        <a href="{% url 'campeonato-list' %}" class="btn btn-light px-4 py-2 fw-bold text-primary">
+          <i class="bi bi-trophy me-2"></i>Ver Campeonatos
+        </a>
+        <a href="{% url 'sobre' %}" class="btn btn-outline-light px-4 py-2">
+          Saber Mais
+        </a>
       </div>
     </div>
   </div>
-</section>
-{% endblock hero %}
-
-{% block conteudo %}
-
-<!-- Seção rápida de recursos -->
-<section class="py-5 bg-surface-alt">
-  <div class="container">
-    <div class="text-center mb-4">
-      <h2 class="fw-display mb-2">Recursos Principais</h2>
-      <p class="text-secondary">Ferramentas essenciais para organizar campeonatos e inscrever jogadores e equipes.</p>
-    </div>
-    
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card-petrol p-4 h-100 text-center">
-          <div class="feature-icon bg-primary bg-opacity-10 mx-auto mb-3"><i class="bi bi-calendar-check fs-4 text-primary"></i></div>
-          <h5 class="fw-display mb-2">Criar Torneios</h5>
-          <p class="text-secondary mb-0">Defina modalidades, regras e chaves de disputa.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card-petrol p-4 h-100 text-center">
-          <div class="feature-icon bg-success bg-opacity-10 mx-auto mb-3"><i class="bi bi-people-fill fs-4 text-success"></i></div>
-          <h5 class="fw-display mb-2">Inscrição de Equipes</h5>
-          <p class="text-secondary mb-0">Jogadores inscrevem suas equipes em modalidades distintas.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card-petrol p-4 h-100 text-center">
-          <div class="feature-icon bg-info bg-opacity-10 mx-auto mb-3"><i class="bi bi-bar-chart-line fs-4 text-info"></i></div>
-          <h5 class="fw-display mb-2">Resultados & Rankings</h5>
-          <p class="text-secondary mb-0">Acompanhe placares, tabelas e evolução dos jogadores.</p>
-        </div>
+  
+  <div class="col-lg-4">
+    <div class="card h-100 border-0 shadow-sm bg-surface-alt">
+      <div class="card-body p-4 text-center d-flex flex-column justify-content-center">
+        <div class="display-1 mb-3">🎮</div>
+        <h3 class="h4 fw-bold mb-2 stencil">Pronto para o Próximo Level?</h3>
+        <p class="text-muted mb-0">Cadastre-se como jogador e comece sua jornada competitiva hoje mesmo.</p>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CTA simples -->
-<section class="py-5 bg-petrol">
-  <div class="container text-center">
-    <h3 class="fw-display text-white mb-2">Pronto para competir?</h3>
-    <p class="text-white-75 mb-3" style="max-width:600px; margin:0 auto">Crie ou participe de campeonatos organizados pelo IFPR e faça parte da comunidade.</p>
-    <div class="d-flex justify-content-center gap-3">
-      <a href="{% url "contato" %}" class="btn btn-light px-4 rounded-2 fw-semibold"><i class="bi bi-envelope me-1"></i>Entrar em contato</a>
-      <a href="{% url "sobre" %}" class="btn btn-auth px-4 rounded-2"><i class="bi bi-info-circle me-1"></i>Saiba mais</a>
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body p-4">
+        <div class="feature-icon bg-primary bg-opacity-10 mb-3" style="font-size: 2rem; color: var(--clr-primary);">
+          <i class="bi bi-joystick"></i>
+        </div>
+        <h5 class="stencil mb-2">Múltiplas Modalidades</h5>
+        <p class="text-muted mb-0">Suporte para diversos jogos, desde FPS até MOBAs e Battle Royales.</p>
+      </div>
     </div>
   </div>
-</section>
+  <div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body p-4">
+        <div class="feature-icon bg-primary bg-opacity-10 mb-3" style="font-size: 2rem; color: var(--clr-primary);">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <h5 class="stencil mb-2">Gestão de Equipes</h5>
+        <p class="text-muted mb-0">Controle total sobre inscrições, jogadores e escalações por campus.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body p-4">
+        <div class="feature-icon bg-primary bg-opacity-10 mb-3" style="font-size: 2rem; color: var(--clr-primary);">
+          <i class="bi bi-calendar-event"></i>
+        </div>
+        <h5 class="stencil mb-2">Etapas e Jogos</h5>
+        <p class="text-muted mb-0">Cronogramas claros e acompanhamento de cada partida do torneio.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 
-{% endblock conteudo %}

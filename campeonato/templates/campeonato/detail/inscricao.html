@@ -1,50 +1,59 @@
-{% extends "website/modelo.html" %}
+{% extends "website/modelo2.html" %}
 
-{% block hero %}
-{% endblock hero %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'inscricao-list' %}">Inscrições</a></li>
+<li class="breadcrumb-item active" aria-current="page">Detalhes</li>
+{% endblock breadcrumb %}
 
-{% block conteudo %}
-<section class="py-5 py-lg-6 bg-surface">
-  <div class="container">
-    <h3 class="text-center border-bottom pb-2 mb-4">
-      Detalhes da Inscrição
-    </h3>
-
-    <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-7">
-        <div class="card shadow-sm">
-
-          <div class="card-body"> 
-            <p class="mb-0 fs-5"><strong>{{ object.nome_time }}</strong></p>
-            <hr>
-            <p class="mb-2"><strong>Campeonato:</strong> {{ object.campeonato.nome }}</p>
-            <p class="mb-2"><strong>Modalidade:</strong> {{ object.modalidade.nome }}</p>
-            <p class="mb-2"><strong>Status:</strong> 
-              {% if object.confirmada %}
-                <span class="badge bg-success">✅ Confirmada</span>
-              {% else %}
-                <span class="badge bg-warning">❌ Pendente</span>
-              {% endif %}
-            </p>
-            {% if object.confirmada_em %}
-            <p class="mb-2"><strong>Confirmada em:</strong> {{ object.confirmada_em|date:"d/m/Y H:i" }}</p>
-            {% endif %}
-            <p class="mb-2"><strong>Jogadores:</strong> {{ object.jogadores.count }}</p>
-            <p class="mb-2"><strong>Inscrito por:</strong> {{ object.inscrito_por.username }}</p>
-            <p class="mb-2"><strong>Data de Inscrição:</strong> {{ object.inscrito_em|date:"d/m/Y H:i" }}</p>
-            <p class="text-muted mb-0">ID: {{ object.pk }}</p>
-          </div>
-
-          <div class="card-footer text-center">
-            <a href="#" class="btn btn-outline-secondary" onclick="window.history.back()">
-              <i class="bi bi-arrow-left me-2"></i>
-              Voltar
-            </a>
-          </div>
-
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center py-3">
+                <h4 class="mb-0 fs-5 stencil d-flex align-items-center"><i class="bi bi-pencil-square me-2 fs-4"></i>Inscrição: {{ object.nome_time }}</h4>
+                {% if object.confirmada %}
+                    <span class="badge bg-success">Confirmada</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Pendente</span>
+                {% endif %}
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Campeonato</p>
+                        <p class="mb-0 fw-medium">{{ object.campeonato.nome }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Modalidade</p>
+                        <p class="mb-0">{{ object.modalidade.nome }}</p>
+                    </div>
+                    {% if object.confirmada_em %}
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Confirmada em</p>
+                        <p class="mb-0 text-success">{{ object.confirmada_em|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Qtd. Jogadores</p>
+                        <p class="mb-0">{{ object.jogadores.count }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Inscrito por</p>
+                        <p class="mb-0">{{ object.inscrito_por.username }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="mb-1 text-muted small uppercase fw-bold">Data Inscrição</p>
+                        <p class="mb-0">{{ object.inscrito_em|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light p-3 d-flex justify-content-between align-items-center">
+                <span class="text-muted small font-monospace">Ref: #{{ object.pk }}</span>
+                <a href="#" class="btn btn-outline-secondary px-4" onclick="window.history.back()">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</section>
-{% endblock conteudo %}
+</div>
+{% endblock content %}
