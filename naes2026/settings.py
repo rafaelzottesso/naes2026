@@ -153,3 +153,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# Configurar domínios confiáveis para o CSRF
+# Tudo que for do github.dev é confiável
+# Se tiver outros domínios, adicionar aqui também
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.github.dev',
+    'https://localhost:8000',
+]
