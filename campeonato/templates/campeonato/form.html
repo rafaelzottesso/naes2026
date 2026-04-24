@@ -15,7 +15,7 @@
                 <h4 class="mb-0 text-center stencil" style="font-size: 1.5rem;">{{ titulo }}</h4>
             </div>
             <div class="card-body p-4">
-                <form method="post">
+                <form method="POST">
                     {% csrf_token %}
                     {{ form|crispy }}
 
