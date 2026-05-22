@@ -10,13 +10,18 @@ from .models import Campus, Jogador, Modalidade, Etapa, Campeonato, Inscricao, J
 # Importar o BaseLoginMixin para proteger as views
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+# Django braces faz o GroupRequiredMixin para controle de acesso por Grupo
+from braces.views import GroupRequiredMixin
+
+
 # Criar um mixin para proteger as views de cadastro, edição e exclusão
 class BaseLoginMixin(LoginRequiredMixin):
     # define o redirecionamento caso o usuário não esteja autenticado ao acessar a view
     login_url = reverse_lazy('login')  
 
 
-class CampusCreate(BaseLoginMixin, CreateView):
+class CampusCreate(GroupRequiredMixin, CreateView):
+    group_required = ['Administrador']
     model = Campus
     fields = ['nome']
     template_name = 'campeonato/form.html'
@@ -27,7 +32,8 @@ class CampusCreate(BaseLoginMixin, CreateView):
     }
 
 
-class CampusUpdate(BaseLoginMixin, UpdateView):
+class CampusUpdate(GroupRequiredMixin, UpdateView):
+    group_required = ['Administrador']
     model = Campus
     fields = ['nome']
     template_name = 'campeonato/form.html'
@@ -38,7 +44,8 @@ class CampusUpdate(BaseLoginMixin, UpdateView):
     }
 
 
-class CampusDelete(BaseLoginMixin, DeleteView):
+class CampusDelete(GroupRequiredMixin, DeleteView):
+    group_required = ['Administrador']
     model = Campus
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('campus-list')
@@ -63,7 +70,8 @@ class CampusDetail(BaseLoginMixin, DetailView):
 #########################################################
 
 
-class ModalidadeCreate(BaseLoginMixin, CreateView):
+class ModalidadeCreate(GroupRequiredMixin, CreateView):
+    group_required = ['Administrador']
     model = Modalidade
     fields = ['nome']
     template_name = 'campeonato/form.html'
@@ -74,7 +82,8 @@ class ModalidadeCreate(BaseLoginMixin, CreateView):
     }
 
 
-class ModalidadeUpdate(BaseLoginMixin, UpdateView):
+class ModalidadeUpdate(GroupRequiredMixin, UpdateView):
+    group_required = ['Administrador']
     model = Modalidade
     fields = ['nome']
     template_name = 'campeonato/form.html'
@@ -85,7 +94,8 @@ class ModalidadeUpdate(BaseLoginMixin, UpdateView):
     }
 
 
-class ModalidadeDelete(BaseLoginMixin, DeleteView):
+class ModalidadeDelete(GroupRequiredMixin, DeleteView):
+    group_required = ['Administrador']
     model = Modalidade
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('modalidade-list')
@@ -107,7 +117,8 @@ class ModalidadeDetail(BaseLoginMixin, DetailView):
 #########################################################
 
 
-class EtapaCreate(BaseLoginMixin, CreateView):
+class EtapaCreate(GroupRequiredMixin, CreateView):
+    group_required = ['Administrador']
     model = Etapa
     fields = ['nome', 'sequencia', 'quantidade_jogos']
     template_name = 'campeonato/form.html'
@@ -119,7 +130,8 @@ class EtapaCreate(BaseLoginMixin, CreateView):
     }
 
 
-class EtapaUpdate(BaseLoginMixin, UpdateView):
+class EtapaUpdate(GroupRequiredMixin, UpdateView):
+    group_required = ['Administrador']
     model = Etapa
     fields = ['nome', 'sequencia', 'quantidade_jogos']
     template_name = 'campeonato/form.html'
@@ -130,7 +142,8 @@ class EtapaUpdate(BaseLoginMixin, UpdateView):
     }
 
 
-class EtapaDelete(BaseLoginMixin, DeleteView):
+class EtapaDelete(GroupRequiredMixin, DeleteView):
+    group_required = ['Administrador']
     model = Etapa
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('etapa-list')
@@ -140,12 +153,14 @@ class EtapaDelete(BaseLoginMixin, DeleteView):
     }
 
 
-class EtapaList(BaseLoginMixin, ListView):
+class EtapaList(GroupRequiredMixin, ListView):
+    group_required = ['Administrador']
     model = Etapa
     template_name = 'campeonato/list/etapa.html'
 
 
-class EtapaDetail(BaseLoginMixin, DetailView):
+class EtapaDetail(GroupRequiredMixin, DetailView):
+    group_required = ['Administrador']
     model = Etapa
     template_name = 'campeonato/detail/etapa.html'
 
@@ -161,7 +176,8 @@ class JogadorCreate(BaseLoginMixin, CreateView):
     }
 
 
-class JogadorUpdate(BaseLoginMixin, UpdateView):
+class JogadorUpdate(GroupRequiredMixin, UpdateView):
+    group_required = ['Administrador', 'Organização']
     model = Jogador
     fields = ['nome', 'id_jogador', 'campus', 'usuario']
     template_name = 'campeonato/form.html'
@@ -172,7 +188,8 @@ class JogadorUpdate(BaseLoginMixin, UpdateView):
     }
 
 
-class JogadorDelete(BaseLoginMixin, DeleteView):
+class JogadorDelete(GroupRequiredMixin, DeleteView):
+    group_required = ['Administrador']
     model = Jogador
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('jogador-list')
@@ -182,19 +199,22 @@ class JogadorDelete(BaseLoginMixin, DeleteView):
     }
 
 
-class JogadorList(BaseLoginMixin, ListView):
+class JogadorList(GroupRequiredMixin, ListView):
+    group_required = ['Administrador', 'Organização']
     model = Jogador
     template_name = 'campeonato/list/jogador.html'
 
 
-class JogadorDetail(BaseLoginMixin, DetailView):
+class JogadorDetail(GroupRequiredMixin, DetailView):
+    group_required = ['Administrador', 'Organização']
     model = Jogador
     template_name = 'campeonato/detail/jogador.html'
 
 ##########################################################
 
 
-class CampeonatoCreate(BaseLoginMixin, CreateView):
+class CampeonatoCreate(GroupRequiredMixin, CreateView):
+    group_required = ['Administrador', 'Organização']
     model = Campeonato
     fields = ['nome', 'campus', 'data', 'data_inscricao', 'modalidades', 'cadastrado_por']
     template_name = 'campeonato/form.html'
@@ -205,7 +225,8 @@ class CampeonatoCreate(BaseLoginMixin, CreateView):
     }
 
 
-class CampeonatoUpdate(BaseLoginMixin, UpdateView):
+class CampeonatoUpdate(GroupRequiredMixin, UpdateView):
+    group_required = ['Administrador', 'Organização']
     model = Campeonato
     fields = ['nome', 'campus', 'data', 'data_inscricao', 'modalidades', 'cadastrado_por']
     template_name = 'campeonato/form.html'
@@ -216,7 +237,8 @@ class CampeonatoUpdate(BaseLoginMixin, UpdateView):
     }
 
 
-class CampeonatoDelete(BaseLoginMixin, DeleteView):
+class CampeonatoDelete(GroupRequiredMixin, DeleteView):
+    group_required = ['Administrador']
     model = Campeonato
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('campeonato-list')
@@ -277,7 +299,8 @@ class InscricaoDetail(BaseLoginMixin, DetailView):
     template_name = 'campeonato/detail/inscricao.html'
 
 
-class JogoCreate(BaseLoginMixin, CreateView):
+class JogoCreate(GroupRequiredMixin, CreateView):
+    group_required = ['Administrador', 'Organização']
     model = Jogo
     fields = ['time_1', 'time_2', 'data_hora', 'etapa', 'modalidade', 'vencedor', 'resultado', 'cadastrado_por']
     template_name = 'campeonato/form.html'
@@ -288,7 +311,8 @@ class JogoCreate(BaseLoginMixin, CreateView):
     }
 
 
-class JogoUpdate(BaseLoginMixin, UpdateView):
+class JogoUpdate(GroupRequiredMixin, UpdateView):
+    group_required = ['Administrador', 'Organização']
     model = Jogo
     fields = ['time_1', 'time_2', 'data_hora', 'etapa', 'modalidade', 'vencedor', 'resultado', 'cadastrado_por']
     template_name = 'campeonato/form.html'
@@ -299,7 +323,8 @@ class JogoUpdate(BaseLoginMixin, UpdateView):
     }
 
 
-class JogoDelete(BaseLoginMixin, DeleteView):
+class JogoDelete(GroupRequiredMixin, DeleteView):
+    group_required = ['Administrador', 'Organização']
     model = Jogo
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('jogo-list')
