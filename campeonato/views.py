@@ -7,8 +7,16 @@ from django.urls import reverse_lazy
 
 from .models import Campus, Jogador, Modalidade, Etapa, Campeonato, Inscricao, Jogo
 
+# Importar o BaseLoginMixin para proteger as views
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class CampusCreate(CreateView):
+# Criar um mixin para proteger as views de cadastro, edição e exclusão
+class BaseLoginMixin(LoginRequiredMixin):
+    # define o redirecionamento caso o usuário não esteja autenticado ao acessar a view
+    login_url = reverse_lazy('login')  
+
+
+class CampusCreate(BaseLoginMixin, CreateView):
     model = Campus
     fields = ['nome']
     template_name = 'campeonato/form.html'
@@ -19,7 +27,7 @@ class CampusCreate(CreateView):
     }
 
 
-class CampusUpdate(UpdateView):
+class CampusUpdate(BaseLoginMixin, UpdateView):
     model = Campus
     fields = ['nome']
     template_name = 'campeonato/form.html'
@@ -30,7 +38,7 @@ class CampusUpdate(UpdateView):
     }
 
 
-class CampusDelete(DeleteView):
+class CampusDelete(BaseLoginMixin, DeleteView):
     model = Campus
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('campus-list')
@@ -40,13 +48,13 @@ class CampusDelete(DeleteView):
     }
 
 
-class CampusList(ListView):
+class CampusList(BaseLoginMixin, ListView):
     model = Campus
     template_name = 'campeonato/list/campus.html'
     paginate_by = 20
 
 
-class CampusDetail(DetailView):
+class CampusDetail(BaseLoginMixin, DetailView):
     model = Campus
     template_name = 'campeonato/detail/campus.html'
 
@@ -55,7 +63,7 @@ class CampusDetail(DetailView):
 #########################################################
 
 
-class ModalidadeCreate(CreateView):
+class ModalidadeCreate(BaseLoginMixin, CreateView):
     model = Modalidade
     fields = ['nome']
     template_name = 'campeonato/form.html'
@@ -66,7 +74,7 @@ class ModalidadeCreate(CreateView):
     }
 
 
-class ModalidadeUpdate(UpdateView):
+class ModalidadeUpdate(BaseLoginMixin, UpdateView):
     model = Modalidade
     fields = ['nome']
     template_name = 'campeonato/form.html'
@@ -77,7 +85,7 @@ class ModalidadeUpdate(UpdateView):
     }
 
 
-class ModalidadeDelete(DeleteView):
+class ModalidadeDelete(BaseLoginMixin, DeleteView):
     model = Modalidade
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('modalidade-list')
@@ -87,19 +95,19 @@ class ModalidadeDelete(DeleteView):
     }
 
 
-class ModalidadeList(ListView):
+class ModalidadeList(BaseLoginMixin, ListView):
     model = Modalidade
     template_name = 'campeonato/list/modalidade.html'
 
 
-class ModalidadeDetail(DetailView):
+class ModalidadeDetail(BaseLoginMixin, DetailView):
     model = Modalidade
     template_name = 'campeonato/detail/modalidade.html'
 
 #########################################################
 
 
-class EtapaCreate(CreateView):
+class EtapaCreate(BaseLoginMixin, CreateView):
     model = Etapa
     fields = ['nome', 'sequencia', 'quantidade_jogos']
     template_name = 'campeonato/form.html'
@@ -111,7 +119,7 @@ class EtapaCreate(CreateView):
     }
 
 
-class EtapaUpdate(UpdateView):
+class EtapaUpdate(BaseLoginMixin, UpdateView):
     model = Etapa
     fields = ['nome', 'sequencia', 'quantidade_jogos']
     template_name = 'campeonato/form.html'
@@ -122,7 +130,7 @@ class EtapaUpdate(UpdateView):
     }
 
 
-class EtapaDelete(DeleteView):
+class EtapaDelete(BaseLoginMixin, DeleteView):
     model = Etapa
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('etapa-list')
@@ -132,17 +140,17 @@ class EtapaDelete(DeleteView):
     }
 
 
-class EtapaList(ListView):
+class EtapaList(BaseLoginMixin, ListView):
     model = Etapa
     template_name = 'campeonato/list/etapa.html'
 
 
-class EtapaDetail(DetailView):
+class EtapaDetail(BaseLoginMixin, DetailView):
     model = Etapa
     template_name = 'campeonato/detail/etapa.html'
 
 
-class JogadorCreate(CreateView):
+class JogadorCreate(BaseLoginMixin, CreateView):
     model = Jogador
     fields = ['nome', 'id_jogador', 'campus', 'usuario']
     template_name = 'campeonato/form.html'
@@ -153,7 +161,7 @@ class JogadorCreate(CreateView):
     }
 
 
-class JogadorUpdate(UpdateView):
+class JogadorUpdate(BaseLoginMixin, UpdateView):
     model = Jogador
     fields = ['nome', 'id_jogador', 'campus', 'usuario']
     template_name = 'campeonato/form.html'
@@ -164,7 +172,7 @@ class JogadorUpdate(UpdateView):
     }
 
 
-class JogadorDelete(DeleteView):
+class JogadorDelete(BaseLoginMixin, DeleteView):
     model = Jogador
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('jogador-list')
@@ -174,19 +182,19 @@ class JogadorDelete(DeleteView):
     }
 
 
-class JogadorList(ListView):
+class JogadorList(BaseLoginMixin, ListView):
     model = Jogador
     template_name = 'campeonato/list/jogador.html'
 
 
-class JogadorDetail(DetailView):
+class JogadorDetail(BaseLoginMixin, DetailView):
     model = Jogador
     template_name = 'campeonato/detail/jogador.html'
 
 ##########################################################
 
 
-class CampeonatoCreate(CreateView):
+class CampeonatoCreate(BaseLoginMixin, CreateView):
     model = Campeonato
     fields = ['nome', 'campus', 'data', 'data_inscricao', 'modalidades', 'cadastrado_por']
     template_name = 'campeonato/form.html'
@@ -197,7 +205,7 @@ class CampeonatoCreate(CreateView):
     }
 
 
-class CampeonatoUpdate(UpdateView):
+class CampeonatoUpdate(BaseLoginMixin, UpdateView):
     model = Campeonato
     fields = ['nome', 'campus', 'data', 'data_inscricao', 'modalidades', 'cadastrado_por']
     template_name = 'campeonato/form.html'
@@ -208,7 +216,7 @@ class CampeonatoUpdate(UpdateView):
     }
 
 
-class CampeonatoDelete(DeleteView):
+class CampeonatoDelete(BaseLoginMixin, DeleteView):
     model = Campeonato
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('campeonato-list')
@@ -216,7 +224,6 @@ class CampeonatoDelete(DeleteView):
         'titulo': 'Excluir Campeonato',
         'botao': 'Sim, excluir!'
     }
-
 
 class CampeonatoList(ListView):
     model = Campeonato
@@ -228,7 +235,7 @@ class CampeonatoDetail(DetailView):
     template_name = 'campeonato/detail/campeonato.html'
 
 
-class InscricaoCreate(CreateView):
+class InscricaoCreate(BaseLoginMixin, CreateView):
     model = Inscricao
     fields = ['nome_time', 'jogadores', 'campeonato', 'modalidade', 'inscrito_por']
     template_name = 'campeonato/form.html'
@@ -239,7 +246,7 @@ class InscricaoCreate(CreateView):
     }
 
 
-class InscricaoUpdate(UpdateView):
+class InscricaoUpdate(BaseLoginMixin, UpdateView):
     model = Inscricao
     fields = ['nome_time', 'jogadores', 'campeonato', 'modalidade', 'confirmada', 'confirmada_em', 'inscrito_por']
     template_name = 'campeonato/form.html'
@@ -250,7 +257,7 @@ class InscricaoUpdate(UpdateView):
     }
 
 
-class InscricaoDelete(DeleteView):
+class InscricaoDelete(BaseLoginMixin, DeleteView):
     model = Inscricao
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('inscricao-list')
@@ -260,17 +267,17 @@ class InscricaoDelete(DeleteView):
     }
 
 
-class InscricaoList(ListView):
+class InscricaoList(BaseLoginMixin, ListView):
     model = Inscricao
     template_name = 'campeonato/list/inscricao.html'
 
 
-class InscricaoDetail(DetailView):
+class InscricaoDetail(BaseLoginMixin, DetailView):
     model = Inscricao
     template_name = 'campeonato/detail/inscricao.html'
 
 
-class JogoCreate(CreateView):
+class JogoCreate(BaseLoginMixin, CreateView):
     model = Jogo
     fields = ['time_1', 'time_2', 'data_hora', 'etapa', 'modalidade', 'vencedor', 'resultado', 'cadastrado_por']
     template_name = 'campeonato/form.html'
@@ -281,7 +288,7 @@ class JogoCreate(CreateView):
     }
 
 
-class JogoUpdate(UpdateView):
+class JogoUpdate(BaseLoginMixin, UpdateView):
     model = Jogo
     fields = ['time_1', 'time_2', 'data_hora', 'etapa', 'modalidade', 'vencedor', 'resultado', 'cadastrado_por']
     template_name = 'campeonato/form.html'
@@ -292,7 +299,7 @@ class JogoUpdate(UpdateView):
     }
 
 
-class JogoDelete(DeleteView):
+class JogoDelete(BaseLoginMixin, DeleteView):
     model = Jogo
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('jogo-list')

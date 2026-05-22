@@ -61,6 +61,8 @@
           </a>
         </li>
 
+        {% comment %} Verifica se o usuário está autenticado {% endcomment %}
+        {% if request.user.is_authenticated %}
         <!-- Dropdown Cadastro -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -94,22 +96,49 @@
             <li><a class="dropdown-item" href="{% url 'jogo-list' %}"><i class="bi bi-controller me-2" style="color:var(--clr-primary)"></i>Jogos</a></li>
           </ul>
         </li>
+        {% endif %}
 
       </ul>
 
       <!-- Pílula do usuário (Simulado) -->
       <div class="d-flex align-items-center gap-2 py-2 py-lg-0">
+        
+        {% comment %} Verifica se o usuário está autenticado {% endcomment %}
+        {% if request.user.is_authenticated %}
         <div class="dropdown">
           <a class="user-pill dropdown-toggle" role="button" data-bs-toggle="dropdown">
             <span class="avatar">JS</span>
-            <span class="d-none d-sm-inline">Visitante</span>
+            <span class="d-none d-sm-inline">
+              {{ request.user }}
+            </span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Meu perfil</a></li>
+            <li>
+              <a class="dropdown-item" href="{% url "alterar-senha" %}">
+                <i class="bi bi-person-lock"></i> Alterar Senha
+              </a>
+            </li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+            <li>
+              {% comment %} A partir do Django 5.0, o LogoutView suporta apenas requisições POST por questões de segurança. {% endcomment %}
+              <form action="{% url "logout" %}" method="POST">
+                {% csrf_token %}
+                <button class="dropdown-item text-danger" type="submit">
+                  <i class="bi bi-box-arrow-right me-2"></i>Sair
+                </button>
+              </form>
+            </li>
           </ul>
         </div>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-primary">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Entrar
+        </a>
+        <a href="" class="btn btn-outline-primary">
+          <i class="bi bi-person-plus me-1"></i> Cadastrar
+        </a>
+        {% endif %}
+
       </div>
     </div>
 
@@ -155,12 +184,38 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  document.querySelectorAll(\'.toast-stack .alert\').forEach(el => {
+  document.querySelectorAll('.toast-stack .alert').forEach(el => {
     setTimeout(() => {
-      const alert = bootstrap.Alert.getOrCreateInstance(el);
-      if (alert) alert.close();
+      const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+      if (bsAlert) bsAlert.close();
     }, 4000);
   });
+
+  // btnLoading — desabilita o botão de submit durante o envio do formulário
+  document.addEventListener('submit', function (e) {
+    const form = e.target;
+    if (!form.classList.contains('btnLoading')) return;
+      const btn = form.querySelector('[type="submit"]');
+      if (!btn || btn.disabled) return;
+      btn.dataset.originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Aguarde…';
+  });
+
+  // Reabilita botões ao navegar de volta (página restaurada do bfcache)
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) {
+      document.querySelectorAll('form.btnLoading [type="submit"]').forEach(function (btn) {
+        btn.disabled = false;
+        if (btn.dataset.originalHtml) {
+          btn.innerHTML = btn.dataset.originalHtml;
+          delete btn.dataset.originalHtml;
+        }
+      });
+    }
+  });
+
 </script>
 
 {% block extra_js %}{% endblock %}
