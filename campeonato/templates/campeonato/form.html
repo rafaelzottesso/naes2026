@@ -12,10 +12,12 @@
     <div class="col-md-{{ largura|default:"6" }}">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-gradient-primary text-white py-3">
-                <h4 class="mb-0 text-center stencil" style="font-size: 1.5rem;">{{ titulo }}</h4>
+                <h4 class="mb-0 text-center stencil" style="font-size: 1.5rem;">
+                    {{ titulo }}
+                </h4>
             </div>
             <div class="card-body p-4">
-                <form method="POST">
+                <form method="POST" class="btnLoading">
                     {% csrf_token %}
                     {{ form|crispy }}
 
@@ -32,7 +34,7 @@
                             </div>
                         {% else %}
                             <button type="submit" class="btn btn-primary px-4">
-                                <i class="bi bi-check-circle me-2"></i>{{ botao }}
+                                <i class="bi bi-check-circle me-2"></i> {{ botao }}
                             </button>
                         {% endif %}
 
