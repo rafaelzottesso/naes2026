@@ -109,6 +109,11 @@ class ModalidadeList(BaseLoginMixin, ListView):
     model = Modalidade
     template_name = 'campeonato/list/modalidade.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_modalidades"] = self.get_queryset().count()
+        return context
+
 
 class ModalidadeDetail(BaseLoginMixin, DetailView):
     model = Modalidade
@@ -216,13 +221,31 @@ class JogadorDetail(GroupRequiredMixin, DetailView):
 class CampeonatoCreate(GroupRequiredMixin, CreateView):
     group_required = ['Administrador', 'Organização']
     model = Campeonato
-    fields = ['nome', 'campus', 'data', 'data_inscricao', 'modalidades', 'cadastrado_por']
+    fields = ['nome', 'campus', 'data', 'data_inscricao', 'modalidades']
     template_name = 'campeonato/form.html'
     success_url = reverse_lazy('campeonato-list')
     extra_context = {
         'titulo': 'Cadastro de Campeonato',
         'botao': 'Criar Campeonato'
     }
+
+    def get_success_url(self):
+        # Redirecionar para a página de detalhes do campeonato criado passando seu pk/id na url
+        return reverse_lazy('campeonato-detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        # Atribuir o usuário logado ao campo 'cadastrado_por' antes de salvar o formulário
+        form.instance.cadastrado_por = self.request.user
+        
+        # Executa a criação do objeto e faz o INSERT no banco
+        url_sucesso = super().form_valid(form)
+
+        # A parti daqui consigo acessar o objeto criado através do self.object
+        # print(self.object)
+        # self.object.nome = "OK - " + self.object.nome
+        # self.object.save()  # Salva a alteração no banco
+
+        return url_sucesso
 
 
 class CampeonatoUpdate(GroupRequiredMixin, UpdateView):
@@ -236,6 +259,10 @@ class CampeonatoUpdate(GroupRequiredMixin, UpdateView):
         'botao': 'Atualizar Campeonato'
     }
 
+    # queryset é uma consulta personalizada para filtrar os objetos que podem ser editados
+    def get_queryset(self):
+        return super().get_queryset().filter(cadastrado_por=self.request.user)
+
 
 class CampeonatoDelete(GroupRequiredMixin, DeleteView):
     group_required = ['Administrador']
@@ -247,14 +274,29 @@ class CampeonatoDelete(GroupRequiredMixin, DeleteView):
         'botao': 'Sim, excluir!'
     }
 
+    def get_queryset(self):
+        return super().get_queryset().filter(cadastrado_por=self.request.user)
+
+
 class CampeonatoList(ListView):
     model = Campeonato
     template_name = 'campeonato/list/campeonato.html'
 
+    # def get_queryset(self):
+    #     return super().get_queryset().filter(cadastrado_por=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_campeonatos"] = Campeonato.objects.all().count()
+        context["total_filtrado"] = self.get_queryset().count()
+        return context
 
 class CampeonatoDetail(DetailView):
     model = Campeonato
     template_name = 'campeonato/detail/campeonato.html'
+
+    # def get_queryset(self):
+    #     return super().get_queryset().filter(cadastrado_por=self.request.user)
 
 
 class InscricaoCreate(BaseLoginMixin, CreateView):
