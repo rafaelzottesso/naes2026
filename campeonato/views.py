@@ -58,7 +58,7 @@ class CampusDelete(GroupRequiredMixin, DeleteView):
 class CampusList(BaseLoginMixin, ListView):
     model = Campus
     template_name = 'campeonato/list/campus.html'
-    paginate_by = 20
+    paginate_by = 30
 
 
 class CampusDetail(BaseLoginMixin, DetailView):

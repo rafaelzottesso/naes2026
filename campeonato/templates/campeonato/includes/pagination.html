@@ -1,0 +1,33 @@
+{% load pagination_tags %}
+
+{% if is_paginated %}
+<nav aria-label="Paginação" class="mt-4">
+  <ul class="pagination justify-content-center mb-0">
+    <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
+      {% if page_obj.has_previous %}
+        <a class="page-link" href="{% pagination_query page=page_obj.previous_page_number %}" aria-label="Anterior">&laquo;</a>
+      {% else %}
+        <span class="page-link" aria-hidden="true">&laquo;</span>
+      {% endif %}
+    </li>
+
+    {% for page_number in paginator.page_range %}
+      <li class="page-item{% if page_number == page_obj.number %} active{% endif %}">
+        {% if page_number == page_obj.number %}
+          <span class="page-link">{{ page_number }}</span>
+        {% else %}
+          <a class="page-link" href="{% pagination_query page=page_number %}">{{ page_number }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+
+    <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
+      {% if page_obj.has_next %}
+        <a class="page-link" href="{% pagination_query page=page_obj.next_page_number %}" aria-label="Próxima">&raquo;</a>
+      {% else %}
+        <span class="page-link" aria-hidden="true">&raquo;</span>
+      {% endif %}
+    </li>
+  </ul>
+</nav>
+{% endif %}
