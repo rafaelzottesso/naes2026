@@ -24,4 +24,7 @@ urlpatterns = [
     path("", include("website.urls")),
     path("campeonato/", include("campeonato.urls")),
 
+    # Ativar o Django Debug Toolbar - Passo 4
+    path('__debug__/', include('debug_toolbar.urls')),
+
 ]
