@@ -108,6 +108,7 @@ class ModalidadeDelete(GroupRequiredMixin, DeleteView):
 class ModalidadeList(BaseLoginMixin, ListView):
     model = Modalidade
     template_name = 'campeonato/list/modalidade.html'
+    paginate_by = 30
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -162,6 +163,7 @@ class EtapaList(GroupRequiredMixin, ListView):
     group_required = ['Administrador']
     model = Etapa
     template_name = 'campeonato/list/etapa.html'
+    paginate_by = 30
 
 
 class EtapaDetail(GroupRequiredMixin, DetailView):
@@ -208,6 +210,7 @@ class JogadorList(GroupRequiredMixin, ListView):
     group_required = ['Administrador', 'Organização']
     model = Jogador
     template_name = 'campeonato/list/jogador.html'
+    paginate_by = 30
 
 
 class JogadorDetail(GroupRequiredMixin, DetailView):
@@ -281,9 +284,13 @@ class CampeonatoDelete(GroupRequiredMixin, DeleteView):
 class CampeonatoList(ListView):
     model = Campeonato
     template_name = 'campeonato/list/campeonato.html'
+    paginate_by = 30
 
-    # def get_queryset(self):
-    #     return super().get_queryset().filter(cadastrado_por=self.request.user)
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(cadastrado_por=self.request.user)
+        qs = qs.select_related('campus', 'atributo2')
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -334,6 +341,7 @@ class InscricaoDelete(BaseLoginMixin, DeleteView):
 class InscricaoList(BaseLoginMixin, ListView):
     model = Inscricao
     template_name = 'campeonato/list/inscricao.html'
+    paginate_by = 30
 
 
 class InscricaoDetail(BaseLoginMixin, DetailView):
@@ -379,7 +387,7 @@ class JogoDelete(GroupRequiredMixin, DeleteView):
 class JogoList(ListView):
     model = Jogo
     template_name = 'campeonato/list/jogo.html'
-
+    paginate_by = 30
 
 class JogoDetail(DetailView):
     model = Jogo

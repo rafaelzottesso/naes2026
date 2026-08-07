@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     # Ativar o crispy forms para renderiar os forms
     'crispy_forms',
     'crispy_bootstrap5',
+    # Ativar o Django Debug Toolbar - Passo 1
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Ativar o Django Debug Toolbar - Passo 2
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'naes2026.urls'
@@ -155,14 +159,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+
 # Configurar domínios confiáveis para o CSRF
 # Tudo que for do github.dev é confiável
 # Se tiver outros domínios, adicionar aqui também
+# https://docs.djangoproject.com/en/5.2/ref/settings/#csrf-trusted-origins
+
 CSRF_TRUSTED_ORIGINS = [
     'https://*.github.dev',
     'https://localhost:8000',
 ]
 
+
 # Configurações de login e logout
+# https://docs.djangoproject.com/en/5.2/topics/auth/default/#using-the-views
 LOGIN_REDIRECT_URL = "index"
 LOGOUT_REDIRECT_URL = "index"
+
+
+# Django Debug Toolbar - Passo 3
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#configuration
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
