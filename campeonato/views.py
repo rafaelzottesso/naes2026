@@ -212,6 +212,9 @@ class JogadorList(GroupRequiredMixin, ListView):
     template_name = 'campeonato/list/jogador.html'
     paginate_by = 30
 
+    def get_queryset(self):
+        return super().get_queryset().select_related('campus')
+
 
 class JogadorDetail(GroupRequiredMixin, DetailView):
     group_required = ['Administrador', 'Organização']
@@ -289,7 +292,7 @@ class CampeonatoList(ListView):
     def get_queryset(self):
         qs = super().get_queryset()
         qs = qs.filter(cadastrado_por=self.request.user)
-        qs = qs.select_related('campus', 'atributo2')
+        qs = qs.select_related('campus')
         return qs
 
     def get_context_data(self, **kwargs):
@@ -343,6 +346,9 @@ class InscricaoList(BaseLoginMixin, ListView):
     template_name = 'campeonato/list/inscricao.html'
     paginate_by = 30
 
+    def get_queryset(self):
+        return super().get_queryset().select_related('campeonato', 'modalidade')
+
 
 class InscricaoDetail(BaseLoginMixin, DetailView):
     model = Inscricao
@@ -388,6 +394,11 @@ class JogoList(ListView):
     model = Jogo
     template_name = 'campeonato/list/jogo.html'
     paginate_by = 30
+
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'time_1', 'time_2', 'etapa'
+        )
 
 class JogoDetail(DetailView):
     model = Jogo
