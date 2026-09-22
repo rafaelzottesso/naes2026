@@ -96,6 +96,19 @@
             <li><a class="dropdown-item" href="{% url 'jogo-list' %}"><i class="bi bi-controller me-2" style="color:var(--clr-primary)"></i>Jogos</a></li>
           </ul>
         </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-wallet2"></i>Finanças
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'categoria-create' %}"><i class="bi bi-tag me-2" style="color:var(--clr-primary)"></i>Cadastrar categoria</a></li>
+            <li><a class="dropdown-item" href="{% url 'categoria-list' %}"><i class="bi bi-tags me-2" style="color:var(--clr-primary)"></i>Listar categorias</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'lancamento-create' %}"><i class="bi bi-plus-circle me-2" style="color:var(--clr-primary)"></i>Cadastrar lançamento</a></li>
+            <li><a class="dropdown-item" href="{% url 'lancamento-list' %}"><i class="bi bi-cash-stack me-2" style="color:var(--clr-primary)"></i>Listar lançamentos</a></li>
+          </ul>
+        </li>
         {% endif %}
 
       </ul>

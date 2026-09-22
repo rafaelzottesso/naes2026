@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # Ativar meus apps
     'website.apps.WebsiteConfig',
     'campeonato.apps.CampeonatoConfig',
+    'financeiro.apps.FinanceiroConfig',
 
     # Ativar o crispy forms para renderiar os forms
     'crispy_forms',

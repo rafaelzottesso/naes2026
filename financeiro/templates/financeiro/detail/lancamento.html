@@ -1,0 +1,103 @@
+{% extends "website/modelo2.html" %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'lancamento-list' %}">Lançamentos</a></li>
+<li class="breadcrumb-item active" aria-current="page">Detalhes</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-gradient-primary text-white py-3">
+                <h4 class="mb-0 fs-5 stencil d-flex align-items-center"><i class="bi bi-cash-stack me-2 fs-4"></i>Detalhes do Lançamento</h4>
+            </div>
+            <div class="card-body p-4">
+                <p class="mb-3 fs-5"><strong>Descrição:</strong> {{ object.descricao|default:"—" }}</p>
+                <hr class="text-muted">
+                <div class="row g-3">
+                    <div class="col-sm-6 col-md-4">
+                        <p class="mb-1 text-muted small fw-bold">Tipo</p>
+                        <p class="mb-0">{{ object.get_tipo_display }}</p>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <p class="mb-1 text-muted small fw-bold">Categoria</p>
+                        <p class="mb-0">{{ object.categoria.nome }}</p>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <p class="mb-1 text-muted small fw-bold">Data da 1ª parcela</p>
+                        <p class="mb-0">{{ object.data|date:"d/m/Y" }}</p>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <p class="mb-1 text-muted small fw-bold">Valor</p>
+                        <p class="mb-0">{{ object.valor }}</p>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <p class="mb-1 text-muted small fw-bold">Desconto</p>
+                        <p class="mb-0">{{ object.desconto|default:"0" }}</p>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <p class="mb-1 text-muted small fw-bold">Acréscimo</p>
+                        <p class="mb-0">{{ object.acrescimo|default:"0" }}</p>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <p class="mb-1 text-muted small fw-bold">Valor líquido</p>
+                        <p class="mb-0">{{ object.valor_total }}</p>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <p class="mb-1 text-muted small fw-bold">Parcelas</p>
+                        <p class="mb-0">{{ object.parcelas|default:"1" }}</p>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <p class="mb-1 text-muted small fw-bold">Intervalo (dias)</p>
+                        <p class="mb-0">{{ object.intervalo_parcelas|default:"—" }}</p>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <p class="mb-1 text-muted small fw-bold">Status</p>
+                        <p class="mb-0">{% if object.status %}Ativo{% else %}Inativo{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header py-3">
+                <h5 class="mb-0 stencil">Parcelas</h5>
+            </div>
+            <div class="card-body p-4">
+                <table class="table table-arena mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nº</th>
+                            <th>Vencimento</th>
+                            <th>Valor</th>
+                            <th>Valor pago</th>
+                            <th>Data de pagamento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parcela in parcelas %}
+                        <tr>
+                            <td>{{ parcela.numero }}</td>
+                            <td>{{ parcela.data|date:"d/m/Y" }}</td>
+                            <td>{{ parcela.valor }}</td>
+                            <td>{{ parcela.valor_pago|default:"—" }}</td>
+                            <td>{{ parcela.data_pagamento|date:"d/m/Y"|default:"—" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">Nenhuma parcela gerada.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer bg-light p-3 text-center">
+                <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
