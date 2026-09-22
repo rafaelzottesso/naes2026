@@ -17,13 +17,17 @@
 
   <!-- ============ SIDEBAR DESKTOP ============ -->
   <aside class="fin-sidebar d-none d-lg-flex flex-column">
-    <a class="fin-brand" href="{% url 'lancamento-list' %}">
+    <a class="fin-brand" href="{% url 'financeiro-dashboard' %}">
       <span class="fin-brand-mark"><i class="bi bi-wallet2"></i></span>
       <span class="fin-brand-text">Fluxo<small>controle financeiro</small></span>
     </a>
 
     <p class="fin-menu-label">Menu</p>
     <nav class="fin-nav nav flex-column">
+      <a class="fin-link {% if request.resolver_match.url_name == 'financeiro-dashboard' %}active{% endif %}" href="{% url 'financeiro-dashboard' %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+      </a>
       <a class="fin-link {% if 'lancamento' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}">
         <i class="bi bi-receipt-cutoff"></i>
         <span>Lançamentos</span>
@@ -65,7 +69,7 @@
   <!-- ============ SIDEBAR MOBILE (offcanvas) ============ -->
   <div class="offcanvas offcanvas-start fin-offcanvas" tabindex="-1" id="menuFinanceiro" aria-labelledby="menuFinanceiroLabel">
     <div class="offcanvas-header">
-      <a class="fin-brand" href="{% url 'lancamento-list' %}" id="menuFinanceiroLabel">
+      <a class="fin-brand" href="{% url 'financeiro-dashboard' %}" id="menuFinanceiroLabel">
         <span class="fin-brand-mark"><i class="bi bi-wallet2"></i></span>
         <span class="fin-brand-text">Fluxo<small>controle financeiro</small></span>
       </a>
@@ -74,6 +78,9 @@
     <div class="offcanvas-body d-flex flex-column">
       <p class="fin-menu-label">Menu</p>
       <nav class="fin-nav nav flex-column">
+        <a class="fin-link {% if request.resolver_match.url_name == 'financeiro-dashboard' %}active{% endif %}" href="{% url 'financeiro-dashboard' %}">
+          <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+        </a>
         <a class="fin-link {% if 'lancamento' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}">
           <i class="bi bi-receipt-cutoff"></i><span>Lançamentos</span>
         </a>
@@ -110,7 +117,7 @@
 
       <nav aria-label="Você está em" class="fin-crumb-wrap">
         <ol class="breadcrumb fin-crumb mb-0">
-          <li class="breadcrumb-item"><a href="{% url 'lancamento-list' %}">Finanças</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'financeiro-dashboard' %}">Finanças</a></li>
           {% block breadcrumb %}{% endblock %}
         </ol>
       </nav>

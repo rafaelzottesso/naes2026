@@ -1,0 +1,359 @@
+{% extends "financeiro/base.html" %}
+
+{% load fin_tags %}
+
+{% block title %}Dashboard · Finanças{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+{% endblock %}
+
+{% block content %}
+<div class="fin-page-head">
+  <div>
+    <div class="fin-eyebrow">Visão geral · {{ mes_label }}</div>
+    <h1>Dashboard</h1>
+    <p>Período de {{ mes_periodo }} · o essencial das suas finanças em um lugar só.</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary"><i class="bi bi-receipt-cutoff me-1"></i>Lançamentos</a>
+    <a href="{% url 'categoria-list' %}" class="btn btn-outline-secondary"><i class="bi bi-tags me-1"></i>Categorias</a>
+    <a href="{% url 'lancamento-create' %}" class="btn btn-fin"><i class="bi bi-plus-lg me-1"></i>Novo</a>
+  </div>
+</div>
+
+<!-- ===== KPIs do mês ===== -->
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="fin-kpi saldo">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-wallet2"></i></span>
+        <div>
+          <span class="fin-kpi-label">Saldo do mês</span>
+          <span class="fin-kpi-sub">Receitas − despesas</span>
+        </div>
+      </div>
+      <span class="fin-kpi-value {% if kpi.saldo_positivo %}fin-positive{% else %}fin-negative{% endif %}">{{ kpi.saldo|brl }}</span>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="fin-kpi receita">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-arrow-down-circle"></i></span>
+        <div>
+          <span class="fin-kpi-label">Receitas do mês</span>
+          <span class="fin-kpi-sub">Vencimentos a receber</span>
+        </div>
+      </div>
+      <span class="fin-kpi-value">{{ kpi.receitas|brl }}</span>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="fin-kpi despesa">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-arrow-up-circle"></i></span>
+        <div>
+          <span class="fin-kpi-label">Despesas do mês</span>
+          <span class="fin-kpi-sub">Vencimentos a pagar</span>
+        </div>
+      </div>
+      <span class="fin-kpi-value">{{ kpi.despesas|brl }}</span>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="fin-kpi neutra">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-cash-coin"></i></span>
+        <div>
+          <span class="fin-kpi-label">Pago no mês</span>
+          <span class="fin-kpi-sub">Saiu do bolso</span>
+        </div>
+      </div>
+      <span class="fin-kpi-value">{{ kpi.pago|brl }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Compromissos em aberto ===== -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-md-4">
+    <div class="fin-kpi receita">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-handbag"></i></span>
+        <div>
+          <span class="fin-kpi-label">A receber</span>
+          <span class="fin-kpi-sub">Receitas em aberto</span>
+        </div>
+      </div>
+      <span class="fin-kpi-value">{{ kpi.a_receber|brl }}</span>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="fin-kpi despesa">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-credit-card"></i></span>
+        <div>
+          <span class="fin-kpi-label">A pagar</span>
+          <span class="fin-kpi-sub">Despesas em aberto</span>
+        </div>
+      </div>
+      <span class="fin-kpi-value">{{ kpi.a_pagar|brl }}</span>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="fin-kpi despesa">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-exclamation-triangle"></i></span>
+        <div>
+          <span class="fin-kpi-label">Em atraso</span>
+          <span class="fin-kpi-sub">{{ kpi.atrasadas_qtd }} conta{{ kpi.atrasadas_qtd|pluralize }} vencida{{ kpi.atrasadas_qtd|pluralize }}</span>
+        </div>
+      </div>
+      <span class="fin-kpi-value">{{ kpi.atrasado|brl }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Gráficos ===== -->
+<div class="row g-3 mb-3">
+  <div class="col-12 col-lg-8">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <div>
+          <h2>Fluxo de caixa</h2>
+          <p>Vencimentos dos últimos 6 meses</p>
+        </div>
+        <span class="badge rounded-pill text-bg-light border">6 meses</span>
+      </div>
+      <div class="fin-panel-body">
+        <div class="fin-chart"><canvas id="fluxoChart" aria-label="Gráfico de fluxo de caixa dos últimos 6 meses" role="img"></canvas></div>
+      </div>
+    </section>
+  </div>
+  <div class="col-12 col-lg-4">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <div>
+          <h2>Despesas por categoria</h2>
+          <p>Para onde o dinheiro está indo</p>
+        </div>
+      </div>
+      <div class="fin-panel-body">
+        <div class="fin-chart"><canvas id="catChart" aria-label="Gráfico de despesas por categoria" role="img"></canvas></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-4">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <div>
+          <h2>Situação das parcelas</h2>
+          <p>Pagas, a vencer e atrasadas</p>
+        </div>
+      </div>
+      <div class="fin-panel-body">
+        <div class="fin-chart"><canvas id="statusChart" aria-label="Gráfico da situação das parcelas" role="img"></canvas></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <div>
+          <h2>Próximos vencimentos</h2>
+          <p>Parcelas em aberto, mais antigas primeiro</p>
+        </div>
+        <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">Ver todos</a>
+      </div>
+      <div class="fin-panel-body py-1">
+        {% for parcela in proximos %}
+        <a class="fin-list-item" href="{% url 'lancamento-detail' parcela.lancamento_id %}">
+          <span class="fin-list-text">
+            <span class="fin-list-title d-block text-truncate">{{ parcela.lancamento.descricao|default:parcela.lancamento.categoria.nome }}</span>
+            <small>
+              {{ parcela.data|date:"d/m/Y" }} · {{ parcela.lancamento.categoria.nome }} · parcela {{ parcela.numero }}
+              {% if parcela.data < hoje %}<span class="badge fin-pill text-bg-danger ms-1">Atrasada</span>{% endif %}
+            </small>
+          </span>
+          <span class="fin-money">{{ parcela.valor|brl }}</span>
+        </a>
+        {% empty %}
+        <div class="fin-empty py-4 mb-0">
+          <div class="fin-empty-icon"><i class="bi bi-check2-circle"></i></div>
+          <strong class="d-block text-dark">Nada em aberto</strong>
+          <p class="mb-0 small">Todas as parcelas estão quitadas.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <div>
+          <h2>Últimos lançamentos</h2>
+          <p>O que foi cadastrado recentemente</p>
+        </div>
+        <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">Ver todos</a>
+      </div>
+      <div class="fin-panel-body py-1">
+        {% for lancamento in ultimos %}
+        <a class="fin-list-item" href="{% url 'lancamento-detail' lancamento.pk %}">
+          <span class="fin-list-text">
+            <span class="fin-list-title d-block text-truncate">{{ lancamento.descricao|default:lancamento.categoria.nome }}</span>
+            <small>{{ lancamento.data|date:"d/m/Y" }} · {{ lancamento.categoria.nome }}</small>
+          </span>
+          <span class="fin-money {% if lancamento.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
+            {% if lancamento.tipo == 'receita' %}+{% else %}&minus;{% endif %}{{ lancamento.valor_total|brl }}
+          </span>
+        </a>
+        {% empty %}
+        <div class="fin-empty py-4 mb-0">
+          <div class="fin-empty-icon"><i class="bi bi-receipt"></i></div>
+          <strong class="d-block text-dark">Nenhum lançamento</strong>
+          <p class="mb-2 small">Cadastre o primeiro para acompanhar suas finanças.</p>
+          <a href="{% url 'lancamento-create' %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar lançamento</a>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+  const brl = v => moeda.format(v);
+
+  function semDados(id, texto) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const p = document.createElement('p');
+    p.className = 'fin-empty mb-0';
+    p.textContent = texto;
+    el.replaceWith(p);
+  }
+
+  Chart.defaults.font.family = '"Inter", "Segoe UI", system-ui, sans-serif';
+  Chart.defaults.color = '#637976';
+
+  // ===== Fluxo de caixa: barras (receitas/despesas) + linha (saldo) =====
+  const fluxoVazio = {{ graficos.receitas|safe }}.every(v => v === 0) &&
+                     {{ graficos.despesas|safe }}.every(v => v === 0);
+  if (fluxoVazio) {
+    semDados('fluxoChart', 'Sem movimentação nos últimos 6 meses.');
+  } else {
+    new Chart(document.getElementById('fluxoChart'), {
+      data: {
+        labels: {{ graficos.labels|safe }},
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Receitas',
+            data: {{ graficos.receitas|safe }},
+            backgroundColor: '#0e7a4d',
+            borderRadius: 6,
+            maxBarThickness: 34
+          },
+          {
+            type: 'bar',
+            label: 'Despesas',
+            data: {{ graficos.despesas|safe }},
+            backgroundColor: '#b42318',
+            borderRadius: 6,
+            maxBarThickness: 34
+          },
+          {
+            type: 'line',
+            label: 'Saldo',
+            data: {{ graficos.saldo|safe }},
+            borderColor: '#1d3fa8',
+            backgroundColor: '#1d3fa8',
+            tension: 0.35,
+            borderWidth: 2,
+            pointRadius: 3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'bottom', labels: { usePointStyle: true, boxHeight: 6, padding: 16 } },
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${brl(ctx.parsed.y)}` } }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: { ticks: { callback: v => brl(v) }, grid: { color: '#eef3f2' } }
+        }
+      }
+    });
+  }
+
+  // ===== Despesas por categoria =====
+  const catValores = {{ graficos.cat_valores|safe }};
+  if (catValores.length) {
+    new Chart(document.getElementById('catChart'), {
+      type: 'doughnut',
+      data: {
+        labels: {{ graficos.cat_labels|safe }},
+        datasets: [{
+          data: catValores,
+          backgroundColor: ['#0e6e68', '#c9a24b', '#1d3fa8', '#b42318', '#7c3aed', '#0891b2'],
+          borderColor: '#ffffff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: {
+          legend: { position: 'bottom', labels: { usePointStyle: true, boxHeight: 6, padding: 12 } },
+          tooltip: { callbacks: { label: ctx => `${ctx.label}: ${brl(ctx.parsed)}` } }
+        }
+      }
+    });
+  } else {
+    semDados('catChart', 'Sem despesas registradas ainda.');
+  }
+
+  // ===== Situação das parcelas =====
+  const statusValores = {{ graficos.status_valores|safe }};
+  if (statusValores.some(v => v > 0)) {
+    new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: {
+        labels: {{ graficos.status_labels|safe }},
+        datasets: [{
+          data: statusValores,
+          backgroundColor: ['#0e7a4d', '#c9a24b', '#b42318'],
+          borderColor: '#ffffff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: {
+          legend: { position: 'bottom', labels: { usePointStyle: true, boxHeight: 6, padding: 12 } },
+          tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed} parcela(s)` } }
+        }
+      }
+    });
+  } else {
+    semDados('statusChart', 'Nenhuma parcela registrada ainda.');
+  }
+})();
+</script>
+{% endblock %}
