@@ -1,41 +1,41 @@
-{% extends "website/modelo2.html" %}
+{% extends "financeiro/base.html" %}
+
+{% block title %}Lançamentos · Finanças{% endblock %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item active">Lançamentos</li>
-{% endblock breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Lançamentos</li>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h2 class="section-title mb-0">Lançamentos</h2>
-  <a href="{% url "lancamento-create" %}" class="btn btn-primary d-flex align-items-center gap-2">
-    <i class="bi bi-plus-lg"></i> Novo
-  </a>
+<div class="fin-page-head">
+  <h1>Lançamentos</h1>
+  <a href="{% url "lancamento-create" %}" class="btn btn-fin">Novo</a>
 </div>
 
 <div class="row g-3 mb-4">
-  <div class="col-md-4">
-    <div class="kpi-card shadow-sm">
-      <div class="kpi-label">Receitas</div>
-      <div class="kpi-value text-success">{{ total_receitas }}</div>
+  <div class="col-12 col-md-4">
+    <div class="fin-kpi receita">
+      <span>Receitas</span>
+      <strong>{{ total_receitas }}</strong>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="kpi-card shadow-sm">
-      <div class="kpi-label">Despesas</div>
-      <div class="kpi-value text-danger">{{ total_despesas }}</div>
+  <div class="col-12 col-md-4">
+    <div class="fin-kpi despesa">
+      <span>Despesas</span>
+      <strong>{{ total_despesas }}</strong>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="kpi-card shadow-sm">
-      <div class="kpi-label">Saldo</div>
-      <div class="kpi-value">{{ saldo }}</div>
+  <div class="col-12 col-md-4">
+    <div class="fin-kpi">
+      <span>Saldo</span>
+      <strong>{{ saldo }}</strong>
     </div>
   </div>
 </div>
 
-<div class="card shadow-sm">
-  <div class="card-body p-4 bg-white">
-    <table class="table table-arena mb-0">
+<section class="fin-panel">
+  <div class="table-responsive">
+    <table class="table fin-table mb-0">
       <thead>
         <tr>
           <th>Data</th>
@@ -43,7 +43,7 @@
           <th>Categoria</th>
           <th>Tipo</th>
           <th>Valor líquido</th>
-          <th class="text-center">Ações</th>
+          <th class="text-end">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -54,22 +54,22 @@
           <td>{{ lancamento.categoria.nome }}</td>
           <td>
             {% if lancamento.tipo == "receita" %}
-              <span class="badge text-bg-success">Receita</span>
+            <span class="badge text-bg-success">Receita</span>
             {% else %}
-              <span class="badge text-bg-danger">Despesa</span>
+            <span class="badge text-bg-danger">Despesa</span>
             {% endif %}
           </td>
-          <td>{{ lancamento.valor_total }}</td>
-          <td class="text-center">
+          <td class="fin-money">{{ lancamento.valor_total }}</td>
+          <td class="text-end">
             <div class="dropdown">
-              <button class="btn btn-link btn-sm text-muted p-0" data-bs-toggle="dropdown">
+              <button class="btn btn-link text-secondary" data-bs-toggle="dropdown" aria-label="Ações do lançamento">
                 <i class="bi bi-three-dots-vertical"></i>
               </button>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{% url "lancamento-detail" lancamento.pk %}"><i class="bi bi-eye me-2"></i>Ver</a></li>
-                <li><a class="dropdown-item" href="{% url "lancamento-update" lancamento.pk %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
+                <li><a class="dropdown-item" href="{% url "lancamento-detail" lancamento.pk %}">Ver</a></li>
+                <li><a class="dropdown-item" href="{% url "lancamento-update" lancamento.pk %}">Editar</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="{% url "lancamento-delete" lancamento.pk %}"><i class="bi bi-trash me-2"></i>Excluir</a></li>
+                <li><a class="dropdown-item text-danger" href="{% url "lancamento-delete" lancamento.pk %}">Excluir</a></li>
               </ul>
             </div>
           </td>
@@ -82,6 +82,6 @@
       </tbody>
     </table>
   </div>
-</div>
+</section>
 {% include "campeonato/includes/pagination.html" %}
-{% endblock content %}
+{% endblock %}

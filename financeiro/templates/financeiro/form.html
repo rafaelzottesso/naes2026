@@ -1,49 +1,40 @@
-{% extends "website/modelo2.html" %}
+{% extends "financeiro/base.html" %}
 
 {% load crispy_forms_tags %}
 
+{% block title %}{{ titulo }} · Finanças{% endblock %}
+
 {% block breadcrumb %}
-    <li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
-{% endblock breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
+{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-{{ largura|default:"6" }}">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-gradient-primary text-white py-3">
-                <h4 class="mb-0 text-center stencil" style="font-size: 1.5rem;">
-                    {{ titulo }}
-                </h4>
+  <div class="col-12 col-lg-{{ largura|default:"6" }}">
+    <section class="fin-panel">
+      <div class="fin-panel-head">
+        <h1 class="h4 mb-0">{{ titulo }}</h1>
+      </div>
+      <div class="fin-panel-body">
+        <form method="post" class="btnLoading">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="fin-actions mt-4">
+            {% if botao == "Sim, excluir!" %}
+            <div class="w-100">
+              <div class="alert alert-danger text-center">
+                <p class="mb-0">Deseja realmente excluir <strong>{{ object }}</strong>?</p>
+              </div>
+              <button type="submit" class="btn btn-danger w-100">{{ botao }}</button>
             </div>
-            <div class="card-body p-4">
-                <form method="POST" class="btnLoading">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-
-                    <div class="d-flex gap-2 mt-4">
-                        {% if botao == "Sim, excluir!" %}
-                            <div class="w-100">
-                                <div class="alert alert-danger mb-4 text-center">
-                                    <h5 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Atenção!</h5>
-                                    <p class="mb-0">Deseja realmente excluir: <strong>{{ object }}</strong>?</p>
-                                </div>
-                                <button type="submit" class="btn btn-danger w-100">
-                                    <i class="bi bi-trash me-2"></i>{{ botao }}
-                                </button>
-                            </div>
-                        {% else %}
-                            <button type="submit" class="btn btn-primary px-4">
-                                <i class="bi bi-check-circle me-2"></i> {{ botao }}
-                            </button>
-                        {% endif %}
-
-                        <a href="#" class="btn btn-outline-secondary px-4" onclick="window.history.back(); return false;">
-                            <i class="bi bi-x-circle me-2"></i>Cancelar
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+            {% else %}
+            <button type="submit" class="btn btn-fin">{{ botao }}</button>
+            {% endif %}
+            <a href="#" class="btn btn-outline-secondary" onclick="window.history.back(); return false;">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
 </div>
-{% endblock content %}
+{% endblock %}

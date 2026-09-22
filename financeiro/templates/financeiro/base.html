@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Finanças{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/financeiro.css' %}">
+</head>
+<body class="fin-body">
+  <nav class="navbar navbar-expand-lg fin-nav sticky-top">
+    <div class="container">
+      <a class="navbar-brand fin-brand" href="{% url 'lancamento-list' %}">
+        <i class="bi bi-wallet2 me-1"></i>Finanças
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuFinanceiro" aria-controls="menuFinanceiro" aria-expanded="false" aria-label="Abrir menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="menuFinanceiro">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link {% if 'lancamento' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}">Lançamentos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'categoria' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'categoria-list' %}">Categorias</a>
+          </li>
+        </ul>
+        <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 py-2 py-lg-0">
+          <a class="btn btn-fin" href="{% url 'lancamento-create' %}">Novo lançamento</a>
+          {% if request.user.is_authenticated %}
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+              {{ request.user }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{% url 'alterar-senha' %}">Alterar senha</a></li>
+              <li><a class="dropdown-item" href="{% url 'index' %}">Voltar à Arena</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form action="{% url 'logout' %}" method="post">
+                  {% csrf_token %}
+                  <button class="dropdown-item text-danger" type="submit">Sair</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+          {% else %}
+          <a class="btn btn-outline-secondary" href="{% url 'login' %}">Entrar</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="fin-main">
+    <div class="container">
+      {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <nav aria-label="Você está em" class="mb-3">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="{% url 'lancamento-list' %}">Finanças</a></li>
+          {% block breadcrumb %}{% endblock %}
+        </ol>
+      </nav>
+
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer class="fin-footer">
+    <div class="container">Lançamentos, parcelas e categorias</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('submit', function (e) {
+      const form = e.target;
+      if (!form.classList.contains('btnLoading')) return;
+      const btn = form.querySelector('[type="submit"]');
+      if (!btn || btn.disabled) return;
+      btn.disabled = true;
+    });
+    window.addEventListener('pageshow', function (e) {
+      if (!e.persisted) return;
+      document.querySelectorAll('form.btnLoading [type="submit"]').forEach(function (btn) {
+        btn.disabled = false;
+      });
+    });
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

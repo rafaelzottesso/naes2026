@@ -1,40 +1,40 @@
-{% extends "website/modelo2.html" %}
+{% extends "financeiro/base.html" %}
+
+{% block title %}Categorias · Finanças{% endblock %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item active">Categorias</li>
-{% endblock breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Categorias</li>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h2 class="section-title mb-0">Categorias</h2>
-  <a href="{% url "categoria-create" %}" class="btn btn-primary d-flex align-items-center gap-2">
-    <i class="bi bi-plus-lg"></i> Novo
-  </a>
+<div class="fin-page-head">
+  <h1>Categorias</h1>
+  <a href="{% url "categoria-create" %}" class="btn btn-fin">Nova</a>
 </div>
 
 <div class="row g-3 mb-4">
-  <div class="col-md-6">
-    <div class="kpi-card shadow-sm">
-      <div class="kpi-label">Total</div>
-      <div class="kpi-value">{{ total_categorias }}</div>
+  <div class="col-12 col-sm-6">
+    <div class="fin-kpi">
+      <span>Total</span>
+      <strong>{{ total_categorias }}</strong>
     </div>
   </div>
-  <div class="col-md-6">
-    <div class="kpi-card shadow-sm">
-      <div class="kpi-label">Ativas</div>
-      <div class="kpi-value text-success">{{ total_ativas }}</div>
+  <div class="col-12 col-sm-6">
+    <div class="fin-kpi receita">
+      <span>Ativas</span>
+      <strong>{{ total_ativas }}</strong>
     </div>
   </div>
 </div>
 
-<div class="card shadow-sm">
-  <div class="card-body p-4 bg-white">
-    <table class="table table-arena mb-0">
+<section class="fin-panel">
+  <div class="table-responsive">
+    <table class="table fin-table mb-0">
       <thead>
         <tr>
           <th>Nome</th>
           <th>Status</th>
-          <th class="text-center">Ações</th>
+          <th class="text-end">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -43,21 +43,21 @@
           <td>{{ categoria.nome }}</td>
           <td>
             {% if categoria.status %}
-              <span class="badge text-bg-primary">Ativa</span>
+            <span class="badge text-bg-success">Ativa</span>
             {% else %}
-              <span class="badge text-bg-secondary">Inativa</span>
+            <span class="badge text-bg-secondary">Inativa</span>
             {% endif %}
           </td>
-          <td class="text-center">
+          <td class="text-end">
             <div class="dropdown">
-              <button class="btn btn-link btn-sm text-muted p-0" data-bs-toggle="dropdown">
+              <button class="btn btn-link text-secondary" data-bs-toggle="dropdown" aria-label="Ações da categoria">
                 <i class="bi bi-three-dots-vertical"></i>
               </button>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{% url "categoria-detail" categoria.pk %}"><i class="bi bi-eye me-2"></i>Ver</a></li>
-                <li><a class="dropdown-item" href="{% url "categoria-update" categoria.pk %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
+                <li><a class="dropdown-item" href="{% url "categoria-detail" categoria.pk %}">Ver</a></li>
+                <li><a class="dropdown-item" href="{% url "categoria-update" categoria.pk %}">Editar</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="{% url "categoria-delete" categoria.pk %}"><i class="bi bi-trash me-2"></i>Excluir</a></li>
+                <li><a class="dropdown-item text-danger" href="{% url "categoria-delete" categoria.pk %}">Excluir</a></li>
               </ul>
             </div>
           </td>
@@ -70,6 +70,6 @@
       </tbody>
     </table>
   </div>
-</div>
+</section>
 {% include "campeonato/includes/pagination.html" %}
-{% endblock content %}
+{% endblock %}
