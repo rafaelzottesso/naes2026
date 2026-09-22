@@ -1,3 +1,6 @@
-# Arquivos compilados do Python
+# ignorar todos arquivos *.pyc do projeto
 *.pyc
+**/*.pyc
+
+# ignorar todos diretórios __pycache__ e seu conteúdo no projeto
 **/__pycache__/
