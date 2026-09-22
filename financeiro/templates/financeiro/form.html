@@ -9,32 +9,50 @@
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-12 col-lg-{{ largura|default:"6" }}">
-    <section class="fin-panel">
-      <div class="fin-panel-head">
-        <h1 class="h4 mb-0">{{ titulo }}</h1>
+<div class="fin-page-head justify-content-center text-center">
+  <div class="w-100">
+    <div class="fin-eyebrow">Finanças</div>
+    <h1>{{ titulo }}</h1>
+    <p>Preencha os campos abaixo para continuar.</p>
+  </div>
+</div>
+
+<div class="fin-panel fin-form-card">
+  <div class="fin-panel-head">
+    <div class="d-flex align-items-center gap-3">
+      <span class="fin-form-head-icon">
+        {% if botao == "Sim, excluir!" %}<i class="bi bi-trash"></i>
+        {% elif "Categoria" in titulo %}<i class="bi bi-tags"></i>
+        {% else %}<i class="bi bi-receipt-cutoff"></i>{% endif %}
+      </span>
+      <div>
+        <h2 class="mb-0">{{ titulo }}</h2>
+        <p>Os campos marcados com * são obrigatórios</p>
       </div>
-      <div class="fin-panel-body">
-        <form method="post" class="btnLoading">
-          {% csrf_token %}
-          {{ form|crispy }}
-          <div class="fin-actions mt-4">
-            {% if botao == "Sim, excluir!" %}
-            <div class="w-100">
-              <div class="alert alert-danger text-center">
-                <p class="mb-0">Deseja realmente excluir <strong>{{ object }}</strong>?</p>
-              </div>
-              <button type="submit" class="btn btn-danger w-100">{{ botao }}</button>
-            </div>
-            {% else %}
-            <button type="submit" class="btn btn-fin">{{ botao }}</button>
-            {% endif %}
-            <a href="#" class="btn btn-outline-secondary" onclick="window.history.back(); return false;">Cancelar</a>
+    </div>
+  </div>
+  <div class="fin-panel-body">
+    <form method="post" class="btnLoading" novalidate>
+      {% csrf_token %}
+      {{ form|crispy }}
+      <div class="fin-actions mt-4">
+        {% if botao == "Sim, excluir!" %}
+        <div class="w-100">
+          <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
+            <div>Deseja realmente excluir <strong>{{ object }}</strong>? Esta ação não pode ser desfeita.</div>
           </div>
-        </form>
+          <div class="fin-actions">
+            <button type="submit" class="btn btn-danger flex-fill"><i class="bi bi-trash me-1"></i>{{ botao }}</button>
+            <a href="#" class="btn btn-outline-secondary flex-fill" onclick="window.history.back(); return false;">Cancelar</a>
+          </div>
+        </div>
+        {% else %}
+        <button type="submit" class="btn btn-fin flex-fill"><i class="bi bi-check-lg me-1"></i>{{ botao }}</button>
+        <a href="#" class="btn btn-outline-secondary flex-fill" onclick="window.history.back(); return false;">Cancelar</a>
+        {% endif %}
       </div>
-    </section>
+    </form>
   </div>
 </div>
 {% endblock %}

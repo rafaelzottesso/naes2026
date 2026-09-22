@@ -1,6 +1,6 @@
 {% extends "financeiro/base.html" %}
 
-{% block title %}Lançamento · Finanças{% endblock %}
+{% block title %}{{ object.descricao|default:"Lançamento" }} · Finanças{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'lancamento-list' %}">Lançamentos</a></li>
@@ -8,58 +8,49 @@
 {% endblock %}
 
 {% block content %}
-<section class="fin-panel mb-4">
-  <div class="fin-panel-head d-flex flex-wrap justify-content-between gap-2">
-    <h1 class="h4 mb-0">{{ object.descricao|default:"Lançamento" }}</h1>
-    <span class="badge {% if object.tipo == 'receita' %}text-bg-success{% else %}text-bg-danger{% endif %} align-self-center">{{ object.get_tipo_display }}</span>
+<div class="fin-hero mb-3">
+  <small>{{ object.get_tipo_display }} · {{ object.categoria.nome }}</small>
+  <p class="fin-hero-value">R$ {{ object.valor_total }}</p>
+  <div class="fin-hero-meta">
+    <span class="badge fin-pill {% if object.tipo == 'receita' %}text-bg-success{% else %}text-bg-danger{% endif %}">{{ object.get_tipo_display }}</span>
+    <span class="badge fin-pill text-bg-light"><i class="bi bi-calendar3 me-1"></i>{{ object.data|date:"d/m/Y" }}</span>
+    <span class="badge fin-pill {% if object.status %}text-bg-light{% else %}text-bg-secondary{% endif %}">{% if object.status %}Ativo{% else %}Inativo{% endif %}</span>
+    <span class="badge fin-pill text-bg-light"><i class="bi bi-layers me-1"></i>{{ object.parcelas|default:"1" }}x</span>
+  </div>
+  <div class="d-flex flex-wrap gap-2 mt-3">
+    <a href="{% url 'lancamento-update' object.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil me-1"></i>Editar</a>
+    <a href="{% url 'lancamento-delete' object.pk %}" class="btn btn-sm btn-outline-light"><i class="bi bi-trash me-1"></i>Excluir</a>
+    <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-link text-white text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  </div>
+</div>
+
+<section class="fin-panel mb-3">
+  <div class="fin-panel-head">
+    <h2>{{ object.descricao|default:"Lançamento sem descrição" }}</h2>
   </div>
   <div class="fin-panel-body">
-    <div class="row g-3">
-      <div class="col-6 col-md-4">
-        <p class="fin-label">Categoria</p>
-        <p class="mb-0">{{ object.categoria.nome }}</p>
-      </div>
-      <div class="col-6 col-md-4">
-        <p class="fin-label">Data da 1ª parcela</p>
-        <p class="mb-0">{{ object.data|date:"d/m/Y" }}</p>
-      </div>
-      <div class="col-6 col-md-4">
-        <p class="fin-label">Status</p>
-        <p class="mb-0">{% if object.status %}Ativo{% else %}Inativo{% endif %}</p>
-      </div>
-      <div class="col-6 col-md-3">
-        <p class="fin-label">Valor</p>
-        <p class="mb-0 fin-money">{{ object.valor }}</p>
-      </div>
-      <div class="col-6 col-md-3">
-        <p class="fin-label">Desconto</p>
-        <p class="mb-0 fin-money">{{ object.desconto|default:"0" }}</p>
-      </div>
-      <div class="col-6 col-md-3">
-        <p class="fin-label">Acréscimo</p>
-        <p class="mb-0 fin-money">{{ object.acrescimo|default:"0" }}</p>
-      </div>
-      <div class="col-6 col-md-3">
-        <p class="fin-label">Valor líquido</p>
-        <p class="mb-0 fin-money">{{ object.valor_total }}</p>
-      </div>
-      <div class="col-6 col-md-4">
-        <p class="fin-label">Parcelas</p>
-        <p class="mb-0">{{ object.parcelas|default:"1" }}</p>
-      </div>
-      <div class="col-6 col-md-4">
-        <p class="fin-label">Intervalo (dias)</p>
-        <p class="mb-0">{{ object.intervalo_parcelas|default:"—" }}</p>
-      </div>
+    <div class="fin-meta-grid">
+      <div class="fin-meta"><p class="fin-label">Categoria</p><p>{{ object.categoria.nome }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Data da 1ª parcela</p><p>{{ object.data|date:"d/m/Y" }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Status</p><p>{% if object.status %}Ativo{% else %}Inativo{% endif %}</p></div>
+      <div class="fin-meta"><p class="fin-label">Intervalo (dias)</p><p>{{ object.intervalo_parcelas|default:"—" }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Valor</p><p class="fin-money">R$ {{ object.valor }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Desconto</p><p class="fin-money">R$ {{ object.desconto|default:"0" }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Acréscimo</p><p class="fin-money">R$ {{ object.acrescimo|default:"0" }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Valor líquido</p><p class="fin-money">R$ {{ object.valor_total }}</p></div>
     </div>
   </div>
 </section>
 
 <section class="fin-panel">
   <div class="fin-panel-head">
-    <h2 class="h5 mb-0">Parcelas</h2>
+    <div>
+      <h2>Parcelas</h2>
+      <p>Acompanhe vencimentos e pagamentos</p>
+    </div>
+    <span class="badge rounded-pill text-bg-light border">{{ parcelas|length }} parcela(s)</span>
   </div>
-  <div class="table-responsive">
+  <div class="table-responsive d-none d-md-block">
     <table class="table fin-table mb-0">
       <thead>
         <tr>
@@ -67,28 +58,53 @@
           <th>Vencimento</th>
           <th>Valor</th>
           <th>Valor pago</th>
-          <th>Data de pagamento</th>
+          <th>Pagamento</th>
+          <th>Situação</th>
         </tr>
       </thead>
       <tbody>
         {% for parcela in parcelas %}
         <tr>
-          <td>{{ parcela.numero }}</td>
+          <td><span class="badge rounded-pill text-bg-light border">{{ parcela.numero }}</span></td>
           <td>{{ parcela.data|date:"d/m/Y" }}</td>
-          <td class="fin-money">{{ parcela.valor }}</td>
-          <td class="fin-money">{{ parcela.valor_pago|default:"—" }}</td>
+          <td class="fin-money">R$ {{ parcela.valor }}</td>
+          <td class="fin-money">{% if parcela.valor_pago %}R$ {{ parcela.valor_pago }}{% else %}—{% endif %}</td>
           <td>{{ parcela.data_pagamento|date:"d/m/Y"|default:"—" }}</td>
+          <td>
+            {% if parcela.data_pagamento %}
+            <span class="badge fin-pill text-bg-success"><i class="bi bi-check-lg"></i> Paga</span>
+            {% else %}
+            <span class="badge fin-pill text-bg-warning"><i class="bi bi-clock"></i> Pendente</span>
+            {% endif %}
+          </td>
         </tr>
         {% empty %}
-        <tr>
-          <td colspan="5" class="text-center py-4 text-muted">Nenhuma parcela gerada.</td>
-        </tr>
+        <tr><td colspan="6"><div class="fin-empty"><div class="fin-empty-icon"><i class="bi bi-layers"></i></div><strong class="d-block text-dark">Nenhuma parcela gerada</strong></div></td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  <div class="fin-panel-body">
-    <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary">Voltar</a>
+  <div class="fin-panel-body d-md-none">
+    {% for parcela in parcelas %}
+    <article class="fin-m-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <strong>Parcela {{ parcela.numero }}</strong>
+        {% if parcela.data_pagamento %}
+        <span class="badge fin-pill text-bg-success">Paga</span>
+        {% else %}
+        <span class="badge fin-pill text-bg-warning">Pendente</span>
+        {% endif %}
+      </div>
+      <small class="text-muted d-block mt-1">Vence em {{ parcela.data|date:"d/m/Y" }}{% if parcela.data_pagamento %} · paga em {{ parcela.data_pagamento|date:"d/m/Y" }}{% endif %}</small>
+      <div class="d-flex justify-content-between mt-2">
+        <span class="fin-money">R$ {{ parcela.valor }}</span>
+        <span class="text-muted small">{% if parcela.valor_pago %}Pago: R$ {{ parcela.valor_pago }}{% else %}Aguardando{% endif %}</span>
+      </div>
+    </article>
+    {% empty %}
+    <div class="fin-empty"><div class="fin-empty-icon"><i class="bi bi-layers"></i></div><strong class="d-block text-dark">Nenhuma parcela gerada</strong></div>
+    {% endfor %}
+    <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary w-100 mt-3"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
   </div>
 </section>
 {% endblock %}

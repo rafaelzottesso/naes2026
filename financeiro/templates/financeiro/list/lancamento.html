@@ -8,34 +8,59 @@
 
 {% block content %}
 <div class="fin-page-head">
-  <h1>Lançamentos</h1>
-  <a href="{% url "lancamento-create" %}" class="btn btn-fin">Novo</a>
+  <div>
+    <div class="fin-eyebrow">Visão geral</div>
+    <h1>Lançamentos</h1>
+    <p>Receitas, despesas e saldo dos lançamentos ativos.</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url "categoria-list" %}" class="btn btn-outline-secondary"><i class="bi bi-tags me-1"></i>Categorias</a>
+    <a href="{% url "lancamento-create" %}" class="btn btn-fin"><i class="bi bi-plus-lg me-1"></i>Novo</a>
+  </div>
 </div>
 
 <div class="row g-3 mb-4">
   <div class="col-12 col-md-4">
     <div class="fin-kpi receita">
-      <span>Receitas</span>
-      <strong>{{ total_receitas }}</strong>
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-arrow-down-circle"></i></span>
+        <div><span class="fin-kpi-label">Receitas</span><span class="fin-kpi-sub">Entradas ativas</span></div>
+      </div>
+      <span class="fin-kpi-value">R$ {{ total_receitas }}</span>
     </div>
   </div>
   <div class="col-12 col-md-4">
     <div class="fin-kpi despesa">
-      <span>Despesas</span>
-      <strong>{{ total_despesas }}</strong>
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-arrow-up-circle"></i></span>
+        <div><span class="fin-kpi-label">Despesas</span><span class="fin-kpi-sub">Saídas ativas</span></div>
+      </div>
+      <span class="fin-kpi-value">R$ {{ total_despesas }}</span>
     </div>
   </div>
   <div class="col-12 col-md-4">
-    <div class="fin-kpi">
-      <span>Saldo</span>
-      <strong>{{ saldo }}</strong>
+    <div class="fin-kpi saldo">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-wallet2"></i></span>
+        <div><span class="fin-kpi-label">Saldo</span><span class="fin-kpi-sub">Receitas − despesas</span></div>
+      </div>
+      <span class="fin-kpi-value">R$ {{ saldo }}</span>
     </div>
   </div>
 </div>
 
 <section class="fin-panel">
-  <div class="table-responsive">
-    <table class="table fin-table mb-0">
+  <div class="fin-panel-head">
+    <div>
+      <h2>Todos os lançamentos</h2>
+      <p>{{ page_obj.paginator.count }} registro(s) encontrado(s)</p>
+    </div>
+    <a href="{% url "lancamento-create" %}" class="btn btn-sm btn-fin"><i class="bi bi-plus-lg me-1"></i>Adicionar</a>
+  </div>
+
+  <!-- Tabela desktop -->
+  <div class="table-responsive d-none d-md-block">
+    <table class="table fin-table mb-0 align-middle">
       <thead>
         <tr>
           <th>Data</th>
@@ -49,38 +74,79 @@
       <tbody>
         {% for lancamento in object_list %}
         <tr>
-          <td>{{ lancamento.data|date:"d/m/Y" }}</td>
-          <td>{{ lancamento.descricao|default:"—" }}</td>
-          <td>{{ lancamento.categoria.nome }}</td>
+          <td class="text-nowrap">{{ lancamento.data|date:"d/m/Y" }}</td>
+          <td class="fin-desc">{{ lancamento.descricao|default:"—" }}</td>
+          <td><span class="badge rounded-pill text-bg-light border">{{ lancamento.categoria.nome }}</span></td>
           <td>
             {% if lancamento.tipo == "receita" %}
-            <span class="badge text-bg-success">Receita</span>
+            <span class="badge fin-pill text-bg-success"><i class="bi bi-arrow-down-short"></i> Receita</span>
             {% else %}
-            <span class="badge text-bg-danger">Despesa</span>
+            <span class="badge fin-pill text-bg-danger"><i class="bi bi-arrow-up-short"></i> Despesa</span>
             {% endif %}
           </td>
-          <td class="fin-money">{{ lancamento.valor_total }}</td>
+          <td class="fin-money">R$ {{ lancamento.valor_total }}</td>
           <td class="text-end">
             <div class="dropdown">
-              <button class="btn btn-link text-secondary" data-bs-toggle="dropdown" aria-label="Ações do lançamento">
+              <button class="btn fin-row-actions" data-bs-toggle="dropdown" aria-label="Ações do lançamento">
                 <i class="bi bi-three-dots-vertical"></i>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{% url "lancamento-detail" lancamento.pk %}">Ver</a></li>
-                <li><a class="dropdown-item" href="{% url "lancamento-update" lancamento.pk %}">Editar</a></li>
+              <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li><a class="dropdown-item" href="{% url "lancamento-detail" lancamento.pk %}"><i class="bi bi-eye me-2"></i>Ver</a></li>
+                <li><a class="dropdown-item" href="{% url "lancamento-update" lancamento.pk %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="{% url "lancamento-delete" lancamento.pk %}">Excluir</a></li>
+                <li><a class="dropdown-item text-danger" href="{% url "lancamento-delete" lancamento.pk %}"><i class="bi bi-trash me-2"></i>Excluir</a></li>
               </ul>
             </div>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" class="text-center py-4 text-muted">Nenhum lançamento cadastrado.</td>
+          <td colspan="6">
+            <div class="fin-empty">
+              <div class="fin-empty-icon"><i class="bi bi-receipt"></i></div>
+              <strong class="d-block text-dark">Nenhum lançamento cadastrado</strong>
+              <p class="mb-3">Crie o primeiro lançamento para ver o saldo aqui.</p>
+              <a href="{% url "lancamento-create" %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar lançamento</a>
+            </div>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+  </div>
+
+  <!-- Cards mobile -->
+  <div class="fin-panel-body d-md-none">
+    {% for lancamento in object_list %}
+    <article class="fin-m-card">
+      <div class="d-flex justify-content-between align-items-start gap-2">
+        <div class="min-w-0">
+          <strong class="d-block text-truncate">{{ lancamento.descricao|default:"Lançamento" }}</strong>
+          <small class="text-muted">{{ lancamento.data|date:"d/m/Y" }} · {{ lancamento.categoria.nome }}</small>
+        </div>
+        {% if lancamento.tipo == "receita" %}
+        <span class="badge fin-pill text-bg-success">Receita</span>
+        {% else %}
+        <span class="badge fin-pill text-bg-danger">Despesa</span>
+        {% endif %}
+      </div>
+      <div class="d-flex justify-content-between align-items-center mt-2">
+        <span class="fin-money">R$ {{ lancamento.valor_total }}</span>
+        <span class="d-flex gap-1">
+          <a class="btn btn-sm btn-outline-secondary" href="{% url "lancamento-detail" lancamento.pk %}" aria-label="Ver"><i class="bi bi-eye"></i></a>
+          <a class="btn btn-sm btn-outline-secondary" href="{% url "lancamento-update" lancamento.pk %}" aria-label="Editar"><i class="bi bi-pencil"></i></a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url "lancamento-delete" lancamento.pk %}" aria-label="Excluir"><i class="bi bi-trash"></i></a>
+        </span>
+      </div>
+    </article>
+    {% empty %}
+    <div class="fin-empty">
+      <div class="fin-empty-icon"><i class="bi bi-receipt"></i></div>
+      <strong class="d-block text-dark">Nenhum lançamento cadastrado</strong>
+      <p class="mb-3">Crie o primeiro lançamento para ver o saldo aqui.</p>
+      <a href="{% url "lancamento-create" %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar lançamento</a>
+    </div>
+    {% endfor %}
   </div>
 </section>
 {% include "campeonato/includes/pagination.html" %}

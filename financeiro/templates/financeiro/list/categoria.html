@@ -8,28 +8,49 @@
 
 {% block content %}
 <div class="fin-page-head">
-  <h1>Categorias</h1>
-  <a href="{% url "categoria-create" %}" class="btn btn-fin">Nova</a>
+  <div>
+    <div class="fin-eyebrow">Organização</div>
+    <h1>Categorias</h1>
+    <p>Agrupe seus lançamentos por categoria.</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url "lancamento-list" %}" class="btn btn-outline-secondary"><i class="bi bi-receipt-cutoff me-1"></i>Lançamentos</a>
+    <a href="{% url "categoria-create" %}" class="btn btn-fin"><i class="bi bi-plus-lg me-1"></i>Nova</a>
+  </div>
 </div>
 
 <div class="row g-3 mb-4">
-  <div class="col-12 col-sm-6">
-    <div class="fin-kpi">
-      <span>Total</span>
-      <strong>{{ total_categorias }}</strong>
+  <div class="col-6">
+    <div class="fin-kpi neutra">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-tags"></i></span>
+        <div><span class="fin-kpi-label">Total</span><span class="fin-kpi-sub">Categorias</span></div>
+      </div>
+      <span class="fin-kpi-value">{{ total_categorias }}</span>
     </div>
   </div>
-  <div class="col-12 col-sm-6">
+  <div class="col-6">
     <div class="fin-kpi receita">
-      <span>Ativas</span>
-      <strong>{{ total_ativas }}</strong>
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-check-circle"></i></span>
+        <div><span class="fin-kpi-label">Ativas</span><span class="fin-kpi-sub">Disponíveis</span></div>
+      </div>
+      <span class="fin-kpi-value">{{ total_ativas }}</span>
     </div>
   </div>
 </div>
 
 <section class="fin-panel">
-  <div class="table-responsive">
-    <table class="table fin-table mb-0">
+  <div class="fin-panel-head">
+    <div>
+      <h2>Todas as categorias</h2>
+      <p>{{ page_obj.paginator.count }} registro(s) encontrado(s)</p>
+    </div>
+    <a href="{% url "categoria-create" %}" class="btn btn-sm btn-fin"><i class="bi bi-plus-lg me-1"></i>Adicionar</a>
+  </div>
+
+  <div class="table-responsive d-none d-md-block">
+    <table class="table fin-table mb-0 align-middle">
       <thead>
         <tr>
           <th>Nome</th>
@@ -40,35 +61,72 @@
       <tbody>
         {% for categoria in object_list %}
         <tr>
-          <td>{{ categoria.nome }}</td>
+          <td><strong>{{ categoria.nome }}</strong><br><small class="text-muted">{{ categoria.descricao|default:"Sem descrição"|truncatechars:60 }}</small></td>
           <td>
             {% if categoria.status %}
-            <span class="badge text-bg-success">Ativa</span>
+            <span class="badge fin-pill text-bg-success"><i class="bi bi-check-lg"></i> Ativa</span>
             {% else %}
-            <span class="badge text-bg-secondary">Inativa</span>
+            <span class="badge fin-pill text-bg-secondary">Inativa</span>
             {% endif %}
           </td>
           <td class="text-end">
             <div class="dropdown">
-              <button class="btn btn-link text-secondary" data-bs-toggle="dropdown" aria-label="Ações da categoria">
+              <button class="btn fin-row-actions" data-bs-toggle="dropdown" aria-label="Ações da categoria">
                 <i class="bi bi-three-dots-vertical"></i>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{% url "categoria-detail" categoria.pk %}">Ver</a></li>
-                <li><a class="dropdown-item" href="{% url "categoria-update" categoria.pk %}">Editar</a></li>
+              <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li><a class="dropdown-item" href="{% url "categoria-detail" categoria.pk %}"><i class="bi bi-eye me-2"></i>Ver</a></li>
+                <li><a class="dropdown-item" href="{% url "categoria-update" categoria.pk %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="{% url "categoria-delete" categoria.pk %}">Excluir</a></li>
+                <li><a class="dropdown-item text-danger" href="{% url "categoria-delete" categoria.pk %}"><i class="bi bi-trash me-2"></i>Excluir</a></li>
               </ul>
             </div>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="3" class="text-center py-4 text-muted">Nenhuma categoria cadastrada.</td>
+          <td colspan="3">
+            <div class="fin-empty">
+              <div class="fin-empty-icon"><i class="bi bi-tags"></i></div>
+              <strong class="d-block text-dark">Nenhuma categoria cadastrada</strong>
+              <p class="mb-3">Crie categorias como Alimentação, Transporte e Moradia.</p>
+              <a href="{% url "categoria-create" %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar categoria</a>
+            </div>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+  </div>
+
+  <div class="fin-panel-body d-md-none">
+    {% for categoria in object_list %}
+    <article class="fin-m-card">
+      <div class="d-flex justify-content-between align-items-start gap-2">
+        <div>
+          <strong class="d-block">{{ categoria.nome }}</strong>
+          <small class="text-muted">{{ categoria.descricao|default:"Sem descrição"|truncatechars:60 }}</small>
+        </div>
+        {% if categoria.status %}
+        <span class="badge fin-pill text-bg-success">Ativa</span>
+        {% else %}
+        <span class="badge fin-pill text-bg-secondary">Inativa</span>
+        {% endif %}
+      </div>
+      <div class="d-flex gap-1 justify-content-end mt-2">
+        <a class="btn btn-sm btn-outline-secondary" href="{% url "categoria-detail" categoria.pk %}" aria-label="Ver"><i class="bi bi-eye"></i></a>
+        <a class="btn btn-sm btn-outline-secondary" href="{% url "categoria-update" categoria.pk %}" aria-label="Editar"><i class="bi bi-pencil"></i></a>
+        <a class="btn btn-sm btn-outline-danger" href="{% url "categoria-delete" categoria.pk %}" aria-label="Excluir"><i class="bi bi-trash"></i></a>
+      </div>
+    </article>
+    {% empty %}
+    <div class="fin-empty">
+      <div class="fin-empty-icon"><i class="bi bi-tags"></i></div>
+      <strong class="d-block text-dark">Nenhuma categoria cadastrada</strong>
+      <p class="mb-3">Crie categorias como Alimentação, Transporte e Moradia.</p>
+      <a href="{% url "categoria-create" %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar categoria</a>
+    </div>
+    {% endfor %}
   </div>
 </section>
 {% include "campeonato/includes/pagination.html" %}
