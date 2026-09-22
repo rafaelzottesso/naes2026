@@ -69,9 +69,6 @@ class CategoriaList(BaseLoginMixin, ListView):
     template_name = 'financeiro/list/categoria.html'
     paginate_by = 30
 
-    def get_queryset(self):
-        return super().get_queryset().order_by('nome')
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['total_categorias'] = self.get_queryset().count()
@@ -104,7 +101,7 @@ class LancamentoCreate(BaseLoginMixin, CreateView):
         form = super().get_form(form_class)
         form.fields['data'].widget = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
         form.fields['data'].input_formats = ['%Y-%m-%d']
-        form.fields['categoria'].queryset = Categoria.objects.filter(status=True).order_by('nome')
+        form.fields['categoria'].queryset = Categoria.objects.filter(status=True)
         return form
 
     def form_valid(self, form):
@@ -140,7 +137,7 @@ class LancamentoUpdate(BaseLoginMixin, UpdateView):
         form = super().get_form(form_class)
         form.fields['categoria'].queryset = Categoria.objects.filter(
             Q(status=True) | Q(pk=self.object.categoria_id)
-        ).order_by('nome')
+        )
         return form
 
     def form_valid(self, form):
@@ -173,7 +170,7 @@ class LancamentoList(BaseLoginMixin, ListView):
     def get_queryset(self):
         return super().get_queryset().filter(
             criado_por=self.request.user
-        ).select_related('categoria').order_by('-data', '-criado_em')
+        ).select_related('categoria')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -195,5 +192,5 @@ class LancamentoDetail(BaseLoginMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['parcelas'] = self.object.parcela_set.order_by('numero')
+        context['parcelas'] = self.object.parcela_set.all()
         return context

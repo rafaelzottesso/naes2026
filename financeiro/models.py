@@ -21,6 +21,7 @@ class Categoria(models.Model):
     class Meta:
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
+        ordering = ['nome']
 
 class Lancamento(models.Model):
     tipo = models.CharField(max_length=10, choices=TIPO_LANCAMENTO, verbose_name='Tipo')
@@ -52,6 +53,7 @@ class Lancamento(models.Model):
     class Meta:
         verbose_name = 'Lançamento'
         verbose_name_plural = 'Lançamentos'
+        ordering = ['-data', '-criado_em']
 
     def __str__(self):
         return f"{self.descricao} - {self.valor}"
@@ -83,6 +85,7 @@ class Parcela(models.Model):
     class Meta:
         verbose_name = 'Parcela'
         verbose_name_plural = 'Parcelas'
+        ordering = ['numero']
 
     def __str__(self):
         return f"{self.lancamento.descricao} - {self.numero}"
