@@ -1,0 +1,89 @@
+{% extends "financeiro/base.html" %}
+
+{% block title %}Pessoas · Finanças{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Pessoas</li>
+{% endblock %}
+
+{% block content %}
+<div class="fin-page-head">
+  <div>
+    <div class="fin-eyebrow">Cadastros</div>
+    <h1>Pessoas</h1>
+    <p>Clientes e fornecedores dos lançamentos.</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary"><i class="bi bi-receipt-cutoff me-1"></i>Lançamentos</a>
+    <a href="{% url 'pessoa-create' %}" class="btn btn-fin"><i class="bi bi-plus-lg me-1"></i>Nova pessoa</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6">
+    <div class="fin-kpi neutra">
+      <div class="fin-kpi-top"><span class="fin-kpi-icon"><i class="bi bi-people"></i></span><div><span class="fin-kpi-label">Total</span><span class="fin-kpi-sub">Pessoas</span></div></div>
+      <span class="fin-kpi-value">{{ total_pessoas }}</span>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="fin-kpi receita">
+      <div class="fin-kpi-top"><span class="fin-kpi-icon"><i class="bi bi-check-circle"></i></span><div><span class="fin-kpi-label">Ativas</span><span class="fin-kpi-sub">Disponíveis</span></div></div>
+      <span class="fin-kpi-value">{{ total_ativas }}</span>
+    </div>
+  </div>
+</div>
+
+<section class="fin-panel">
+  <div class="fin-panel-head">
+    <div><h2>Todas as pessoas</h2><p>{{ page_obj.paginator.count }} registro(s) encontrado(s)</p></div>
+    <a href="{% url 'pessoa-create' %}" class="btn btn-sm btn-fin"><i class="bi bi-plus-lg me-1"></i>Adicionar</a>
+  </div>
+  <div class="table-responsive d-none d-md-block">
+    <table class="table fin-table mb-0 align-middle">
+      <thead><tr><th>Nome</th><th>CPF/CNPJ</th><th>Cidade</th><th>Status</th><th class="text-end">Ações</th></tr></thead>
+      <tbody>
+        {% for pessoa in object_list %}
+        <tr>
+          <td><strong>{{ pessoa.nome }}</strong></td>
+          <td>{{ pessoa.documento }}</td>
+          <td>{{ pessoa.cidade }}</td>
+          <td>{% if pessoa.status %}<span class="badge fin-pill text-bg-success">Ativa</span>{% else %}<span class="badge fin-pill text-bg-secondary">Inativa</span>{% endif %}</td>
+          <td class="text-end">
+            <div class="dropdown">
+              <button class="btn fin-row-actions" data-bs-toggle="dropdown" aria-label="Ações de {{ pessoa.nome }}"><i class="bi bi-three-dots-vertical"></i></button>
+              <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li><a class="dropdown-item" href="{% url 'pessoa-detail' pessoa.pk %}"><i class="bi bi-eye me-2"></i>Ver</a></li>
+                <li><a class="dropdown-item" href="{% url 'pessoa-update' pessoa.pk %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="{% url 'pessoa-delete' pessoa.pk %}"><i class="bi bi-trash me-2"></i>Excluir</a></li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5"><div class="fin-empty"><div class="fin-empty-icon"><i class="bi bi-people"></i></div><strong class="d-block text-dark">Nenhuma pessoa cadastrada</strong><p class="mb-3">Cadastre clientes e fornecedores para associá-los aos lançamentos.</p><a href="{% url 'pessoa-create' %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Cadastrar pessoa</a></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="fin-panel-body d-md-none">
+    {% for pessoa in object_list %}
+    <article class="fin-m-card">
+      <div class="d-flex justify-content-between align-items-start gap-2">
+        <div class="min-w-0"><strong class="d-block text-truncate">{{ pessoa.nome }}</strong><small class="text-muted">{{ pessoa.documento }} · {{ pessoa.cidade }}</small></div>
+        {% if pessoa.status %}<span class="badge fin-pill text-bg-success">Ativa</span>{% else %}<span class="badge fin-pill text-bg-secondary">Inativa</span>{% endif %}
+      </div>
+      <div class="d-flex gap-1 justify-content-end mt-2">
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'pessoa-detail' pessoa.pk %}" aria-label="Ver"><i class="bi bi-eye"></i></a>
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'pessoa-update' pessoa.pk %}" aria-label="Editar"><i class="bi bi-pencil"></i></a>
+        <a class="btn btn-sm btn-outline-danger" href="{% url 'pessoa-delete' pessoa.pk %}" aria-label="Excluir"><i class="bi bi-trash"></i></a>
+      </div>
+    </article>
+    {% empty %}
+    <div class="fin-empty"><div class="fin-empty-icon"><i class="bi bi-people"></i></div><strong class="d-block text-dark">Nenhuma pessoa cadastrada</strong><p class="mb-3">Cadastre clientes e fornecedores para associá-los aos lançamentos.</p><a href="{% url 'pessoa-create' %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Cadastrar pessoa</a></div>
+    {% endfor %}
+  </div>
+</section>
+{% include "campeonato/includes/pagination.html" %}
+{% endblock %}

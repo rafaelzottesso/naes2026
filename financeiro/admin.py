@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Categoria, Lancamento, Parcela
+from .models import Categoria, Lancamento, Parcela, Pessoa
 
 
 @admin.register(Categoria)
@@ -10,9 +10,16 @@ class CategoriaAdmin(admin.ModelAdmin):
     search_fields = ('nome',)
 
 
+@admin.register(Pessoa)
+class PessoaAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'documento', 'cidade', 'status', 'criado_por')
+    list_filter = ('status', 'cidade')
+    search_fields = ('nome', 'documento', 'cidade')
+
+
 @admin.register(Lancamento)
 class LancamentoAdmin(admin.ModelAdmin):
-    list_display = ('descricao', 'tipo', 'data', 'valor', 'parcelas', 'status', 'criado_por')
+    list_display = ('descricao', 'pessoa', 'tipo', 'data', 'valor', 'parcelas', 'status', 'criado_por')
     list_filter = ('tipo', 'status')
     search_fields = ('descricao',)
 

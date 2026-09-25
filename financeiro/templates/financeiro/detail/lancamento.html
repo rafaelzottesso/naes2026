@@ -31,6 +31,7 @@
   <div class="fin-panel-body">
     <div class="fin-meta-grid">
       <div class="fin-meta"><p class="fin-label">Categoria</p><p>{{ object.categoria.nome }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Cliente/Fornecedor</p><p><a href="{% url 'pessoa-detail' object.pessoa.pk %}">{{ object.pessoa.nome }}</a></p></div>
       <div class="fin-meta"><p class="fin-label">Data da 1ª parcela</p><p>{{ object.data|date:"d/m/Y" }}</p></div>
       <div class="fin-meta"><p class="fin-label">Status</p><p>{% if object.status %}Ativo{% else %}Inativo{% endif %}</p></div>
       <div class="fin-meta"><p class="fin-label">Intervalo (dias)</p><p>{{ object.intervalo_parcelas|default:"—" }}</p></div>

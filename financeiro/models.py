@@ -23,10 +23,33 @@ class Categoria(models.Model):
         verbose_name_plural = 'Categorias'
         ordering = ['nome']
 
+
+class Pessoa(models.Model):
+    nome = models.CharField(max_length=150, verbose_name='Nome')
+    documento = models.CharField(max_length=18, unique=True, verbose_name='CPF ou CNPJ')
+    cep = models.CharField(max_length=9, verbose_name='CEP')
+    endereco = models.CharField(max_length=255, verbose_name='Endereço')
+    cidade = models.CharField(max_length=100, verbose_name='Cidade')
+    status = models.BooleanField(default=True, verbose_name='Ativo')
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+    criado_por = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        verbose_name = 'Pessoa'
+        verbose_name_plural = 'Pessoas'
+        ordering = ['nome']
+
+
 class Lancamento(models.Model):
     tipo = models.CharField(max_length=10, choices=TIPO_LANCAMENTO, verbose_name='Tipo')
     data = models.DateField(verbose_name='Data')
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    pessoa = models.ForeignKey(Pessoa, on_delete=models.PROTECT, verbose_name='Cliente/Fornecedor')
     descricao = models.TextField(blank=True, verbose_name='Descrição')
     
     valor = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Valor')

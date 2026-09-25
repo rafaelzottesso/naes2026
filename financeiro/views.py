@@ -6,6 +6,9 @@ from django import forms
 from django.db.models import DecimalField, ExpressionWrapper, F, Q, Sum, Value
 from django.db.models.functions import Coalesce
 from django.db import transaction
+from django.db.models.deletion import ProtectedError
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, TemplateView, UpdateView, DeleteView
@@ -13,7 +16,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Categoria, Lancamento, Parcela
+from .models import Categoria, Lancamento, Parcela, Pessoa
 from .services import gerar_parcelas, validar_lancamento
 
 
@@ -84,10 +87,70 @@ class CategoriaDetail(BaseLoginMixin, DetailView):
     template_name = 'financeiro/detail/categoria.html'
 
 
+class PessoaCreate(BaseLoginMixin, CreateView):
+    model = Pessoa
+    fields = ['nome', 'documento', 'cep', 'endereco', 'cidade', 'status']
+    template_name = 'financeiro/form.html'
+    success_url = reverse_lazy('pessoa-list')
+    extra_context = {
+        'titulo': 'Cadastro de Pessoa',
+        'botao': 'Criar Pessoa',
+    }
+
+    def form_valid(self, form):
+        form.instance.criado_por = self.request.user
+        return super().form_valid(form)
+
+
+class PessoaUpdate(BaseLoginMixin, UpdateView):
+    model = Pessoa
+    fields = ['nome', 'documento', 'cep', 'endereco', 'cidade', 'status']
+    template_name = 'financeiro/form.html'
+    success_url = reverse_lazy('pessoa-list')
+    extra_context = {
+        'titulo': 'Editar Pessoa',
+        'botao': 'Atualizar Pessoa',
+    }
+
+
+class PessoaDelete(BaseLoginMixin, DeleteView):
+    model = Pessoa
+    template_name = 'financeiro/form.html'
+    success_url = reverse_lazy('pessoa-list')
+    extra_context = {
+        'titulo': 'Excluir Pessoa',
+        'botao': 'Sim, excluir!',
+    }
+
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(request, 'Esta pessoa está vinculada a lançamentos e não pode ser excluída.')
+            return HttpResponseRedirect(self.get_success_url())
+
+
+class PessoaList(BaseLoginMixin, ListView):
+    model = Pessoa
+    template_name = 'financeiro/list/pessoa.html'
+    paginate_by = 30
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_pessoas'] = self.get_queryset().count()
+        context['total_ativas'] = self.get_queryset().filter(status=True).count()
+        return context
+
+
+class PessoaDetail(BaseLoginMixin, DetailView):
+    model = Pessoa
+    template_name = 'financeiro/detail/pessoa.html'
+
+
 class LancamentoCreate(BaseLoginMixin, CreateView):
     model = Lancamento
     fields = [
-        'tipo', 'data', 'categoria', 'descricao', 'valor',
+        'tipo', 'data', 'categoria', 'pessoa', 'descricao', 'valor',
         'desconto', 'acrescimo', 'parcelas', 'intervalo_parcelas', 'status',
     ]
     template_name = 'financeiro/form.html'
@@ -105,6 +168,7 @@ class LancamentoCreate(BaseLoginMixin, CreateView):
         form.fields['data'].widget = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
         form.fields['data'].input_formats = ['%Y-%m-%d']
         form.fields['categoria'].queryset = Categoria.objects.filter(status=True)
+        form.fields['pessoa'].queryset = Pessoa.objects.filter(status=True)
         return form
 
     def form_valid(self, form):
@@ -123,7 +187,7 @@ class LancamentoCreate(BaseLoginMixin, CreateView):
 
 class LancamentoUpdate(BaseLoginMixin, UpdateView):
     model = Lancamento
-    fields = ['descricao', 'tipo', 'categoria', 'status']
+    fields = ['descricao', 'tipo', 'categoria', 'pessoa', 'status']
     template_name = 'financeiro/form.html'
     extra_context = {
         'titulo': 'Editar Lançamento',
@@ -140,6 +204,9 @@ class LancamentoUpdate(BaseLoginMixin, UpdateView):
         form = super().get_form(form_class)
         form.fields['categoria'].queryset = Categoria.objects.filter(
             Q(status=True) | Q(pk=self.object.categoria_id)
+        )
+        form.fields['pessoa'].queryset = Pessoa.objects.filter(
+            Q(status=True) | Q(pk=self.object.pessoa_id)
         )
         return form
 
@@ -173,7 +240,7 @@ class LancamentoList(BaseLoginMixin, ListView):
     def get_queryset(self):
         return super().get_queryset().filter(
             criado_por=self.request.user
-        ).select_related('categoria')
+        ).select_related('categoria', 'pessoa')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -191,7 +258,7 @@ class LancamentoDetail(BaseLoginMixin, DetailView):
     def get_queryset(self):
         return super().get_queryset().filter(
             criado_por=self.request.user
-        ).select_related('categoria')
+        ).select_related('categoria', 'pessoa')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

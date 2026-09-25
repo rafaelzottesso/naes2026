@@ -1,0 +1,38 @@
+{% extends "financeiro/base.html" %}
+
+{% block title %}{{ object.nome }} · Pessoas{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'pessoa-list' %}">Pessoas</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ object.nome }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="fin-hero mb-3">
+  <small>Cliente/Fornecedor</small>
+  <h1 class="h2 text-white mb-2">{{ object.nome }}</h1>
+  <div class="fin-hero-meta">
+    <span class="badge fin-pill text-bg-light">{{ object.documento }}</span>
+    <span class="badge fin-pill {% if object.status %}text-bg-light{% else %}text-bg-secondary{% endif %}">{% if object.status %}Ativa{% else %}Inativa{% endif %}</span>
+  </div>
+  <div class="d-flex flex-wrap gap-2 mt-3">
+    <a href="{% url 'pessoa-update' object.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil me-1"></i>Editar</a>
+    <a href="{% url 'pessoa-delete' object.pk %}" class="btn btn-sm btn-outline-light"><i class="bi bi-trash me-1"></i>Excluir</a>
+    <a href="{% url 'pessoa-list' %}" class="btn btn-sm btn-link text-white text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  </div>
+</div>
+
+<section class="fin-panel">
+  <div class="fin-panel-head"><h2>Dados cadastrais</h2></div>
+  <div class="fin-panel-body">
+    <div class="fin-meta-grid">
+      <div class="fin-meta"><p class="fin-label">Nome</p><p>{{ object.nome }}</p></div>
+      <div class="fin-meta"><p class="fin-label">CPF/CNPJ</p><p>{{ object.documento }}</p></div>
+      <div class="fin-meta"><p class="fin-label">CEP</p><p>{{ object.cep }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Endereço</p><p>{{ object.endereco }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Cidade</p><p>{{ object.cidade }}</p></div>
+      <div class="fin-meta"><p class="fin-label">Status</p><p>{% if object.status %}Ativa{% else %}Inativa{% endif %}</p></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

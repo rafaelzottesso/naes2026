@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     CategoriaCreate, CategoriaUpdate, CategoriaDelete, CategoriaList, CategoriaDetail,
+    PessoaCreate, PessoaUpdate, PessoaDelete, PessoaList, PessoaDetail,
     LancamentoCreate, LancamentoUpdate, LancamentoDelete, LancamentoList, LancamentoDetail,
     FinanceiroDashboard,
 )
@@ -15,6 +16,12 @@ urlpatterns = [
     path('excluir/categoria/<int:pk>/', CategoriaDelete.as_view(), name='categoria-delete'),
     path('listar/categoria/', CategoriaList.as_view(), name='categoria-list'),
     path('detalhar/categoria/<int:pk>/', CategoriaDetail.as_view(), name='categoria-detail'),
+
+    path('cadastrar/pessoa/', PessoaCreate.as_view(), name='pessoa-create'),
+    path('atualizar/pessoa/<int:pk>/', PessoaUpdate.as_view(), name='pessoa-update'),
+    path('excluir/pessoa/<int:pk>/', PessoaDelete.as_view(), name='pessoa-delete'),
+    path('listar/pessoa/', PessoaList.as_view(), name='pessoa-list'),
+    path('detalhar/pessoa/<int:pk>/', PessoaDetail.as_view(), name='pessoa-detail'),
 
     path('cadastrar/lancamento/', LancamentoCreate.as_view(), name='lancamento-create'),
     path('atualizar/lancamento/<int:pk>/', LancamentoUpdate.as_view(), name='lancamento-update'),
