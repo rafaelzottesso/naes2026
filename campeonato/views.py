@@ -1,11 +1,20 @@
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView
+from django_filters.views import FilterView
 
 # Buscar a rota da url pelo name dela (urls.py)
 from django.urls import reverse_lazy
 
 from .models import Campus, Jogador, Modalidade, Etapa, Campeonato, Inscricao, Jogo
+from .filters import (
+    CampusFilter,
+    CampeonatoFilter,
+    EtapaFilter,
+    InscricaoFilter,
+    JogadorFilter,
+    JogoFilter,
+    ModalidadeFilter,
+)
 
 # Importar o BaseLoginMixin para proteger as views
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -55,10 +64,12 @@ class CampusDelete(GroupRequiredMixin, DeleteView):
     }
 
 
-class CampusList(BaseLoginMixin, ListView):
+class CampusList(BaseLoginMixin, FilterView):
     model = Campus
     template_name = 'campeonato/list/campus.html'
     paginate_by = 30
+    ordering = ['nome']
+    filterset_class = CampusFilter
 
 
 class CampusDetail(BaseLoginMixin, DetailView):
@@ -105,10 +116,12 @@ class ModalidadeDelete(GroupRequiredMixin, DeleteView):
     }
 
 
-class ModalidadeList(BaseLoginMixin, ListView):
+class ModalidadeList(BaseLoginMixin, FilterView):
     model = Modalidade
     template_name = 'campeonato/list/modalidade.html'
     paginate_by = 30
+    ordering = ['nome']
+    filterset_class = ModalidadeFilter
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -159,11 +172,13 @@ class EtapaDelete(GroupRequiredMixin, DeleteView):
     }
 
 
-class EtapaList(GroupRequiredMixin, ListView):
+class EtapaList(GroupRequiredMixin, FilterView):
     group_required = ['Administrador']
     model = Etapa
     template_name = 'campeonato/list/etapa.html'
     paginate_by = 30
+    ordering = ['pk']
+    filterset_class = EtapaFilter
 
 
 class EtapaDetail(GroupRequiredMixin, DetailView):
@@ -206,11 +221,13 @@ class JogadorDelete(GroupRequiredMixin, DeleteView):
     }
 
 
-class JogadorList(GroupRequiredMixin, ListView):
+class JogadorList(GroupRequiredMixin, FilterView):
     group_required = ['Administrador', 'Organização']
     model = Jogador
     template_name = 'campeonato/list/jogador.html'
     paginate_by = 30
+    ordering = ['pk']
+    filterset_class = JogadorFilter
 
     def get_queryset(self):
         return super().get_queryset().select_related('campus')
@@ -284,10 +301,12 @@ class CampeonatoDelete(GroupRequiredMixin, DeleteView):
         return super().get_queryset().filter(cadastrado_por=self.request.user)
 
 
-class CampeonatoList(ListView):
+class CampeonatoList(FilterView):
     model = Campeonato
     template_name = 'campeonato/list/campeonato.html'
     paginate_by = 30
+    ordering = ['pk']
+    filterset_class = CampeonatoFilter
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -341,10 +360,12 @@ class InscricaoDelete(BaseLoginMixin, DeleteView):
     }
 
 
-class InscricaoList(BaseLoginMixin, ListView):
+class InscricaoList(BaseLoginMixin, FilterView):
     model = Inscricao
     template_name = 'campeonato/list/inscricao.html'
     paginate_by = 30
+    ordering = ['pk']
+    filterset_class = InscricaoFilter
 
     def get_queryset(self):
         return super().get_queryset().select_related('campeonato', 'modalidade')
@@ -390,10 +411,12 @@ class JogoDelete(GroupRequiredMixin, DeleteView):
     }
 
 
-class JogoList(ListView):
+class JogoList(FilterView):
     model = Jogo
     template_name = 'campeonato/list/jogo.html'
     paginate_by = 30
+    ordering = ['pk']
+    filterset_class = JogoFilter
 
     def get_queryset(self):
         return super().get_queryset().select_related(

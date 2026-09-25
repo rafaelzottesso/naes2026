@@ -13,10 +13,11 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, TemplateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView
+from django_filters.views import FilterView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Categoria, Lancamento, Parcela, Pessoa
+from .filters import CategoriaFilter, LancamentoFilter, PessoaFilter
 from .services import gerar_parcelas, validar_lancamento
 
 
@@ -70,10 +71,12 @@ class CategoriaDelete(BaseLoginMixin, DeleteView):
     }
 
 
-class CategoriaList(BaseLoginMixin, ListView):
+class CategoriaList(BaseLoginMixin, FilterView):
     model = Categoria
     template_name = 'financeiro/list/categoria.html'
     paginate_by = 30
+    ordering = ['nome']
+    filterset_class = CategoriaFilter
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -130,10 +133,12 @@ class PessoaDelete(BaseLoginMixin, DeleteView):
             return HttpResponseRedirect(self.get_success_url())
 
 
-class PessoaList(BaseLoginMixin, ListView):
+class PessoaList(BaseLoginMixin, FilterView):
     model = Pessoa
     template_name = 'financeiro/list/pessoa.html'
     paginate_by = 30
+    ordering = ['nome']
+    filterset_class = PessoaFilter
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -232,10 +237,12 @@ class LancamentoDelete(BaseLoginMixin, DeleteView):
         return super().get_queryset().filter(criado_por=self.request.user)
 
 
-class LancamentoList(BaseLoginMixin, ListView):
+class LancamentoList(BaseLoginMixin, FilterView):
     model = Lancamento
     template_name = 'financeiro/list/lancamento.html'
     paginate_by = 30
+    ordering = ['-data', '-criado_em']
+    filterset_class = LancamentoFilter
 
     def get_queryset(self):
         return super().get_queryset().filter(
