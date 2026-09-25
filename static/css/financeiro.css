@@ -363,6 +363,16 @@ body.fin-body {
 }
 .btn-fin:hover, .btn-fin:focus-visible { color: #fff; filter: brightness(1.05); }
 .btn-fin:active { transform: scale(0.98); }
+.btn-fin-soft {
+  background: linear-gradient(135deg, var(--fin-surface), var(--fin-accent-soft));
+  border: 1px solid rgba(14, 110, 104, 0.18); color: var(--fin-accent-2);
+  font-weight: 600; border-radius: 12px; padding: 0.6rem 1.1rem;
+  box-shadow: 0 2px 8px rgba(14, 110, 104, 0.08);
+}
+.btn-fin-soft:hover, .btn-fin-soft:focus-visible {
+  background: linear-gradient(135deg, var(--fin-accent-soft), #d0ebe6);
+  border-color: var(--fin-accent); color: var(--fin-accent-2);
+}
 .btn-outline-secondary { border-radius: 12px; font-weight: 600; }
 
 .pagination .page-link { border-radius: 10px !important; margin: 0 2px; border-color: var(--fin-border); color: var(--fin-accent); font-weight: 700; }

@@ -18,12 +18,12 @@
                     {{ filter.form|crispy }}
 
                     <div class="col d-flex flex-wrap gap-2 mb-3">
-                        <button type="submit" class="btn btn-outline-primary">
-                            <i class="bi bi-search"></i> Filtrar
+                        <button type="submit" class="btn btn-fin">
+                            <i class="bi bi-search me-1"></i> Filtrar
                         </button>
                         {# O botão "Limpar" volta para a mesma página, sem os parâmetros da busca #}
-                        <a href="{{ request.path }}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-lg"></i> Limpar
+                        <a href="{{ request.path }}" class="btn btn-fin-soft">
+                            <i class="bi bi-x-lg me-1"></i> Limpar
                         </a>
                     </div>
                 </form>
