@@ -19,7 +19,7 @@
     <a href="{% url 'financeiro-dashboard' %}" class="btn btn-outline-secondary">
       <i class="bi bi-speedometer2 me-1"></i>Ir ao Dashboard
     </a>
-    <a href="{% url 'lancamento-create' %}" class="btn btn-fin">
+    <a href="{% url 'lancamento-create' %}" class="btn btn-primary">
       <i class="bi bi-plus-lg me-1"></i>Novo Lançamento
     </a>
   </div>
@@ -118,10 +118,10 @@
               {% endif %}
             </td>
             <td class="text-end fw-bold">
-              {% if l.categoria.tipo == 'R' or l.valor >= 0 %}
-                <span class="text-success">+ {{ l.valor|brl }}</span>
+              {% if l.tipo == 'receita' %}
+                <span class="text-success">+ {{ l.valor_total|brl }}</span>
               {% else %}
-                <span class="text-danger">- {{ l.valor|brl }}</span>
+                <span class="text-danger">− {{ l.valor_total|brl }}</span>
               {% endif %}
             </td>
             <td class="text-end">
@@ -137,7 +137,7 @@
                 <div class="fin-empty-icon mb-2"><i class="bi bi-cash-stack fs-2 text-muted"></i></div>
                 <strong class="d-block text-dark">Nenhum lançamento cadastrado ainda</strong>
                 <p class="text-muted mb-3">Comece criando o primeiro registro de receita ou despesa.</p>
-                <a href="{% url 'lancamento-create' %}" class="btn btn-fin btn-sm">
+                <a href="{% url 'lancamento-create' %}" class="btn btn-primary btn-sm">
                   <i class="bi bi-plus-lg me-1"></i>Criar lançamento
                 </a>
               </div>

@@ -35,7 +35,7 @@
       {% csrf_token %}
       {{ form|crispy }}
       <div class="fin-actions mt-4">
-        <button type="submit" class="btn btn-fin flex-fill">
+        <button type="submit" class="btn btn-primary flex-fill">
           <i class="bi bi-check-lg me-1"></i>{{ botao }}
         </button>
         <a href="{% url 'index' %}" class="btn btn-outline-secondary flex-fill">Cancelar</a>
