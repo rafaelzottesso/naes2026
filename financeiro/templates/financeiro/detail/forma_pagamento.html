@@ -1,0 +1,35 @@
+{% extends "financeiro/base.html" %}
+
+{% block title %}{{ object.nome }} · Finanças{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'forma-pagamento-list' %}">Formas de pagamento</a></li>
+<li class="breadcrumb-item active" aria-current="page">Detalhes</li>
+{% endblock %}
+
+{% block content %}
+<div class="fin-hero mb-3">
+  <small>Forma de pagamento</small>
+  <p class="fin-hero-value">{{ object.nome }}</p>
+  <div class="fin-hero-meta">
+    {% if object.status %}
+    <span class="badge fin-pill text-bg-success"><i class="bi bi-check-lg"></i> Ativa</span>
+    {% else %}
+    <span class="badge fin-pill text-bg-secondary">Inativa</span>
+    {% endif %}
+  </div>
+  <div class="d-flex flex-wrap gap-2 mt-3">
+    <a href="{% url 'forma-pagamento-update' object.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil me-1"></i>Editar</a>
+    <a href="{% url 'forma-pagamento-delete' object.pk %}" class="btn btn-sm btn-outline-light js-excluir" data-titulo="Excluir forma de pagamento" data-mensagem="Excluir a forma de pagamento {{ object.nome }}?"><i class="bi bi-trash me-1"></i>Excluir</a>
+    <a href="{% url 'forma-pagamento-list' %}" class="btn btn-sm btn-link text-white text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  </div>
+</div>
+
+<section class="fin-panel">
+  <div class="fin-panel-head"><h2>Informações</h2></div>
+  <div class="fin-panel-body">
+    <div class="fin-meta"><p class="fin-label">Descrição</p><p class="mb-0">{{ object.descricao|default:"—" }}</p></div>
+    <a href="{% url 'forma-pagamento-list' %}" class="btn btn-outline-secondary mt-4"><i class="bi bi-arrow-left me-1"></i>Voltar para formas de pagamento</a>
+  </div>
+</section>
+{% endblock %}

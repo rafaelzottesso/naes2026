@@ -2,27 +2,49 @@ import json
 from calendar import monthrange
 from decimal import Decimal
 
-from django import forms
-from django.db.models import DecimalField, ExpressionWrapper, F, Q, Sum, Value
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import DecimalField, ExpressionWrapper, F, Sum, Value
+from django.db.models.deletion import ProtectedError
 from django.db.models.functions import Coalesce
 from django.db import transaction
-from django.db.models.deletion import ProtectedError
-from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, TemplateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 from django_filters.views import FilterView
-from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Categoria, Lancamento, Parcela, Pessoa
-from .filters import CategoriaFilter, LancamentoFilter, PessoaFilter
-from .services import gerar_parcelas, validar_lancamento
+from .filters import CategoriaFilter, FormaPagamentoFilter, LancamentoFilter, PessoaFilter
+from .forms import LancamentoForm, LancamentoUpdateForm, ParcelaForm
+from .models import Categoria, FormaPagamento, Lancamento, Parcela, Pessoa
+from .services import gerar_parcelas
 
 
 class BaseLoginMixin(LoginRequiredMixin):
     login_url = reverse_lazy('login')
+
+
+class RegistroDoUsuarioMixin(BaseLoginMixin):
+    """Cada pessoa só acessa os cadastros que ela mesma criou."""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(criado_por=self.request.user)
+
+
+class ProtegidoDeleteMixin:
+    mensagem_protegido = 'Este registro está em uso e não pode ser excluído.'
+    mensagem_sucesso = 'Registro excluído.'
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        try:
+            self.object.delete()
+        except ProtectedError:
+            messages.error(self.request, self.mensagem_protegido)
+            return HttpResponseRedirect(self.get_success_url())
+        messages.success(self.request, self.mensagem_sucesso)
+        return HttpResponseRedirect(self.get_success_url())
 
 
 def _soma_liquida(queryset):
@@ -42,36 +64,46 @@ class CategoriaCreate(BaseLoginMixin, CreateView):
     success_url = reverse_lazy('categoria-list')
     extra_context = {
         'titulo': 'Cadastro de Categoria',
-        'botao': 'Criar Categoria',
+        'botao': 'Criar categoria',
     }
 
     def form_valid(self, form):
         form.instance.criado_por = self.request.user
+        messages.success(self.request, 'Categoria cadastrada.')
         return super().form_valid(form)
 
 
-class CategoriaUpdate(BaseLoginMixin, UpdateView):
+class CategoriaUpdate(RegistroDoUsuarioMixin, UpdateView):
     model = Categoria
     fields = ['nome', 'descricao', 'status']
     template_name = 'financeiro/form.html'
     success_url = reverse_lazy('categoria-list')
     extra_context = {
         'titulo': 'Editar Categoria',
-        'botao': 'Atualizar Categoria',
+        'botao': 'Atualizar categoria',
     }
 
+    def form_valid(self, form):
+        messages.success(self.request, 'Categoria atualizada.')
+        return super().form_valid(form)
 
-class CategoriaDelete(BaseLoginMixin, DeleteView):
+
+class CategoriaDelete(ProtegidoDeleteMixin, RegistroDoUsuarioMixin, DeleteView):
     model = Categoria
     template_name = 'financeiro/form.html'
     success_url = reverse_lazy('categoria-list')
+    mensagem_protegido = (
+        'Esta categoria está em lançamentos e não pode ser excluída. '
+        'Inative-a se não quiser mais usá-la.'
+    )
+    mensagem_sucesso = 'Categoria excluída.'
     extra_context = {
         'titulo': 'Excluir Categoria',
         'botao': 'Sim, excluir!',
     }
 
 
-class CategoriaList(BaseLoginMixin, FilterView):
+class CategoriaList(RegistroDoUsuarioMixin, FilterView):
     model = Categoria
     template_name = 'financeiro/list/categoria.html'
     paginate_by = 30
@@ -80,14 +112,22 @@ class CategoriaList(BaseLoginMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_categorias'] = self.get_queryset().count()
-        context['total_ativas'] = self.get_queryset().filter(status=True).count()
+        minhas = Categoria.objects.filter(criado_por=self.request.user)
+        context['total_categorias'] = minhas.count()
+        context['total_ativas'] = minhas.filter(status=True).count()
         return context
 
 
-class CategoriaDetail(BaseLoginMixin, DetailView):
+class CategoriaDetail(RegistroDoUsuarioMixin, DetailView):
     model = Categoria
     template_name = 'financeiro/detail/categoria.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['lancamentos'] = self.object.lancamentos.filter(
+            criado_por=self.request.user,
+        ).select_related('pessoa', 'forma_pagamento')[:8]
+        return context
 
 
 class PessoaCreate(BaseLoginMixin, CreateView):
@@ -97,43 +137,43 @@ class PessoaCreate(BaseLoginMixin, CreateView):
     success_url = reverse_lazy('pessoa-list')
     extra_context = {
         'titulo': 'Cadastro de Pessoa',
-        'botao': 'Criar Pessoa',
+        'botao': 'Criar pessoa',
     }
 
     def form_valid(self, form):
         form.instance.criado_por = self.request.user
+        messages.success(self.request, 'Pessoa cadastrada.')
         return super().form_valid(form)
 
 
-class PessoaUpdate(BaseLoginMixin, UpdateView):
+class PessoaUpdate(RegistroDoUsuarioMixin, UpdateView):
     model = Pessoa
     fields = ['nome', 'documento', 'cep', 'endereco', 'cidade', 'status']
     template_name = 'financeiro/form.html'
     success_url = reverse_lazy('pessoa-list')
     extra_context = {
         'titulo': 'Editar Pessoa',
-        'botao': 'Atualizar Pessoa',
+        'botao': 'Atualizar pessoa',
     }
 
+    def form_valid(self, form):
+        messages.success(self.request, 'Pessoa atualizada.')
+        return super().form_valid(form)
 
-class PessoaDelete(BaseLoginMixin, DeleteView):
+
+class PessoaDelete(ProtegidoDeleteMixin, RegistroDoUsuarioMixin, DeleteView):
     model = Pessoa
     template_name = 'financeiro/form.html'
     success_url = reverse_lazy('pessoa-list')
+    mensagem_protegido = 'Esta pessoa está vinculada a lançamentos e não pode ser excluída.'
+    mensagem_sucesso = 'Pessoa excluída.'
     extra_context = {
         'titulo': 'Excluir Pessoa',
         'botao': 'Sim, excluir!',
     }
 
-    def post(self, request, *args, **kwargs):
-        try:
-            return super().post(request, *args, **kwargs)
-        except ProtectedError:
-            messages.error(request, 'Esta pessoa está vinculada a lançamentos e não pode ser excluída.')
-            return HttpResponseRedirect(self.get_success_url())
 
-
-class PessoaList(BaseLoginMixin, FilterView):
+class PessoaList(RegistroDoUsuarioMixin, FilterView):
     model = Pessoa
     template_name = 'financeiro/list/pessoa.html'
     paginate_by = 30
@@ -142,102 +182,169 @@ class PessoaList(BaseLoginMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_pessoas'] = self.get_queryset().count()
-        context['total_ativas'] = self.get_queryset().filter(status=True).count()
+        minhas = Pessoa.objects.filter(criado_por=self.request.user)
+        context['total_pessoas'] = minhas.count()
+        context['total_ativas'] = minhas.filter(status=True).count()
         return context
 
 
-class PessoaDetail(BaseLoginMixin, DetailView):
+class PessoaDetail(RegistroDoUsuarioMixin, DetailView):
     model = Pessoa
     template_name = 'financeiro/detail/pessoa.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['lancamentos'] = self.object.lancamentos.filter(
+            criado_por=self.request.user,
+        ).select_related('categoria', 'forma_pagamento')[:8]
+        return context
+
+
+class FormaPagamentoCreate(BaseLoginMixin, CreateView):
+    model = FormaPagamento
+    fields = ['nome', 'descricao', 'status']
+    template_name = 'financeiro/form.html'
+    success_url = reverse_lazy('forma-pagamento-list')
+    extra_context = {
+        'titulo': 'Cadastro de Forma de Pagamento',
+        'botao': 'Criar forma de pagamento',
+    }
+
+    def form_valid(self, form):
+        form.instance.criado_por = self.request.user
+        messages.success(self.request, 'Forma de pagamento cadastrada.')
+        return super().form_valid(form)
+
+
+class FormaPagamentoUpdate(RegistroDoUsuarioMixin, UpdateView):
+    model = FormaPagamento
+    fields = ['nome', 'descricao', 'status']
+    template_name = 'financeiro/form.html'
+    success_url = reverse_lazy('forma-pagamento-list')
+    extra_context = {
+        'titulo': 'Editar Forma de Pagamento',
+        'botao': 'Atualizar forma de pagamento',
+    }
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Forma de pagamento atualizada.')
+        return super().form_valid(form)
+
+
+class FormaPagamentoDelete(ProtegidoDeleteMixin, RegistroDoUsuarioMixin, DeleteView):
+    model = FormaPagamento
+    template_name = 'financeiro/form.html'
+    success_url = reverse_lazy('forma-pagamento-list')
+    mensagem_protegido = (
+        'Esta forma de pagamento está em lançamentos ou parcelas e não pode ser excluída.'
+    )
+    mensagem_sucesso = 'Forma de pagamento excluída.'
+    extra_context = {
+        'titulo': 'Excluir Forma de Pagamento',
+        'botao': 'Sim, excluir!',
+    }
+
+
+class FormaPagamentoList(RegistroDoUsuarioMixin, FilterView):
+    model = FormaPagamento
+    template_name = 'financeiro/list/forma_pagamento.html'
+    paginate_by = 30
+    ordering = ['nome']
+    filterset_class = FormaPagamentoFilter
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        minhas = FormaPagamento.objects.filter(criado_por=self.request.user)
+        context['total_formas'] = minhas.count()
+        context['total_ativas'] = minhas.filter(status=True).count()
+        return context
+
+
+class FormaPagamentoDetail(RegistroDoUsuarioMixin, DetailView):
+    model = FormaPagamento
+    template_name = 'financeiro/detail/forma_pagamento.html'
 
 
 class LancamentoCreate(BaseLoginMixin, CreateView):
     model = Lancamento
-    fields = [
-        'tipo', 'data', 'categoria', 'pessoa', 'descricao', 'valor',
-        'desconto', 'acrescimo', 'parcelas', 'intervalo_parcelas', 'status',
-    ]
+    form_class = LancamentoForm
     template_name = 'financeiro/form.html'
     extra_context = {
         'titulo': 'Cadastro de Lançamento',
-        'botao': 'Criar Lançamento',
-        'largura': 8,
+        'botao': 'Criar lançamento',
+        'aviso': 'Ao salvar, as parcelas são geradas na hora. À vista conta como 1 parcela.',
     }
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if not FormaPagamento.objects.filter(criado_por=self.request.user, status=True).exists():
+            context['aviso'] = (
+                'Cadastre uma forma de pagamento ativa antes de lançar. '
+                'À vista conta como 1 parcela.'
+            )
+        return context
 
     def get_success_url(self):
         return reverse_lazy('lancamento-detail', kwargs={'pk': self.object.pk})
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields['data'].widget = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
-        form.fields['data'].input_formats = ['%Y-%m-%d']
-        form.fields['categoria'].queryset = Categoria.objects.filter(status=True)
-        form.fields['pessoa'].queryset = Pessoa.objects.filter(status=True)
-        return form
-
     def form_valid(self, form):
-        form.instance.criado_por = self.request.user
-        erros = validar_lancamento(form.instance)
-        if erros:
-            for campo, mensagem in erros.items():
-                form.add_error(campo, mensagem)
-            return self.form_invalid(form)
-
         with transaction.atomic():
-            resposta = super().form_valid(form)
+            self.object = form.save()
             gerar_parcelas(self.object)
-            return resposta
+        messages.success(
+            self.request,
+            f'Lançamento cadastrado com {self.object.parcelas} parcela(s).',
+        )
+        return HttpResponseRedirect(self.get_success_url())
 
 
-class LancamentoUpdate(BaseLoginMixin, UpdateView):
+class LancamentoUpdate(RegistroDoUsuarioMixin, UpdateView):
     model = Lancamento
-    fields = ['descricao', 'tipo', 'categoria', 'pessoa', 'status']
+    form_class = LancamentoUpdateForm
     template_name = 'financeiro/form.html'
     extra_context = {
         'titulo': 'Editar Lançamento',
-        'botao': 'Atualizar Lançamento',
+        'botao': 'Atualizar lançamento',
+        'aviso': (
+            'Valor, quantidade e vencimentos não mudam aqui, para não apagar o histórico '
+            'das parcelas. Ajuste cada parcela na tela dela. A forma de pagamento do '
+            'lançamento não reescreve as parcelas já criadas.'
+        ),
     }
 
     def get_queryset(self):
-        return super().get_queryset().filter(criado_por=self.request.user).select_related('categoria')
+        return super().get_queryset().select_related('categoria', 'pessoa', 'forma_pagamento')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy('lancamento-detail', kwargs={'pk': self.object.pk})
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields['categoria'].queryset = Categoria.objects.filter(
-            Q(status=True) | Q(pk=self.object.categoria_id)
-        )
-        form.fields['pessoa'].queryset = Pessoa.objects.filter(
-            Q(status=True) | Q(pk=self.object.pessoa_id)
-        )
-        return form
-
     def form_valid(self, form):
-        erros = validar_lancamento(form.instance)
-        if erros:
-            for campo, mensagem in erros.items():
-                form.add_error(campo, mensagem)
-            return self.form_invalid(form)
+        messages.success(self.request, 'Lançamento atualizado.')
         return super().form_valid(form)
 
 
-class LancamentoDelete(BaseLoginMixin, DeleteView):
+class LancamentoDelete(ProtegidoDeleteMixin, RegistroDoUsuarioMixin, DeleteView):
     model = Lancamento
     template_name = 'financeiro/form.html'
     success_url = reverse_lazy('lancamento-list')
+    mensagem_sucesso = 'Lançamento excluído junto com as parcelas.'
     extra_context = {
         'titulo': 'Excluir Lançamento',
         'botao': 'Sim, excluir!',
     }
 
-    def get_queryset(self):
-        return super().get_queryset().filter(criado_por=self.request.user)
 
-
-class LancamentoList(BaseLoginMixin, FilterView):
+class LancamentoList(RegistroDoUsuarioMixin, FilterView):
     model = Lancamento
     template_name = 'financeiro/list/lancamento.html'
     paginate_by = 30
@@ -245,9 +352,7 @@ class LancamentoList(BaseLoginMixin, FilterView):
     filterset_class = LancamentoFilter
 
     def get_queryset(self):
-        return super().get_queryset().filter(
-            criado_por=self.request.user
-        ).select_related('categoria', 'pessoa')
+        return super().get_queryset().select_related('categoria', 'pessoa', 'forma_pagamento')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -258,18 +363,62 @@ class LancamentoList(BaseLoginMixin, FilterView):
         return context
 
 
-class LancamentoDetail(BaseLoginMixin, DetailView):
+class LancamentoDetail(RegistroDoUsuarioMixin, DetailView):
     model = Lancamento
     template_name = 'financeiro/detail/lancamento.html'
 
     def get_queryset(self):
-        return super().get_queryset().filter(
-            criado_por=self.request.user
-        ).select_related('categoria', 'pessoa')
+        return super().get_queryset().select_related('categoria', 'pessoa', 'forma_pagamento')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['parcelas'] = self.object.parcela_set.all()
+        context['parcelas'] = self.object.itens.select_related('forma_pagamento')
+        context['hoje'] = timezone.localdate()
+        return context
+
+
+class ParcelaDoUsuarioMixin(BaseLoginMixin):
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            lancamento__criado_por=self.request.user,
+        ).select_related('lancamento', 'lancamento__categoria', 'forma_pagamento')
+
+
+class ParcelaUpdate(ParcelaDoUsuarioMixin, UpdateView):
+    model = Parcela
+    form_class = ParcelaForm
+    template_name = 'financeiro/form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = f'Editar parcela {self.object.numero}'
+        context['botao'] = 'Salvar parcela'
+        context['aviso'] = (
+            'Parcela não tem exclusão. Para removê-la, exclua o lançamento, '
+            'o que também apaga as outras parcelas.'
+        )
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('lancamento-detail', kwargs={'pk': self.object.lancamento_id})
+
+    def form_valid(self, form):
+        messages.success(self.request, f'Parcela {self.object.numero} atualizada.')
+        return super().form_valid(form)
+
+
+class ParcelaDetail(ParcelaDoUsuarioMixin, DetailView):
+    model = Parcela
+    template_name = 'financeiro/detail/parcela.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['hoje'] = timezone.localdate()
         return context
 
 
@@ -291,33 +440,31 @@ class FinanceiroDashboard(BaseLoginMixin, TemplateView):
         inicio_mes = hoje.replace(day=1)
         fim_mes = hoje.replace(day=monthrange(hoje.year, hoje.month)[1])
 
-        zero = Value(Decimal('0.00'), output_field=DecimalField(max_digits=12, decimal_places=2))
-
         parc = Parcela.objects.filter(
             lancamento__criado_por=user,
             lancamento__status=True,
             status=True,
-        ).select_related('lancamento', 'lancamento__categoria')
+        ).select_related('lancamento', 'lancamento__categoria', 'forma_pagamento')
 
-        # ----- KPIs do mês corrente (por vencimento da parcela) -----
         parc_mes = parc.filter(data__range=(inicio_mes, fim_mes))
-        receitas_mes = parc_mes.filter(lancamento__tipo='receita').aggregate(s=Coalesce(Sum('valor'), zero))['s']
-        despesas_mes = parc_mes.filter(lancamento__tipo='despesa').aggregate(s=Coalesce(Sum('valor'), zero))['s']
+        receitas_mes = _soma_liquida(parc_mes.filter(lancamento__tipo='receita'))
+        despesas_mes = _soma_liquida(parc_mes.filter(lancamento__tipo='despesa'))
         saldo_mes = receitas_mes - despesas_mes
 
+        zero = Value(Decimal('0.00'), output_field=DecimalField(max_digits=12, decimal_places=2))
         pagas_mes = parc.filter(
+            lancamento__tipo='despesa',
             data_pagamento__isnull=False,
             data_pagamento__range=(inicio_mes, fim_mes),
         ).aggregate(s=Coalesce(Sum('valor_pago'), zero))['s']
 
-        pendentes = parc.filter(valor_pago__isnull=True)
+        pendentes = parc.filter(data_pagamento__isnull=True)
         atrasadas = pendentes.filter(data__lt=hoje)
         contas_vencidas = atrasadas.filter(lancamento__tipo='despesa')
-        a_pagar = pendentes.filter(lancamento__tipo='despesa').aggregate(s=Coalesce(Sum('valor'), zero))['s']
-        a_receber = pendentes.filter(lancamento__tipo='receita').aggregate(s=Coalesce(Sum('valor'), zero))['s']
-        atrasado = contas_vencidas.aggregate(s=Coalesce(Sum('valor'), zero))['s']
+        a_pagar = _soma_liquida(pendentes.filter(lancamento__tipo='despesa'))
+        a_receber = _soma_liquida(pendentes.filter(lancamento__tipo='receita'))
+        atrasado = _soma_liquida(contas_vencidas)
 
-        # ----- Fluxo dos últimos 6 meses (por vencimento) -----
         meses = []
         cursor = inicio_mes
         for _ in range(6):
@@ -329,39 +476,33 @@ class FinanceiroDashboard(BaseLoginMixin, TemplateView):
             )
 
         fluxo_labels, fluxo_receitas, fluxo_despesas, fluxo_saldo = [], [], [], []
-        for d in reversed(meses):
-            ini = d
-            f = d.replace(day=monthrange(d.year, d.month)[1])
-            r = parc.filter(lancamento__tipo='receita', data__range=(ini, f)).aggregate(s=Coalesce(Sum('valor'), zero))['s']
-            desp = parc.filter(lancamento__tipo='despesa', data__range=(ini, f)).aggregate(s=Coalesce(Sum('valor'), zero))['s']
-            fluxo_labels.append(f"{MESES[d.month - 1]}/{d.year}")
-            fluxo_receitas.append(float(r))
-            fluxo_despesas.append(float(desp))
-            fluxo_saldo.append(float(r - desp))
+        for data_mes in reversed(meses):
+            inicio = data_mes
+            fim = data_mes.replace(day=monthrange(data_mes.year, data_mes.month)[1])
+            receitas = _soma_liquida(parc.filter(lancamento__tipo='receita', data__range=(inicio, fim)))
+            despesas = _soma_liquida(parc.filter(lancamento__tipo='despesa', data__range=(inicio, fim)))
+            fluxo_labels.append(f'{MESES[data_mes.month - 1]}/{data_mes.year}')
+            fluxo_receitas.append(float(receitas))
+            fluxo_despesas.append(float(despesas))
+            fluxo_saldo.append(float(receitas - despesas))
 
-        # ----- Despesas por categoria (top 6) -----
         cat_qs = (
             parc.filter(lancamento__tipo='despesa')
             .values('lancamento__categoria__nome')
             .annotate(total=Sum('valor'))
             .order_by('-total')[:6]
         )
-        cat_labels = [c['lancamento__categoria__nome'] or 'Sem categoria' for c in cat_qs]
-        cat_valores = [float(c['total']) for c in cat_qs]
+        cat_labels = [item['lancamento__categoria__nome'] or 'Sem categoria' for item in cat_qs]
+        cat_valores = [float(item['total']) for item in cat_qs]
 
-        # ----- Situação das parcelas -----
-        n_pagas = parc.filter(valor_pago__isnull=False).count()
+        n_pagas = parc.filter(data_pagamento__isnull=False).count()
         n_pendentes = pendentes.filter(data__gte=hoje).count()
         n_vencidas = atrasadas.count()
         n_contas_vencidas = contas_vencidas.count()
 
-        # ----- Listas -----
-        proximos = pendentes.order_by('data')[:5]
-        ultimos = Lancamento.objects.filter(criado_por=user).select_related('categoria').order_by('-criado_em')[:5]
-
         ctx.update({
             'hoje': hoje,
-            'mes_label': f"{MESES_EXT[hoje.month - 1]}/{hoje.year}",
+            'mes_label': f'{MESES_EXT[hoje.month - 1]}/{hoje.year}',
             'mes_periodo': f"{inicio_mes.strftime('%d/%m/%Y')} a {fim_mes.strftime('%d/%m/%Y')}",
             'kpi': {
                 'saldo': saldo_mes,
@@ -384,7 +525,11 @@ class FinanceiroDashboard(BaseLoginMixin, TemplateView):
                 'status_labels': json.dumps(['Pagas', 'A vencer', 'Atrasadas'], ensure_ascii=False),
                 'status_valores': json.dumps([n_pagas, n_pendentes, n_vencidas]),
             },
-            'proximos': proximos,
-            'ultimos': ultimos,
+            'proximos': pendentes.order_by('data')[:5],
+            'ultimos': (
+                Lancamento.objects.filter(criado_por=user)
+                .select_related('categoria', 'pessoa')
+                .order_by('-criado_em')[:5]
+            ),
         })
         return ctx

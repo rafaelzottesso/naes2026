@@ -3,7 +3,10 @@ from django.urls import path
 from .views import (
     CategoriaCreate, CategoriaUpdate, CategoriaDelete, CategoriaList, CategoriaDetail,
     PessoaCreate, PessoaUpdate, PessoaDelete, PessoaList, PessoaDetail,
+    FormaPagamentoCreate, FormaPagamentoUpdate, FormaPagamentoDelete,
+    FormaPagamentoList, FormaPagamentoDetail,
     LancamentoCreate, LancamentoUpdate, LancamentoDelete, LancamentoList, LancamentoDetail,
+    ParcelaUpdate, ParcelaDetail,
     FinanceiroDashboard,
 )
 
@@ -23,9 +26,18 @@ urlpatterns = [
     path('listar/pessoa/', PessoaList.as_view(), name='pessoa-list'),
     path('detalhar/pessoa/<int:pk>/', PessoaDetail.as_view(), name='pessoa-detail'),
 
+    path('cadastrar/forma-pagamento/', FormaPagamentoCreate.as_view(), name='forma-pagamento-create'),
+    path('atualizar/forma-pagamento/<int:pk>/', FormaPagamentoUpdate.as_view(), name='forma-pagamento-update'),
+    path('excluir/forma-pagamento/<int:pk>/', FormaPagamentoDelete.as_view(), name='forma-pagamento-delete'),
+    path('listar/forma-pagamento/', FormaPagamentoList.as_view(), name='forma-pagamento-list'),
+    path('detalhar/forma-pagamento/<int:pk>/', FormaPagamentoDetail.as_view(), name='forma-pagamento-detail'),
+
     path('cadastrar/lancamento/', LancamentoCreate.as_view(), name='lancamento-create'),
     path('atualizar/lancamento/<int:pk>/', LancamentoUpdate.as_view(), name='lancamento-update'),
     path('excluir/lancamento/<int:pk>/', LancamentoDelete.as_view(), name='lancamento-delete'),
     path('listar/lancamento/', LancamentoList.as_view(), name='lancamento-list'),
     path('detalhar/lancamento/<int:pk>/', LancamentoDetail.as_view(), name='lancamento-detail'),
+
+    path('atualizar/parcela/<int:pk>/', ParcelaUpdate.as_view(), name='parcela-update'),
+    path('detalhar/parcela/<int:pk>/', ParcelaDetail.as_view(), name='parcela-detail'),
 ]

@@ -3,53 +3,46 @@ from decimal import Decimal, ROUND_DOWN
 
 from django.db import transaction
 
-from .models import Parcela
-
-
-def validar_lancamento(lancamento):
-    """Regras que o formulário genérico não cobre sozinho."""
-    erros = {}
-    quantidade = lancamento.parcelas or 1
-
-    if lancamento.categoria_id:
-        if not lancamento.categoria.status:
-            erros['categoria'] = 'Escolha uma categoria ativa.'
-
-    if lancamento.parcelas is not None and lancamento.parcelas < 1:
-        erros['parcelas'] = 'Informe pelo menos 1 parcela, ou deixe o campo vazio para à vista.'
-
-    if quantidade > 1 and (not lancamento.intervalo_parcelas or lancamento.intervalo_parcelas < 1):
-        erros['intervalo_parcelas'] = 'Informe o intervalo em dias quando houver mais de uma parcela.'
-
-    if lancamento.valor is not None and lancamento.valor_total < 0:
-        erros['valor'] = 'O valor líquido (valor − desconto + acréscimo) não pode ser negativo.'
-
-    return erros
+from .models import CENTAVO, Parcela
 
 
 def dividir_valor(total, quantidade):
-    """Divide o total em parcelas de 2 casas. A última recebe o resto."""
-    quantia = (total / quantidade).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+    """Divide o total em parcelas de 2 casas. A última recebe o centavo que sobra."""
+    if quantidade < 1:
+        raise ValueError('A quantidade de parcelas precisa ser pelo menos 1.')
+
+    total = Decimal(total).quantize(CENTAVO)
+    quantia = (total / quantidade).quantize(CENTAVO, rounding=ROUND_DOWN)
     valores = [quantia] * (quantidade - 1)
-    valores.append(total - quantia * (quantidade - 1))
+    valores.append((total - quantia * (quantidade - 1)).quantize(CENTAVO))
     return valores
 
 
 def gerar_parcelas(lancamento):
+    """Cria as parcelas do lançamento uma única vez, copiando a forma de pagamento."""
+    if lancamento.itens.exists():
+        return []
+
     quantidade = lancamento.parcelas or 1
     intervalo = lancamento.intervalo_parcelas or 0
     if quantidade == 1:
         intervalo = 0
 
     valores = dividir_valor(lancamento.valor_total, quantidade)
+    criadas = []
 
     with transaction.atomic():
         for numero, valor in enumerate(valores, start=1):
-            Parcela.objects.create(
+            criadas.append(Parcela.objects.create(
                 lancamento=lancamento,
                 numero=numero,
                 data=lancamento.data + timedelta(days=(numero - 1) * intervalo),
                 valor=valor,
+                desconto=Decimal('0.00'),
+                acrescimo=Decimal('0.00'),
+                forma_pagamento=lancamento.forma_pagamento,
                 status=True,
                 criado_por=lancamento.criado_por,
-            )
+            ))
+
+    return criadas
