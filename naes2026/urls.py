@@ -22,7 +22,6 @@ urlpatterns = [
     
     # Importar urls dos apps
     path("", include("website.urls")),
-    path("campeonato/", include("campeonato.urls")),
     path("financeiro/", include("financeiro.urls")),
 
     # Ativar o Django Debug Toolbar - Passo 4

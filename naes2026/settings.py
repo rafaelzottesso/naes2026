@@ -43,7 +43,6 @@ INSTALLED_APPS = [
 
     # Ativar meus apps
     'website.apps.WebsiteConfig',
-    'campeonato.apps.CampeonatoConfig',
     'financeiro.apps.FinanceiroConfig',
 
     # Ativar o crispy forms para renderiar os forms
@@ -51,6 +50,8 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     # Ativar o Django Debug Toolbar - Passo 1
     'debug_toolbar',
+    # Ativar o Django Filter
+    'django_filters', 
 ]
 
 MIDDLEWARE = [

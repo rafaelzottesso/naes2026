@@ -1,171 +1,193 @@
-{% extends "website/modelo2.html" %}
+{% extends "financeiro/base.html" %}
 {% load static %}
+{% load fin_tags %}
 
-{% block title %}Arena - Início{% endblock %}
+{% block title %}Início · Fluxo Finanças{% endblock %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item active">Início</li>
+<li class="breadcrumb-item active" aria-current="page">Início</li>
 {% endblock %}
 
 {% block content %}
-<div class="row g-4 mb-5">
-  
-  <div class="col-lg-8">
-    <div class="p-5 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, var(--clr-primary) 0%, #7b2ff7 100%); border: 1px solid var(--clr-border);">
-      <h1 class="display-4 stencil mb-3 text-white">BEM-VINDO À ARENA</h1>
-      <p class="lead mb-4 text-white text-opacity-75">A plataforma definitiva para gestão de campeonatos de E-Sports. Organize torneios, inscreva equipes e acompanhe resultados em tempo real.</p>
-      <div class="d-flex gap-3">
-        <a href="{% url 'campeonato-list' %}" class="btn btn-light px-4 py-2 fw-bold text-primary">
-          <i class="bi bi-trophy me-2"></i>Ver Campeonatos
-        </a>
-        <a href="{% url 'sobre' %}" class="btn btn-outline-light px-4 py-2">
-          Saber Mais
-        </a>
+<div class="fin-page-head">
+  <div>
+    <div class="fin-eyebrow">Visão Geral · Controle Financeiro</div>
+    <h1>Fluxo Financeiro</h1>
+    <p>Acompanhe receitas, despesas, pessoas e lançamentos em um único ambiente integrado.</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url 'financeiro-dashboard' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-speedometer2 me-1"></i>Ir ao Dashboard
+    </a>
+    <a href="{% url 'lancamento-create' %}" class="btn btn-fin">
+      <i class="bi bi-plus-lg me-1"></i>Novo Lançamento
+    </a>
+  </div>
+</div>
+
+<!-- ===== KPIs Consolidados ===== -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-md-4">
+    <div class="fin-kpi saldo">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-receipt-cutoff"></i></span>
+        <div>
+          <span class="fin-kpi-label">Lançamentos</span>
+          <span class="fin-kpi-sub">Total registrado</span>
+        </div>
       </div>
+      <span class="fin-kpi-value fin-positive">{{ total_lancamentos }}</span>
     </div>
   </div>
-  
-  <div class="col-lg-4">
-    <div class="row g-4 h-100">
-      <div class="col-12">
-        <div class="card h-100 border-0 shadow-sm bg-surface-alt">
-          <div class="card-body p-4 d-flex align-items-center gap-3">
-            <div class="feature-icon bg-primary bg-opacity-10 flex-shrink-0" style="font-size: 2rem; color: var(--clr-primary);">
-              <i class="bi bi-trophy-fill"></i>
-            </div>
-            <div>
-              <p class="text-muted mb-1 text-uppercase small fw-semibold">Campeonatos</p>
-              <h3 class="display-6 stencil mb-1">{{ total_campeonatos }}</h3>
-              <p class="mb-0 text-muted">Total de competições cadastradas na Arena.</p>
-            </div>
-          </div>
+
+  <div class="col-12 col-md-4">
+    <div class="fin-kpi receita">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-tags"></i></span>
+        <div>
+          <span class="fin-kpi-label">Categorias</span>
+          <span class="fin-kpi-sub">Centros de custo</span>
         </div>
       </div>
-      <div class="col-12">
-        <div class="card h-100 border-0 shadow-sm">
-          <div class="card-body p-4 d-flex align-items-center gap-3">
-            <div class="feature-icon bg-primary bg-opacity-10 flex-shrink-0" style="font-size: 2rem; color: var(--clr-primary);">
-              <i class="bi bi-unlock-fill"></i>
-            </div>
-            <div>
-              <p class="text-muted mb-1 text-uppercase small fw-semibold">Inscrições Abertas</p>
-              <h3 class="display-6 stencil mb-1">{{ total_abertos }}</h3>
-              <p class="mb-0 text-muted">Campeonatos com prazo de inscrição ainda ativo.</p>
-            </div>
-          </div>
+      <span class="fin-kpi-value">{{ total_categorias }}</span>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-4">
+    <div class="fin-kpi neutra">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-person-vcard"></i></span>
+        <div>
+          <span class="fin-kpi-label">Pessoas / Fornecedores</span>
+          <span class="fin-kpi-sub">Contatos cadastrados</span>
         </div>
       </div>
+      <span class="fin-kpi-value">{{ total_pessoas }}</span>
     </div>
   </div>
 </div>
 
-<div class="row g-4 mb-4">
-  <div class="col-12 d-flex align-items-center justify-content-between">
-    <h3 class="stencil mb-0">Últimos Campeonatos</h3>
-    <span class="badge text-bg-light border" style="color: var(--clr-primary); border-color: var(--clr-border) !important;">Top 5 recentes</span>
+<!-- ===== Painel de Lançamentos Recentes ===== -->
+<div class="fin-panel mb-4">
+  <div class="fin-panel-head">
+    <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2">
+      <div>
+        <h2 class="mb-0">Últimos Lançamentos</h2>
+        <p>Lançamentos financeiros mais recentes no sistema</p>
+      </div>
+      <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">
+        Ver todos <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
   </div>
-  {% for c in ultimos_campeonatos %}
-    <div class="col-md-6 col-xl-4">
-      <div class="card h-100 border-0 shadow-sm bg-surface-alt">
-        <div class="card-body p-4 d-flex flex-column">
-          <div class="d-flex align-items-start justify-content-between mb-3 gap-2">
-            <h5 class="stencil mb-0">{{ c.nome }}</h5>
-            <span class="badge rounded-pill" style="background: rgba(110, 84, 255, 0.12); color: var(--clr-primary);">Recente</span>
-          </div>
-          <p class="text-muted mb-2 d-flex align-items-center gap-2">
-            <i class="bi bi-geo-alt"></i>{{ c.campus }}
-          </p>
-          <p class="text-muted mb-4 d-flex align-items-center gap-2">
-            <i class="bi bi-calendar-event"></i>{{ c.data|date:"d/m/Y" }}
-          </p>
-          <div class="mt-auto">
-            <a href="{% url 'campeonato-list' %}" class="btn btn-sm btn-outline-primary">Ver no painel</a>
-          </div>
-        </div>
-      </div>
+
+  <div class="fin-panel-body p-0">
+    <div class="table-responsive">
+      <table class="table fin-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Pessoa</th>
+            <th class="text-end">Valor</th>
+            <th class="text-end">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in ultimos_lancamentos %}
+          <tr>
+            <td>
+              <span class="text-nowrap">{{ l.data|date:"d/m/Y" }}</span>
+            </td>
+            <td>
+              <a href="{% url 'lancamento-detail' l.pk %}" class="fw-semibold text-decoration-none text-dark">
+                {{ l.descricao }}
+              </a>
+            </td>
+            <td>
+              <span class="badge rounded-pill bg-light text-dark border">
+                <i class="bi bi-tag me-1"></i>{{ l.categoria.nome }}
+              </span>
+            </td>
+            <td>
+              {% if l.pessoa %}
+                <span class="text-muted"><i class="bi bi-person me-1"></i>{{ l.pessoa.nome }}</span>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td class="text-end fw-bold">
+              {% if l.categoria.tipo == 'R' or l.valor >= 0 %}
+                <span class="text-success">+ {{ l.valor|brl }}</span>
+              {% else %}
+                <span class="text-danger">- {{ l.valor|brl }}</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <a href="{% url 'lancamento-detail' l.pk %}" class="btn btn-sm btn-outline-secondary" title="Ver detalhes">
+                <i class="bi bi-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="p-4 text-center">
+              <div class="fin-empty py-3">
+                <div class="fin-empty-icon mb-2"><i class="bi bi-cash-stack fs-2 text-muted"></i></div>
+                <strong class="d-block text-dark">Nenhum lançamento cadastrado ainda</strong>
+                <p class="text-muted mb-3">Comece criando o primeiro registro de receita ou despesa.</p>
+                <a href="{% url 'lancamento-create' %}" class="btn btn-fin btn-sm">
+                  <i class="bi bi-plus-lg me-1"></i>Criar lançamento
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  {% empty %}
-    <div class="col-12">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-4 text-muted">
-          Nenhum campeonato cadastrado até o momento.
-        </div>
-      </div>
-    </div>
-  {% endfor %}
+  </div>
 </div>
 
-<div class="row g-4 mb-4">
-  <div class="col-12 d-flex align-items-center justify-content-between">
-    <h3 class="stencil mb-0">Inscrições Abertas</h3>
-    <span class="badge text-bg-light border" style="color: var(--clr-primary); border-color: var(--clr-border) !important;">{{ total_abertos }} ativo(s)</span>
+<!-- ===== Ações Rápidas do Sistema ===== -->
+<div class="row g-3">
+  <div class="col-12 col-md-4">
+    <div class="fin-panel h-100 p-4 d-flex flex-column justify-content-between">
+      <div>
+        <div class="fin-kpi-icon mb-3" style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--fin-saldo-bg); color: var(--fin-saldo);">
+          <i class="bi bi-speedometer2 fs-5"></i>
+        </div>
+        <h4 class="h6 fw-bold">Dashboard Analítico</h4>
+        <p class="text-muted small">Acompanhe saldos, total a pagar e a receber do mês com indicadores consolidados.</p>
+      </div>
+      <a href="{% url 'financeiro-dashboard' %}" class="btn btn-sm btn-outline-secondary mt-3">Acessar dashboard</a>
+    </div>
   </div>
-  {% for c in campeonatos_abertos %}
-    <div class="col-md-6">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body p-4 d-flex flex-column">
-          <div class="d-flex align-items-start justify-content-between mb-3 gap-2">
-            <h5 class="stencil mb-0">{{ c.nome }}</h5>
-            <span class="badge rounded-pill text-bg-success">Aberto</span>
-          </div>
-          <p class="text-muted mb-2 d-flex align-items-center gap-2">
-            <i class="bi bi-geo-alt"></i>{{ c.campus }}
-          </p>
-          <p class="text-muted mb-2 d-flex align-items-center gap-2">
-            <i class="bi bi-calendar-check"></i>Evento: {{ c.data|date:"d/m/Y" }}
-          </p>
-          <p class="text-muted mb-4 d-flex align-items-center gap-2">
-            <i class="bi bi-clock"></i>Inscrição até {{ c.data_inscricao|date:"d/m/Y H:i" }}
-          </p>
-          <div class="mt-auto">
-            <a href="{% url 'campeonato-list' %}" class="btn btn-sm btn-primary">Inscrever equipe</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  {% empty %}
-    <div class="col-12">
-      <div class="card border-0 shadow-sm bg-surface-alt">
-        <div class="card-body p-4 text-muted d-flex align-items-center gap-2">
-          <i class="bi bi-info-circle"></i>Nenhum campeonato com inscrições abertas no momento.
-        </div>
-      </div>
-    </div>
-  {% endfor %}
-</div>
 
-<div class="row g-4">
-  <div class="col-md-4">
-    <div class="card h-100 border-0 shadow-sm">
-      <div class="card-body p-4">
-        <div class="feature-icon bg-primary bg-opacity-10 mb-3" style="font-size: 2rem; color: var(--clr-primary);">
-          <i class="bi bi-joystick"></i>
+  <div class="col-12 col-md-4">
+    <div class="fin-panel h-100 p-4 d-flex flex-column justify-content-between">
+      <div>
+        <div class="fin-kpi-icon mb-3" style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--fin-receita-bg); color: var(--fin-receita);">
+          <i class="bi bi-tags fs-5"></i>
         </div>
-        <h5 class="stencil mb-2">Múltiplas Modalidades</h5>
-        <p class="text-muted mb-0">Suporte para diversos jogos, desde FPS até MOBAs e Battle Royales.</p>
+        <h4 class="h6 fw-bold">Categorização</h4>
+        <p class="text-muted small">Classifique receitas e despesas com organização para relatórios assertivos.</p>
       </div>
+      <a href="{% url 'categoria-list' %}" class="btn btn-sm btn-outline-secondary mt-3">Gerenciar categorias</a>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="card h-100 border-0 shadow-sm">
-      <div class="card-body p-4">
-        <div class="feature-icon bg-primary bg-opacity-10 mb-3" style="font-size: 2rem; color: var(--clr-primary);">
-          <i class="bi bi-people-fill"></i>
+
+  <div class="col-12 col-md-4">
+    <div class="fin-panel h-100 p-4 d-flex flex-column justify-content-between">
+      <div>
+        <div class="fin-kpi-icon mb-3" style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: #fef3c7; color: #b45309;">
+          <i class="bi bi-person-vcard fs-5"></i>
         </div>
-        <h5 class="stencil mb-2">Gestão de Equipes</h5>
-        <p class="text-muted mb-0">Controle total sobre inscrições, jogadores e escalações por campus.</p>
+        <h4 class="h6 fw-bold">Pessoas e Fornecedores</h4>
+        <p class="text-muted small">Centralize dados cadastrais e vínculos de compras, pagamentos e clientes.</p>
       </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card h-100 border-0 shadow-sm">
-      <div class="card-body p-4">
-        <div class="feature-icon bg-primary bg-opacity-10 mb-3" style="font-size: 2rem; color: var(--clr-primary);">
-          <i class="bi bi-calendar-event"></i>
-        </div>
-        <h5 class="stencil mb-2">Etapas e Jogos</h5>
-        <p class="text-muted mb-0">Cronogramas claros e acompanhamento de cada partida do torneio.</p>
-      </div>
+      <a href="{% url 'pessoa-list' %}" class="btn btn-sm btn-outline-secondary mt-3">Ver pessoas</a>
     </div>
   </div>
 </div>

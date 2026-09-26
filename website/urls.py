@@ -1,6 +1,6 @@
 
 from django.urls import path
-from .views import IndexView, ContatoView, SobreView
+from .views import IndexView
 
 # Importas as views para gerenciamento de usuários
 from django.contrib.auth.views import (
@@ -11,12 +11,10 @@ from django.contrib.auth.views import (
 
 urlpatterns = [
     path("", IndexView.as_view(), name="index"),
-    path("contato/", ContatoView.as_view(), name="contato"),
-    path("sobre/", SobreView.as_view(), name="sobre"),
 
     # URL para login e usuários reutiliza o meu template de form e recebe o texto do titulo e botão
     path("login/", LoginView.as_view(
-            template_name="campeonato/form.html",
+            template_name="website/form.html",
             extra_context = {
                 'titulo': 'Autenticação de Usuário',
                 'botao': 'Entrar'
@@ -28,7 +26,7 @@ urlpatterns = [
     
     # URL para login e usuários reutiliza o meu template de form e recebe o texto do titulo e botão    
     path("alterar-senha/", PasswordChangeView.as_view(
-            template_name="campeonato/form.html",
+            template_name="website/form.html",
             extra_context = {
                 'titulo': 'Alterar minha senha',
                 'botao': 'Alterar Senha'

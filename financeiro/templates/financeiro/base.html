@@ -17,34 +17,52 @@
 
   <!-- ============ SIDEBAR DESKTOP ============ -->
   <aside class="fin-sidebar d-none d-lg-flex flex-column">
-    <a class="fin-brand" href="{% url 'financeiro-dashboard' %}">
+    <a class="fin-brand" href="{% url 'index' %}">
       <span class="fin-brand-mark"><i class="bi bi-wallet2"></i></span>
       <span class="fin-brand-text">Fluxo<small>controle financeiro</small></span>
     </a>
 
     <p class="fin-menu-label">Menu</p>
     <nav class="fin-nav nav flex-column">
+      <a class="fin-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">
+        <i class="bi bi-house"></i>
+        <span>Início</span>
+      </a>
       <a class="fin-link {% if request.resolver_match.url_name == 'financeiro-dashboard' %}active{% endif %}" href="{% url 'financeiro-dashboard' %}">
         <i class="bi bi-speedometer2"></i>
         <span>Dashboard</span>
       </a>
-      <a class="fin-link {% if 'lancamento' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}">
+      <a class="fin-link {% if 'lancamento' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}">
         <i class="bi bi-receipt-cutoff"></i>
         <span>Lançamentos</span>
       </a>
-      <a class="fin-link {% if 'categoria' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'categoria-list' %}">
+      <a class="fin-link {% if 'categoria' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'categoria-list' %}">
         <i class="bi bi-tags"></i>
         <span>Categorias</span>
       </a>
-      <a class="fin-link {% if 'pessoa' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'pessoa-list' %}">
+      <a class="fin-link {% if 'pessoa' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'pessoa-list' %}">
         <i class="bi bi-person-vcard"></i>
         <span>Pessoas</span>
       </a>
     </nav>
 
-    <a href="{% url 'lancamento-create' %}" class="fin-cta">
-      <i class="bi bi-plus-lg"></i> Novo lançamento
-    </a>
+    {% if request.user.is_authenticated %}
+    <p class="fin-menu-label">Cadastrar</p>
+    <nav class="fin-nav nav flex-column">
+      <a class="fin-link {% if request.resolver_match.url_name == 'lancamento-create' %}active{% endif %}" href="{% url 'lancamento-create' %}">
+        <i class="bi bi-plus-circle"></i>
+        <span>Novo lançamento</span>
+      </a>
+      <a class="fin-link {% if request.resolver_match.url_name == 'categoria-create' %}active{% endif %}" href="{% url 'categoria-create' %}">
+        <i class="bi bi-tag"></i>
+        <span>Nova categoria</span>
+      </a>
+      <a class="fin-link {% if request.resolver_match.url_name == 'pessoa-create' %}active{% endif %}" href="{% url 'pessoa-create' %}">
+        <i class="bi bi-person-plus"></i>
+        <span>Nova pessoa</span>
+      </a>
+    </nav>
+    {% endif %}
 
     <div class="fin-side-spacer"></div>
 
@@ -58,7 +76,7 @@
         </div>
       </div>
       <div class="fin-user-links">
-        <a href="{% url 'index' %}"><i class="bi bi-arrow-left-circle me-1"></i>Voltar à Arena</a>
+        <a href="{% url 'alterar-senha' %}"><i class="bi bi-key me-1"></i>Alterar senha</a>
         <form action="{% url 'logout' %}" method="post" class="d-inline">
           {% csrf_token %}
           <button type="submit"><i class="bi bi-box-arrow-right me-1"></i>Sair</button>
@@ -73,7 +91,7 @@
   <!-- ============ SIDEBAR MOBILE (offcanvas) ============ -->
   <div class="offcanvas offcanvas-start fin-offcanvas" tabindex="-1" id="menuFinanceiro" aria-labelledby="menuFinanceiroLabel">
     <div class="offcanvas-header">
-      <a class="fin-brand" href="{% url 'financeiro-dashboard' %}" id="menuFinanceiroLabel">
+      <a class="fin-brand" href="{% url 'index' %}" id="menuFinanceiroLabel">
         <span class="fin-brand-mark"><i class="bi bi-wallet2"></i></span>
         <span class="fin-brand-text">Fluxo<small>controle financeiro</small></span>
       </a>
@@ -82,20 +100,38 @@
     <div class="offcanvas-body d-flex flex-column">
       <p class="fin-menu-label">Menu</p>
       <nav class="fin-nav nav flex-column">
+        <a class="fin-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">
+          <i class="bi bi-house"></i><span>Início</span>
+        </a>
         <a class="fin-link {% if request.resolver_match.url_name == 'financeiro-dashboard' %}active{% endif %}" href="{% url 'financeiro-dashboard' %}">
           <i class="bi bi-speedometer2"></i><span>Dashboard</span>
         </a>
-        <a class="fin-link {% if 'lancamento' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}">
+        <a class="fin-link {% if 'lancamento' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}">
           <i class="bi bi-receipt-cutoff"></i><span>Lançamentos</span>
         </a>
-        <a class="fin-link {% if 'categoria' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'categoria-list' %}">
+        <a class="fin-link {% if 'categoria' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'categoria-list' %}">
           <i class="bi bi-tags"></i><span>Categorias</span>
         </a>
-        <a class="fin-link {% if 'pessoa' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'pessoa-list' %}">
+        <a class="fin-link {% if 'pessoa' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'pessoa-list' %}">
           <i class="bi bi-person-vcard"></i><span>Pessoas</span>
         </a>
       </nav>
-      <a href="{% url 'lancamento-create' %}" class="fin-cta mt-3"><i class="bi bi-plus-lg"></i> Novo lançamento</a>
+
+      {% if request.user.is_authenticated %}
+      <p class="fin-menu-label">Cadastrar</p>
+      <nav class="fin-nav nav flex-column">
+        <a class="fin-link {% if request.resolver_match.url_name == 'lancamento-create' %}active{% endif %}" href="{% url 'lancamento-create' %}">
+          <i class="bi bi-plus-circle"></i><span>Novo lançamento</span>
+        </a>
+        <a class="fin-link {% if request.resolver_match.url_name == 'categoria-create' %}active{% endif %}" href="{% url 'categoria-create' %}">
+          <i class="bi bi-tag"></i><span>Nova categoria</span>
+        </a>
+        <a class="fin-link {% if request.resolver_match.url_name == 'pessoa-create' %}active{% endif %}" href="{% url 'pessoa-create' %}">
+          <i class="bi bi-person-plus"></i><span>Nova pessoa</span>
+        </a>
+      </nav>
+      {% endif %}
+
       <div class="fin-side-spacer"></div>
       <div class="fin-user-card">
         {% if request.user.is_authenticated %}
@@ -104,7 +140,7 @@
           <div class="fin-user-meta"><strong>{{ request.user.username }}</strong><small>Conta ativa</small></div>
         </div>
         <div class="fin-user-links">
-          <a href="{% url 'index' %}"><i class="bi bi-arrow-left-circle me-1"></i>Voltar à Arena</a>
+          <a href="{% url 'alterar-senha' %}"><i class="bi bi-key me-1"></i>Alterar senha</a>
           <form action="{% url 'logout' %}" method="post" class="d-inline">{% csrf_token %}<button type="submit"><i class="bi bi-box-arrow-right me-1"></i>Sair</button></form>
         </div>
         {% else %}
@@ -124,19 +160,26 @@
 
       <nav aria-label="Você está em" class="fin-crumb-wrap">
         <ol class="breadcrumb fin-crumb mb-0">
-          <li class="breadcrumb-item"><a href="{% url 'financeiro-dashboard' %}">Finanças</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'index' %}">Fluxo</a></li>
           {% block breadcrumb %}{% endblock %}
         </ol>
       </nav>
 
       <div class="fin-top-actions">
-        <a href="{% url 'lancamento-create' %}" class="btn btn-fin d-none d-md-inline-flex">
-          <i class="bi bi-plus-lg me-1"></i>Novo lançamento
-        </a>
+        {% if request.user.is_authenticated %}
+        <div class="dropdown d-none d-md-inline-block">
+          <button class="btn btn-fin dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-plus-lg me-1"></i>Cadastrar
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow">
+            <li><a class="dropdown-item" href="{% url 'lancamento-create' %}"><i class="bi bi-receipt-cutoff me-2"></i>Novo Lançamento</a></li>
+            <li><a class="dropdown-item" href="{% url 'categoria-create' %}"><i class="bi bi-tags me-2"></i>Nova Categoria</a></li>
+            <li><a class="dropdown-item" href="{% url 'pessoa-create' %}"><i class="bi bi-person-plus me-2"></i>Nova Pessoa</a></li>
+          </ul>
+        </div>
         <a href="{% url 'lancamento-create' %}" class="btn btn-fin btn-sm d-md-none" aria-label="Novo lançamento">
           <i class="bi bi-plus-lg"></i>
         </a>
-        {% if request.user.is_authenticated %}
         <div class="dropdown">
           <button class="fin-avatar-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="{{ request.user.username }}">
             {{ request.user.username|slice:":1"|upper }}
@@ -144,7 +187,7 @@
           <ul class="dropdown-menu dropdown-menu-end shadow">
             <li><h6 class="dropdown-header">{{ request.user.username }}</h6></li>
             <li><a class="dropdown-item" href="{% url 'alterar-senha' %}"><i class="bi bi-key me-2"></i>Alterar senha</a></li>
-            <li><a class="dropdown-item" href="{% url 'index' %}"><i class="bi bi-grid me-2"></i>Voltar à Arena</a></li>
+            <li><a class="dropdown-item" href="{% url 'financeiro-dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
               <form action="{% url 'logout' %}" method="post">{% csrf_token %}
@@ -154,7 +197,7 @@
           </ul>
         </div>
         {% else %}
-        <a class="btn btn-outline-secondary btn-sm" href="{% url 'login' %}">Entrar</a>
+        <a class="btn btn-fin btn-sm" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar</a>
         {% endif %}
       </div>
     </header>
@@ -215,6 +258,9 @@
     });
   }, 6000);
 </script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="{% static 'js/mascaras.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>
