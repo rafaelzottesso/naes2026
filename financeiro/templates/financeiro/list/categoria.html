@@ -15,7 +15,7 @@
   </div>
   <div class="fin-head-actions">
     <a href="{% url "lancamento-list" %}" class="btn btn-outline-secondary"><i class="bi bi-receipt-cutoff me-1"></i>Lançamentos</a>
-    <a href="{% url "categoria-create" %}" class="btn btn-fin"><i class="bi bi-plus-lg me-1"></i>Nova</a>
+    <a href="{% url "categoria-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nova</a>
   </div>
 </div>
 {% include "financeiro/form-filter.html" %}
@@ -47,7 +47,7 @@
       <h2>Todas as categorias</h2>
       <p>{{ page_obj.paginator.count }} registro(s) encontrado(s)</p>
     </div>
-    <a href="{% url "categoria-create" %}" class="btn btn-sm btn-fin"><i class="bi bi-plus-lg me-1"></i>Adicionar</a>
+    <a href="{% url "categoria-create" %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Adicionar</a>
   </div>
 
   <div class="table-responsive d-none d-md-block">
@@ -79,7 +79,7 @@
                 <li><a class="dropdown-item" href="{% url "categoria-detail" categoria.pk %}"><i class="bi bi-eye me-2"></i>Ver</a></li>
                 <li><a class="dropdown-item" href="{% url "categoria-update" categoria.pk %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="{% url "categoria-delete" categoria.pk %}"><i class="bi bi-trash me-2"></i>Excluir</a></li>
+                <li><a class="dropdown-item text-danger js-excluir" href="{% url "categoria-delete" categoria.pk %}" data-titulo="Excluir categoria" data-mensagem="Excluir a categoria {{ categoria.nome }}?"><i class="bi bi-trash me-2"></i>Excluir</a></li>
               </ul>
             </div>
           </td>
@@ -91,7 +91,7 @@
               <div class="fin-empty-icon"><i class="bi bi-tags"></i></div>
               <strong class="d-block text-dark">Nenhuma categoria cadastrada</strong>
               <p class="mb-3">Crie categorias como Alimentação, Transporte e Moradia.</p>
-              <a href="{% url "categoria-create" %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar categoria</a>
+              <a href="{% url "categoria-create" %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar categoria</a>
             </div>
           </td>
         </tr>
@@ -117,7 +117,7 @@
       <div class="d-flex gap-1 justify-content-end mt-2">
         <a class="btn btn-sm btn-outline-secondary" href="{% url "categoria-detail" categoria.pk %}" aria-label="Ver"><i class="bi bi-eye"></i></a>
         <a class="btn btn-sm btn-outline-secondary" href="{% url "categoria-update" categoria.pk %}" aria-label="Editar"><i class="bi bi-pencil"></i></a>
-        <a class="btn btn-sm btn-outline-danger" href="{% url "categoria-delete" categoria.pk %}" aria-label="Excluir"><i class="bi bi-trash"></i></a>
+        <a class="btn btn-sm btn-outline-danger js-excluir" href="{% url "categoria-delete" categoria.pk %}" data-titulo="Excluir categoria" data-mensagem="Excluir a categoria {{ categoria.nome }}?" aria-label="Excluir"><i class="bi bi-trash"></i></a>
       </div>
     </article>
     {% empty %}
@@ -125,7 +125,7 @@
       <div class="fin-empty-icon"><i class="bi bi-tags"></i></div>
       <strong class="d-block text-dark">Nenhuma categoria cadastrada</strong>
       <p class="mb-3">Crie categorias como Alimentação, Transporte e Moradia.</p>
-      <a href="{% url "categoria-create" %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar categoria</a>
+      <a href="{% url "categoria-create" %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar categoria</a>
     </div>
     {% endfor %}
   </div>

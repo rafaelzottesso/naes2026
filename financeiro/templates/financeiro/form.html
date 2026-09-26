@@ -24,6 +24,8 @@
         {% if botao == "Sim, excluir!" %}<i class="bi bi-trash"></i>
         {% elif "Categoria" in titulo %}<i class="bi bi-tags"></i>
         {% elif "Pessoa" in titulo %}<i class="bi bi-person-vcard"></i>
+        {% elif "Forma" in titulo %}<i class="bi bi-credit-card"></i>
+        {% elif "arcela" in titulo %}<i class="bi bi-layers"></i>
         {% else %}<i class="bi bi-receipt-cutoff"></i>{% endif %}
       </span>
       <div>
@@ -35,6 +37,12 @@
   <div class="fin-panel-body">
     <form method="post" class="btnLoading" novalidate>
       {% csrf_token %}
+      {% if aviso %}
+      <div class="alert alert-info d-flex align-items-start" role="status">
+        <i class="bi bi-info-circle-fill me-2 mt-1"></i>
+        <div>{{ aviso }}</div>
+      </div>
+      {% endif %}
       {{ form|crispy }}
       <div class="fin-actions mt-4">
         {% if botao == "Sim, excluir!" %}
@@ -49,7 +57,7 @@
           </div>
         </div>
         {% else %}
-        <button type="submit" class="btn btn-fin flex-fill"><i class="bi bi-check-lg me-1"></i>{{ botao }}</button>
+        <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-check-lg me-1"></i>{{ botao }}</button>
         <a href="#" class="btn btn-outline-secondary flex-fill" onclick="window.history.back(); return false;">Cancelar</a>
         {% endif %}
       </div>

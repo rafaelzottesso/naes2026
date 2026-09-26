@@ -355,26 +355,86 @@ body.fin-body {
 .fin-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .fin-actions .btn { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; }
 
-/* ===== Buttons / pagination / footer ===== */
-.btn-fin {
-  background: linear-gradient(135deg, #0e6e68, #129086);
-  border: 0; color: #fff; font-weight: 700;
-  border-radius: 12px; padding: 0.6rem 1.1rem;
-  box-shadow: 0 8px 18px rgba(14, 110, 104, 0.3);
+/* ===== Buttons: classes do Bootstrap, cores do Fluxo ===== */
+.btn-primary {
+  --bs-btn-bg: #0e6e68;
+  --bs-btn-border-color: #0e6e68;
+  --bs-btn-hover-bg: #0a4f4b;
+  --bs-btn-hover-border-color: #0a4f4b;
+  --bs-btn-active-bg: #083f3c;
+  --bs-btn-active-border-color: #083f3c;
+  --bs-btn-disabled-bg: #0e6e68;
+  --bs-btn-disabled-border-color: #0e6e68;
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-color: #fff;
+  font-weight: 700;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(14, 110, 104, 0.28);
 }
-.btn-fin:hover, .btn-fin:focus-visible { color: #fff; filter: brightness(1.05); }
-.btn-fin:active { transform: scale(0.98); }
-.btn-fin-soft {
-  background: linear-gradient(135deg, var(--fin-surface), var(--fin-accent-soft));
-  border: 1px solid rgba(14, 110, 104, 0.18); color: var(--fin-accent-2);
-  font-weight: 600; border-radius: 12px; padding: 0.6rem 1.1rem;
-  box-shadow: 0 2px 8px rgba(14, 110, 104, 0.08);
+.btn-outline-primary {
+  --bs-btn-color: #0e6e68;
+  --bs-btn-border-color: #0e6e68;
+  --bs-btn-hover-bg: #0e6e68;
+  --bs-btn-hover-border-color: #0e6e68;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: #0a4f4b;
+  --bs-btn-active-border-color: #0a4f4b;
+  --bs-btn-active-color: #fff;
+  font-weight: 700;
+  border-radius: 12px;
 }
-.btn-fin-soft:hover, .btn-fin-soft:focus-visible {
-  background: linear-gradient(135deg, var(--fin-accent-soft), #d0ebe6);
-  border-color: var(--fin-accent); color: var(--fin-accent-2);
+.btn-outline-secondary {
+  --bs-btn-color: #0a4f4b;
+  --bs-btn-border-color: rgba(14, 110, 104, 0.35);
+  --bs-btn-hover-bg: #e0f2ef;
+  --bs-btn-hover-border-color: #0e6e68;
+  --bs-btn-hover-color: #0a4f4b;
+  --bs-btn-active-bg: #d0ebe6;
+  --bs-btn-active-border-color: #0e6e68;
+  --bs-btn-active-color: #0a4f4b;
+  --bs-btn-disabled-color: #637976;
+  --bs-btn-disabled-border-color: #e3ebe9;
+  font-weight: 600;
+  border-radius: 12px;
 }
-.btn-outline-secondary { border-radius: 12px; font-weight: 600; }
+.btn-danger {
+  --bs-btn-bg: #b42318;
+  --bs-btn-border-color: #b42318;
+  --bs-btn-hover-bg: #8e1b12;
+  --bs-btn-hover-border-color: #8e1b12;
+  --bs-btn-active-bg: #7a1710;
+  --bs-btn-active-border-color: #7a1710;
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-color: #fff;
+  font-weight: 700;
+  border-radius: 12px;
+}
+.btn-outline-danger {
+  --bs-btn-color: #b42318;
+  --bs-btn-border-color: #b42318;
+  --bs-btn-hover-bg: #b42318;
+  --bs-btn-hover-border-color: #b42318;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: #8e1b12;
+  --bs-btn-active-color: #fff;
+  font-weight: 600;
+  border-radius: 12px;
+}
+.btn-success {
+  --bs-btn-bg: #0e7a4d;
+  --bs-btn-border-color: #0e7a4d;
+  --bs-btn-hover-bg: #0b6140;
+  --bs-btn-hover-border-color: #0b6140;
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+  font-weight: 700;
+  border-radius: 12px;
+}
+.badge.text-bg-success { background-color: var(--fin-receita) !important; }
+.badge.text-bg-danger { background-color: var(--fin-despesa) !important; }
+.badge.text-bg-warning { background-color: var(--fin-gold) !important; color: #1f2933 !important; }
 
 .pagination .page-link { border-radius: 10px !important; margin: 0 2px; border-color: var(--fin-border); color: var(--fin-accent); font-weight: 700; }
 .pagination .page-item.active .page-link { background: var(--fin-accent); border-color: var(--fin-accent); }
@@ -419,6 +479,6 @@ body.fin-body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fin-kpi, .fin-cta, .btn-fin { transition: none; }
+  .fin-kpi, .fin-cta, .btn { transition: none; }
   .fin-kpi:hover, .fin-cta:hover { transform: none; }
 }

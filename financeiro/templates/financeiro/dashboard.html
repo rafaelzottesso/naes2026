@@ -18,7 +18,7 @@
   <div class="fin-head-actions">
     <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary"><i class="bi bi-receipt-cutoff me-1"></i>Lançamentos</a>
     <a href="{% url 'categoria-list' %}" class="btn btn-outline-secondary"><i class="bi bi-tags me-1"></i>Categorias</a>
-    <a href="{% url 'lancamento-create' %}" class="btn btn-fin"><i class="bi bi-plus-lg me-1"></i>Novo</a>
+    <a href="{% url 'lancamento-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Novo</a>
   </div>
 </div>
 
@@ -171,7 +171,7 @@
       </div>
       <div class="fin-panel-body py-1">
         {% for parcela in proximos %}
-        <a class="fin-list-item" href="{% url 'lancamento-detail' parcela.lancamento_id %}">
+        <a class="fin-list-item" href="{% url 'parcela-detail' parcela.pk %}">
           <span class="fin-list-text">
             <span class="fin-list-title d-block text-truncate">{{ parcela.lancamento.descricao|default:parcela.lancamento.categoria.nome }}</span>
             <small>
@@ -217,7 +217,7 @@
           <div class="fin-empty-icon"><i class="bi bi-receipt"></i></div>
           <strong class="d-block text-dark">Nenhum lançamento</strong>
           <p class="mb-2 small">Cadastre o primeiro para acompanhar suas finanças.</p>
-          <a href="{% url 'lancamento-create' %}" class="btn btn-fin btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar lançamento</a>
+          <a href="{% url 'lancamento-create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar lançamento</a>
         </div>
         {% endfor %}
       </div>
