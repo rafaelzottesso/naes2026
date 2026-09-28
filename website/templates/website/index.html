@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block content %}
+{% if request.user.is_authenticated %}
 <div class="fin-page-head">
   <div>
     <div class="fin-eyebrow">Visão Geral · Controle Financeiro</div>
@@ -191,5 +192,43 @@
     </div>
   </div>
 </div>
+{% else %}
+<div class="fin-page-head justify-content-center text-center">
+  <div class="w-100">
+    <div class="fin-eyebrow">Controle financeiro pessoal</div>
+    <h1>Seu dinheiro, em fluxo.</h1>
+    <p>Organize receitas, despesas, parcelas e compromissos em um só lugar.</p>
+    <div class="fin-head-actions justify-content-center">
+      <a href="{% url 'login' %}" class="btn btn-primary">
+        <i class="bi bi-box-arrow-in-right me-1"></i>Entrar no Fluxo
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-md-4">
+    <div class="fin-panel h-100 p-4">
+      <span class="fin-kpi-icon mb-3"><i class="bi bi-receipt-cutoff"></i></span>
+      <h2 class="h5 fw-bold">Lançamentos organizados</h2>
+      <p class="text-muted mb-0">Registre receitas e despesas com categorias e pessoas relacionadas.</p>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="fin-panel h-100 p-4">
+      <span class="fin-kpi-icon mb-3"><i class="bi bi-calendar2-check"></i></span>
+      <h2 class="h5 fw-bold">Parcelas sob controle</h2>
+      <p class="text-muted mb-0">Acompanhe vencimentos, pagamentos e formas de pagamento por parcela.</p>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="fin-panel h-100 p-4">
+      <span class="fin-kpi-icon mb-3"><i class="bi bi-speedometer2"></i></span>
+      <h2 class="h5 fw-bold">Visão do mês</h2>
+      <p class="text-muted mb-0">Consulte saldos e compromissos em um painel financeiro direto ao ponto.</p>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}
 

@@ -141,6 +141,8 @@ body.fin-body {
   border: 1px dashed rgba(255,255,255,0.3);
   box-shadow: none;
 }
+.fin-cta-ghost:hover { color: #fff; }
+.fin-user-card > .fin-cta-ghost { width: 100%; }
 
 .fin-side-spacer { flex: 1; min-height: 1rem; }
 

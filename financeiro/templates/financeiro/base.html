@@ -29,6 +29,7 @@
         <i class="bi bi-house"></i>
         <span>Início</span>
       </a>
+      {% if request.user.is_authenticated %}
       <a class="fin-link {% if request.resolver_match.url_name == 'financeiro-dashboard' %}active{% endif %}" href="{% url 'financeiro-dashboard' %}">
         <i class="bi bi-speedometer2"></i>
         <span>Dashboard</span>
@@ -49,6 +50,12 @@
         <i class="bi bi-credit-card"></i>
         <span>Formas de pagamento</span>
       </a>
+      {% else %}
+      <a class="fin-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span>Entrar</span>
+      </a>
+      {% endif %}
     </nav>
 
     {% if request.user.is_authenticated %}
@@ -112,6 +119,7 @@
         <a class="fin-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">
           <i class="bi bi-house"></i><span>Início</span>
         </a>
+        {% if request.user.is_authenticated %}
         <a class="fin-link {% if request.resolver_match.url_name == 'financeiro-dashboard' %}active{% endif %}" href="{% url 'financeiro-dashboard' %}">
           <i class="bi bi-speedometer2"></i><span>Dashboard</span>
         </a>
@@ -127,6 +135,11 @@
         <a class="fin-link {% if 'forma-pagamento' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'forma-pagamento-list' %}">
           <i class="bi bi-credit-card"></i><span>Formas de pagamento</span>
         </a>
+        {% else %}
+        <a class="fin-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
+          <i class="bi bi-box-arrow-in-right"></i><span>Entrar</span>
+        </a>
+        {% endif %}
       </nav>
 
       {% if request.user.is_authenticated %}
