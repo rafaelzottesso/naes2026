@@ -196,7 +196,6 @@ h1, h2, h3, h4, h5, .fin-display { font-weight: 600; letter-spacing: -0.01em; }
   --bs-dropdown-link-active-bg: var(--fx-primary);
   --bs-dropdown-link-active-color: #fff;
   background: #fff;
-  border-top: 3px solid var(--fx-primary);
   box-shadow: var(--fx-shadow);
   animation: fin-abre 0.15s var(--fx-ease);
 }
