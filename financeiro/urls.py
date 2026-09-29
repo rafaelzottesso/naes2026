@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     CategoriaCreate, CategoriaUpdate, CategoriaDelete, CategoriaList, CategoriaDetail,
+    CentroCreate, CentroUpdate, CentroDelete, CentroList, CentroDetail,
     PessoaCreate, PessoaUpdate, PessoaDelete, PessoaList, PessoaDetail,
     FormaPagamentoCreate, FormaPagamentoUpdate, FormaPagamentoDelete,
     FormaPagamentoList, FormaPagamentoDetail,
@@ -19,6 +20,12 @@ urlpatterns = [
     path('excluir/categoria/<int:pk>/', CategoriaDelete.as_view(), name='categoria-delete'),
     path('listar/categoria/', CategoriaList.as_view(), name='categoria-list'),
     path('detalhar/categoria/<int:pk>/', CategoriaDetail.as_view(), name='categoria-detail'),
+
+    path('cadastrar/centro/', CentroCreate.as_view(), name='centro-create'),
+    path('atualizar/centro/<int:pk>/', CentroUpdate.as_view(), name='centro-update'),
+    path('excluir/centro/<int:pk>/', CentroDelete.as_view(), name='centro-delete'),
+    path('listar/centro/', CentroList.as_view(), name='centro-list'),
+    path('detalhar/centro/<int:pk>/', CentroDetail.as_view(), name='centro-detail'),
 
     path('cadastrar/pessoa/', PessoaCreate.as_view(), name='pessoa-create'),
     path('atualizar/pessoa/<int:pk>/', PessoaUpdate.as_view(), name='pessoa-update'),

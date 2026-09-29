@@ -21,7 +21,7 @@ class Categoria(models.Model):
     status = models.BooleanField(default=True, verbose_name='Ativo')
 
     criado_em = models.DateTimeField(auto_now_add=True)
-    criado_por = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='categorias')
+    criado_por = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='categorias')
     atualizado_em = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -33,16 +33,36 @@ class Categoria(models.Model):
         ordering = ['nome']
 
 
+class Centro(models.Model):
+    """Centro de lançamento: acompanha uma atividade específica (viagem, reforma, projeto)."""
+
+    nome = models.CharField(max_length=100)
+    descricao = models.TextField(blank=True, verbose_name='Descrição')
+    status = models.BooleanField(default=True, verbose_name='Ativo')
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+    criado_por = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='centros')
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        verbose_name = 'Centro de lançamento'
+        verbose_name_plural = 'Centros de lançamento'
+        ordering = ['nome']
+
+
 class Pessoa(models.Model):
     nome = models.CharField(max_length=150, verbose_name='Nome')
-    documento = models.CharField(max_length=18, unique=True, verbose_name='CPF ou CNPJ')
+    documento = models.CharField(max_length=18, verbose_name='CPF ou CNPJ')
     cep = models.CharField(max_length=9, verbose_name='CEP')
     endereco = models.CharField(max_length=255, verbose_name='Endereço')
     cidade = models.CharField(max_length=100, verbose_name='Cidade')
     status = models.BooleanField(default=True, verbose_name='Ativo')
 
     criado_em = models.DateTimeField(auto_now_add=True)
-    criado_por = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='pessoas')
+    criado_por = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='pessoas')
     atualizado_em = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -56,6 +76,12 @@ class Pessoa(models.Model):
         cep = ''.join(caractere for caractere in (self.cep or '') if caractere.isdigit())
         if cep and len(cep) != 8:
             erros['cep'] = 'Informe um CEP com 8 dígitos.'
+        if self.documento and self.criado_por_id:
+            repetidas = Pessoa.objects.filter(criado_por_id=self.criado_por_id, documento=self.documento)
+            if self.pk:
+                repetidas = repetidas.exclude(pk=self.pk)
+            if repetidas.exists():
+                erros['documento'] = 'Você já cadastrou uma pessoa com este CPF ou CNPJ.'
         if erros:
             raise ValidationError(erros)
 
@@ -63,6 +89,12 @@ class Pessoa(models.Model):
         verbose_name = 'Pessoa'
         verbose_name_plural = 'Pessoas'
         ordering = ['nome']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['criado_por', 'documento'],
+                name='pessoa_documento_unico_por_usuario',
+            ),
+        ]
 
 
 class FormaPagamento(models.Model):
@@ -71,7 +103,7 @@ class FormaPagamento(models.Model):
     status = models.BooleanField(default=True, verbose_name='Ativo')
 
     criado_em = models.DateTimeField(auto_now_add=True)
-    criado_por = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='formas_pagamento')
+    criado_por = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='formas_pagamento')
     atualizado_em = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -92,6 +124,15 @@ class Lancamento(models.Model):
         related_name='lancamentos',
         verbose_name='Categoria',
     )
+    centro = models.ForeignKey(
+        Centro,
+        on_delete=models.PROTECT,
+        related_name='lancamentos',
+        null=True,
+        blank=True,
+        verbose_name='Centro de lançamento',
+        help_text='Opcional. Use para acompanhar uma viagem, reforma ou projeto.',
+    )
     pessoa = models.ForeignKey(
         Pessoa,
         on_delete=models.PROTECT,
@@ -107,7 +148,23 @@ class Lancamento(models.Model):
         verbose_name='Forma de pagamento',
         help_text='As parcelas nascem com esta forma. Depois, cada parcela pode ser paga de outro jeito.',
     )
+    numero = models.CharField(
+        max_length=30,
+        blank=True,
+        verbose_name='Número',
+        help_text='Número da nota, do boleto ou do documento. Opcional.',
+    )
     descricao = models.TextField(blank=True, verbose_name='Descrição')
+    declara_ir = models.BooleanField(
+        default=False,
+        verbose_name='Declara no imposto de renda',
+        help_text='Marque se este lançamento deve entrar na declaração do imposto de renda.',
+    )
+    agrupado = models.BooleanField(
+        default=False,
+        verbose_name='Lançamento agrupado',
+        help_text='Marque se este lançamento junta várias notas em um só.',
+    )
 
     valor = models.DecimalField(
         max_digits=10,
@@ -151,10 +208,8 @@ class Lancamento(models.Model):
         validators=[MinValueValidator(1, 'O intervalo precisa ser de pelo menos 1 dia.')],
         help_text='Obrigatório quando houver mais de uma parcela. Em dias corridos.',
     )
-    status = models.BooleanField(default=True, verbose_name='Ativo')
-
     criado_em = models.DateTimeField(auto_now_add=True)
-    criado_por = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='lancamentos')
+    criado_por = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='lancamentos')
     atualizado_em = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -211,6 +266,11 @@ class Lancamento(models.Model):
             erros['categoria'] = 'Escolha uma categoria da sua conta.'
         elif self.categoria_id and not self.categoria.status and not self.pk:
             erros['categoria'] = 'Escolha uma categoria ativa.'
+
+        if self.centro_id and self.centro.criado_por_id != self.criado_por_id:
+            erros['centro'] = 'Escolha um centro de lançamento da sua conta.'
+        elif self.centro_id and not self.centro.status and not self.pk:
+            erros['centro'] = 'Escolha um centro de lançamento ativo.'
 
         if self.pessoa_id and self.pessoa.criado_por_id != self.criado_por_id:
             erros['pessoa'] = 'Escolha uma pessoa da sua conta.'
@@ -276,10 +336,8 @@ class Parcela(models.Model):
     )
     data_pagamento = models.DateField(verbose_name='Data de pagamento', blank=True, null=True)
 
-    status = models.BooleanField(default=True, verbose_name='Ativo')
-
     criado_em = models.DateTimeField(auto_now_add=True)
-    criado_por = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='parcelas')
+    criado_por = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='parcelas')
     atualizado_em = models.DateTimeField(auto_now=True)
 
     class Meta:

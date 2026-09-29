@@ -5,21 +5,21 @@
 
 {% block content %}
 <nav aria-label="Você está em" class="mb-3">
-  <a href="{% url 'categoria-list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar para a lista</a>
+  <a href="{% url 'centro-list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar para a lista</a>
 </nav>
 
 <header class="fin-ficha-head">
   <div>
-    <div class="fin-eyebrow">Categoria</div>
+    <div class="fin-eyebrow">Centro de lançamento</div>
     <h1>{{ object.nome }}</h1>
     <div class="fin-ficha-tags">
-      {% if object.status %}<span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Ativa</span>{% else %}<span class="badge fin-pill text-bg-secondary"><i class="bi bi-pause-circle-fill me-1"></i>Inativa</span>{% endif %}
+      {% if object.status %}<span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Ativo</span>{% else %}<span class="badge fin-pill text-bg-secondary"><i class="bi bi-pause-circle-fill me-1"></i>Inativo</span>{% endif %}
       
     </div>
   </div>
   <div class="fin-head-actions">
-    <a href="{% url 'categoria-update' object.pk %}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>Editar</a>
-    <a href="{% url 'categoria-delete' object.pk %}" class="btn btn-outline-danger js-excluir" data-titulo="Excluir categoria" data-mensagem="Excluir a categoria {{ object.nome }}?"><i class="bi bi-trash me-1"></i>Excluir</a>
+    <a href="{% url 'centro-update' object.pk %}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>Editar</a>
+    <a href="{% url 'centro-delete' object.pk %}" class="btn btn-outline-danger js-excluir" data-titulo="Excluir centro" data-mensagem="Excluir o centro {{ object.nome }}?"><i class="bi bi-trash me-1"></i>Excluir</a>
   </div>
 </header>
 
@@ -40,9 +40,9 @@
       <div class="fin-panel-body">
         <dl class="fin-dl">
           <div><dt>Descrição</dt><dd>{{ object.descricao|default:"—" }}</dd></div>
-          <div><dt>Situação</dt><dd>{% if object.status %}Ativa{% else %}Inativa{% endif %}</dd></div>
-          <div><dt>Cadastrada por</dt><dd>{{ object.criado_por.get_username }}</dd></div>
-          <div><dt>Cadastrada em</dt><dd>{{ object.criado_em|date:"d/m/Y H:i" }}</dd></div>
+          <div><dt>Situação</dt><dd>{% if object.status %}Ativo{% else %}Inativo{% endif %}</dd></div>
+          <div><dt>Cadastrado por</dt><dd>{{ object.criado_por.get_username }}</dd></div>
+          <div><dt>Cadastrado em</dt><dd>{{ object.criado_em|date:"d/m/Y H:i" }}</dd></div>
           <div><dt>Última edição</dt><dd>{{ object.atualizado_em|date:"d/m/Y H:i" }}</dd></div>
         </dl>
       </div>
@@ -51,7 +51,7 @@
   <div class="col-12 col-xl-7">
     <section class="fin-panel h-100">
       <div class="fin-panel-head">
-        <h2>Lançamentos desta categoria</h2>
+        <h2>Lançamentos deste centro</h2>
         <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">Ver todos<i class="bi bi-arrow-right ms-1"></i></a>
       </div>
       <div class="fin-panel-body py-2">
@@ -64,7 +64,7 @@
           <span class="fin-money {% if lancamento.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}">{% if lancamento.tipo == "receita" %}+{% else %}−{% endif %} {{ lancamento.valor_total|brl }}</span>
         </a>
         {% empty %}
-        <div class="fin-empty py-4"><strong class="d-block">Nenhum lançamento nesta categoria</strong></div>
+        <div class="fin-empty py-4"><strong class="d-block">Nenhum lançamento neste centro</strong></div>
         {% endfor %}
       </div>
     </section>

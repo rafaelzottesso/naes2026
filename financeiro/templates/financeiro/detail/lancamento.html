@@ -1,130 +1,155 @@
 {% extends "financeiro/base.html" %}
 {% load fin_tags %}
 
-{% block title %}{{ object.descricao|default:"Lançamento" }} · Finanças{% endblock %}
-
-{% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'lancamento-list' %}">Lançamentos</a></li>
-<li class="breadcrumb-item active" aria-current="page">Detalhes</li>
-{% endblock %}
+{% block title %}{{ object.descricao|default:"Lançamento" }} · AnotAI{% endblock %}
 
 {% block content %}
-<div class="fin-hero mb-3">
-  <small>{{ object.get_tipo_display }} · {{ object.categoria.nome }}</small>
-  <p class="fin-hero-value">{{ object.valor_total|brl }}</p>
-  <div class="fin-hero-meta">
-    <span class="badge fin-pill {% if object.tipo == 'receita' %}text-bg-success{% else %}text-bg-danger{% endif %}">{{ object.get_tipo_display }}</span>
-    <span class="badge fin-pill text-bg-light"><i class="bi bi-calendar3 me-1"></i>{{ object.data|date:"d/m/Y" }}</span>
-    <span class="badge fin-pill {% if object.status %}text-bg-light{% else %}text-bg-secondary{% endif %}">{% if object.status %}Ativo{% else %}Inativo{% endif %}</span>
-    <span class="badge fin-pill text-bg-light"><i class="bi bi-layers me-1"></i>{{ object.parcelas|default:"1" }}x</span>
-    {% if object.forma_pagamento %}
-    <span class="badge fin-pill text-bg-light"><i class="bi bi-credit-card me-1"></i>{{ object.forma_pagamento.nome }}</span>
-    {% endif %}
+<div class="fin-tipo-{{ object.tipo }}">
+<nav aria-label="Você está em" class="mb-3">
+  <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Lançamentos</a>
+</nav>
+
+<!-- ===== Cabeçalho da ficha ===== -->
+<header class="fin-ficha-head">
+  <div>
+    <div class="fin-eyebrow">Lançamento de {{ object.get_tipo_display|lower }} · {{ object.categoria.nome }}</div>
+    <h1>{{ object.descricao|default:"Lançamento sem descrição" }}</h1>
+    <div class="fin-ficha-tags">
+      {% if object.tipo == "receita" %}
+      <span class="badge fin-pill text-bg-success"><i class="bi bi-arrow-down-left me-1"></i>Receita</span>
+      {% else %}
+      <span class="badge fin-pill text-bg-danger"><i class="bi bi-arrow-up-right me-1"></i>Despesa</span>
+      {% endif %}
+      {% if object.numero %}<span class="badge fin-pill text-bg-light"><i class="bi bi-hash me-1"></i>{{ object.numero }}</span>{% endif %}
+      {% if object.centro %}<span class="badge fin-pill text-bg-light"><i class="bi bi-bullseye me-1"></i>{{ object.centro.nome }}</span>{% endif %}
+      {% if object.declara_ir %}<span class="badge fin-pill text-bg-primary"><i class="bi bi-file-earmark-text me-1"></i>Imposto de renda</span>{% endif %}
+      {% if object.agrupado %}<span class="badge fin-pill text-bg-primary"><i class="bi bi-collection me-1"></i>Agrupado</span>{% endif %}
+    </div>
   </div>
-  <div class="d-flex flex-wrap gap-2 mt-3">
-    <a href="{% url 'lancamento-update' object.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil me-1"></i>Editar</a>
-    <a href="{% url 'lancamento-delete' object.pk %}" class="btn btn-sm btn-outline-light js-excluir" data-titulo="Excluir lançamento" data-mensagem="Excluir o lançamento {{ object.descricao|default:object.categoria.nome }}? As parcelas dele também serão excluídas."><i class="bi bi-trash me-1"></i>Excluir</a>
-    <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-link text-white text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  <div class="fin-head-actions">
+    <a href="{% url 'lancamento-update' object.pk %}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>Editar</a>
+    <a href="{% url 'lancamento-delete' object.pk %}" class="btn btn-outline-danger js-excluir" data-titulo="Excluir lançamento" data-mensagem="Excluir o lançamento {{ object.descricao|default:object.categoria.nome }}? As parcelas dele também serão excluídas."><i class="bi bi-trash me-1"></i>Excluir</a>
+  </div>
+</header>
+
+<div class="row g-3 mb-3">
+  <!-- ===== Composição do valor ===== -->
+  <div class="col-12 col-lg-6">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head"><h2>Composição do valor</h2></div>
+      <div class="fin-panel-body">
+        <table class="fin-extrato">
+          <tbody>
+            <tr><th scope="row">Valor</th><td>{{ object.valor|brl }}</td></tr>
+            <tr><th scope="row">Desconto</th><td>− {{ object.desconto|default:0|brl }}</td></tr>
+            <tr><th scope="row">Acréscimo</th><td>+ {{ object.acrescimo|default:0|brl }}</td></tr>
+            <tr class="fin-total"><th scope="row">Valor líquido</th><td>{{ object.valor_total|brl }}</td></tr>
+          </tbody>
+        </table>
+        <dl class="fin-dl mt-3">
+          <div><dt>Parcelamento</dt><dd>{{ object.parcelas|default:"1" }}x{% if object.intervalo_parcelas %}, a cada {{ object.intervalo_parcelas }} dia(s){% endif %}</dd></div>
+          <div><dt>Data da 1ª parcela</dt><dd>{{ object.data|date:"d/m/Y" }}</dd></div>
+          <div><dt>Forma de pagamento</dt><dd>{% if object.forma_pagamento %}<a href="{% url 'forma-pagamento-detail' object.forma_pagamento.pk %}">{{ object.forma_pagamento.nome }}</a>{% else %}—{% endif %}</dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== Situação dos pagamentos ===== -->
+  <div class="col-12 col-lg-6">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <div><h2>Situação dos pagamentos</h2><p>{{ resumo.qtd_pagas }} de {{ parcelas|length }} parcela(s) paga(s) · {{ resumo.percentual }}%</p></div>
+      </div>
+      <div class="fin-panel-body">
+        <div class="fin-segmentos" role="img" aria-label="{{ resumo.qtd_pagas }} de {{ parcelas|length }} parcelas pagas">
+          {% for parcela in parcelas %}<a class="fin-seg-{{ parcela.situacao }}" href="{% url 'parcela-detail' parcela.pk %}" title="Parcela {{ parcela.numero }} · vence em {{ parcela.data|date:'d/m/Y' }}"></a>{% endfor %}
+        </div>
+        <ul class="fin-situacoes">
+          <li>
+            <span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Paga</span>
+            <span class="fin-sit-nome"><small>{{ resumo.qtd_pagas }} parcela(s)</small></span>
+            <span class="fin-money">{{ resumo.pago|brl }}</span>
+          </li>
+          <li>
+            <span class="badge fin-pill text-bg-info"><i class="bi bi-hourglass-split me-1"></i>Em aberto</span>
+            <span class="fin-sit-nome"><small>{{ resumo.qtd_abertas }} parcela(s)</small></span>
+            <span class="fin-money">{{ resumo.aberto|brl }}</span>
+          </li>
+          <li>
+            <span class="badge fin-pill text-bg-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>Vencida</span>
+            <span class="fin-sit-nome"><small>{{ resumo.qtd_vencidas }} parcela(s)</small></span>
+            <span class="fin-money">{{ resumo.vencido|brl }}</span>
+          </li>
+        </ul>
+      </div>
+    </section>
   </div>
 </div>
 
+<!-- ===== Parcelas ===== -->
 <section class="fin-panel mb-3">
   <div class="fin-panel-head">
-    <h2>{{ object.descricao|default:"Lançamento sem descrição" }}</h2>
+    <div><h2>Parcelas</h2><p>Cada parcela pode ser editada e baixada separadamente.</p></div>
   </div>
-  <div class="fin-panel-body">
-    <div class="fin-meta-grid">
-      <div class="fin-meta"><p class="fin-label">Categoria</p><p>{{ object.categoria.nome }}</p></div>
-      <div class="fin-meta"><p class="fin-label">Cliente/Fornecedor</p><p><a href="{% url 'pessoa-detail' object.pessoa.pk %}">{{ object.pessoa.nome }}</a></p></div>
-      <div class="fin-meta"><p class="fin-label">Forma de pagamento</p><p>{% if object.forma_pagamento %}<a href="{% url 'forma-pagamento-detail' object.forma_pagamento.pk %}">{{ object.forma_pagamento.nome }}</a>{% else %}—{% endif %}</p></div>
-      <div class="fin-meta"><p class="fin-label">Data da 1ª parcela</p><p>{{ object.data|date:"d/m/Y" }}</p></div>
-      <div class="fin-meta"><p class="fin-label">Status</p><p>{% if object.status %}Ativo{% else %}Inativo{% endif %}</p></div>
-      <div class="fin-meta"><p class="fin-label">Intervalo (dias)</p><p>{{ object.intervalo_parcelas|default:"—" }}</p></div>
-      <div class="fin-meta"><p class="fin-label">Valor</p><p class="fin-money">{{ object.valor|brl }}</p></div>
-      <div class="fin-meta"><p class="fin-label">Desconto</p><p class="fin-money">{{ object.desconto|default:0|brl }}</p></div>
-      <div class="fin-meta"><p class="fin-label">Acréscimo</p><p class="fin-money">{{ object.acrescimo|default:0|brl }}</p></div>
-      <div class="fin-meta"><p class="fin-label">Valor líquido</p><p class="fin-money">{{ object.valor_total|brl }}</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="fin-panel">
-  <div class="fin-panel-head">
-    <div>
-      <h2>Parcelas</h2>
-      <p>Geradas junto com o lançamento. Dá para ver e editar; a exclusão é a do lançamento.</p>
-    </div>
-    <span class="badge rounded-pill text-bg-light border">{{ parcelas|length }} parcela(s)</span>
-  </div>
-  <div class="table-responsive d-none d-md-block">
-    <table class="table fin-table mb-0">
+  {% if parcelas %}
+  <div class="fin-table-wrap">
+    <table class="table fin-table align-middle js-tabela fin-tabela-parcelas">
       <thead>
         <tr>
-          <th>Nº</th>
-          <th>Vencimento</th>
-          <th>Forma</th>
-          <th>Valor</th>
-          <th>Valor pago</th>
-          <th>Pagamento</th>
-          <th>Situação</th>
-          <th class="text-end">Ações</th>
+          <th data-priority="1">Parcela</th>
+          <th data-priority="3">Vencimento</th>
+          <th data-priority="2">Situação</th>
+          <th data-priority="2" class="text-end">Valor</th>
+          <th data-priority="5" class="text-end">Valor pago</th>
+          <th data-priority="6">Pago em</th>
+          <th data-priority="7">Forma</th>
+          <th class="all text-end">Ações</th>
         </tr>
       </thead>
       <tbody>
         {% for parcela in parcelas %}
-        <tr>
-          <td><span class="badge rounded-pill text-bg-light border">{{ parcela.numero }}</span></td>
-          <td>{{ parcela.data|date:"d/m/Y" }}</td>
-          <td>{{ parcela.forma_pagamento|default:"—" }}</td>
-          <td class="fin-money">{{ parcela.valor_liquido|brl }}</td>
-          <td class="fin-money">{% if parcela.valor_pago %}{{ parcela.valor_pago|brl }}{% else %}—{% endif %}</td>
-          <td>{{ parcela.data_pagamento|date:"d/m/Y"|default:"—" }}</td>
+        <tr class="fin-linha-{{ parcela.situacao }}">
           <td>
-            {% if parcela.situacao == 'paga' %}
-            <span class="badge fin-pill text-bg-success"><i class="bi bi-check-lg"></i> Paga</span>
-            {% elif parcela.situacao == 'atrasada' %}
-            <span class="badge fin-pill text-bg-danger"><i class="bi bi-exclamation-lg"></i> Atrasada</span>
-            {% else %}
-            <span class="badge fin-pill text-bg-warning"><i class="bi bi-clock"></i> A vencer</span>
-            {% endif %}
+            <a class="fw-semibold text-decoration-none text-reset" href="{% url 'parcela-detail' parcela.pk %}">Parcela {{ parcela.numero }}</a>
+            <span class="fin-sub-mobile d-md-none"><span class="fin-money">{{ parcela.valor_liquido|brl }}</span><br>{% situacao_parcela parcela %}</span>
           </td>
-          <td class="text-end">
+          <td class="text-nowrap">{{ parcela.data|date:"d/m/Y" }}</td>
+          <td>{% situacao_parcela parcela True %}</td>
+          <td class="text-end fin-money">{{ parcela.valor_liquido|brl }}</td>
+          <td class="text-end fin-money">{% if parcela.valor_pago %}{{ parcela.valor_pago|brl }}{% else %}—{% endif %}</td>
+          <td class="text-nowrap">{{ parcela.data_pagamento|date:"d/m/Y"|default:"—" }}</td>
+          <td>{{ parcela.forma_pagamento|default:"—" }}</td>
+          <td class="text-end text-nowrap">
             <a class="btn btn-sm btn-outline-secondary" href="{% url 'parcela-detail' parcela.pk %}" aria-label="Ver parcela {{ parcela.numero }}"><i class="bi bi-eye"></i></a>
-            <a class="btn btn-sm btn-outline-primary" href="{% url 'parcela-update' parcela.pk %}" aria-label="Editar parcela {{ parcela.numero }}"><i class="bi bi-pencil"></i></a>
+            <a class="btn btn-sm btn-primary" href="{% url 'parcela-update' parcela.pk %}" aria-label="{% if parcela.quitada %}Editar{% else %}Dar baixa na{% endif %} parcela {{ parcela.numero }}"><i class="bi {% if parcela.quitada %}bi-pencil{% else %}bi-cash-coin{% endif %}"></i></a>
           </td>
         </tr>
-        {% empty %}
-        <tr><td colspan="8"><div class="fin-empty"><div class="fin-empty-icon"><i class="bi bi-layers"></i></div><strong class="d-block text-dark">Nenhuma parcela gerada</strong></div></td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  <div class="fin-panel-body d-md-none">
-    {% for parcela in parcelas %}
-    <article class="fin-m-card">
-      <div class="d-flex justify-content-between align-items-center">
-        <strong>Parcela {{ parcela.numero }}</strong>
-        {% if parcela.situacao == 'paga' %}
-        <span class="badge fin-pill text-bg-success">Paga</span>
-        {% elif parcela.situacao == 'atrasada' %}
-        <span class="badge fin-pill text-bg-danger">Atrasada</span>
-        {% else %}
-        <span class="badge fin-pill text-bg-warning">A vencer</span>
-        {% endif %}
-      </div>
-      <small class="text-muted d-block mt-1">Vence em {{ parcela.data|date:"d/m/Y" }} · {{ parcela.forma_pagamento|default:"sem forma" }}{% if parcela.data_pagamento %} · paga em {{ parcela.data_pagamento|date:"d/m/Y" }}{% endif %}</small>
-      <div class="d-flex justify-content-between align-items-center mt-2">
-        <span class="fin-money">{{ parcela.valor_liquido|brl }}</span>
-        <span class="d-flex gap-1">
-          <a class="btn btn-sm btn-outline-secondary" href="{% url 'parcela-detail' parcela.pk %}" aria-label="Ver parcela {{ parcela.numero }}"><i class="bi bi-eye"></i></a>
-          <a class="btn btn-sm btn-outline-primary" href="{% url 'parcela-update' parcela.pk %}" aria-label="Editar parcela {{ parcela.numero }}"><i class="bi bi-pencil"></i></a>
-        </span>
-      </div>
-    </article>
-    {% empty %}
-    <div class="fin-empty"><div class="fin-empty-icon"><i class="bi bi-layers"></i></div><strong class="d-block text-dark">Nenhuma parcela gerada</strong></div>
-    {% endfor %}
-    <a href="{% url 'lancamento-list' %}" class="btn btn-outline-secondary w-100 mt-3"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  {% else %}
+  <div class="fin-empty"><div class="fin-empty-icon"><i class="bi bi-layers"></i></div><strong class="d-block">Nenhuma parcela gerada</strong></div>
+  {% endif %}
+</section>
+
+<!-- ===== Dados do lançamento ===== -->
+<section class="fin-panel">
+  <div class="fin-panel-head"><h2>Dados do lançamento</h2></div>
+  <div class="fin-panel-body">
+    <dl class="fin-dl fin-dl-2">
+      <div><dt>Categoria</dt><dd>{{ object.categoria.nome }}</dd></div>
+      <div><dt>Cliente/Fornecedor</dt><dd><a href="{% url 'pessoa-detail' object.pessoa.pk %}">{{ object.pessoa.nome }}</a></dd></div>
+      <div><dt>Centro de lançamento</dt><dd>{% if object.centro %}<a href="{% url 'centro-detail' object.centro.pk %}">{{ object.centro.nome }}</a>{% else %}—{% endif %}</dd></div>
+      <div><dt>Número</dt><dd>{{ object.numero|default:"—" }}</dd></div>
+      <div><dt>Imposto de renda</dt><dd>{% if object.declara_ir %}Sim{% else %}Não{% endif %}</dd></div>
+      <div><dt>Lançamento agrupado</dt><dd>{% if object.agrupado %}Sim{% else %}Não{% endif %}</dd></div>
+      <div><dt>Cadastrado por</dt><dd>{{ object.criado_por.get_username }}</dd></div>
+      <div><dt>Cadastrado em</dt><dd>{{ object.criado_em|date:"d/m/Y H:i" }}</dd></div>
+      <div><dt>Última edição</dt><dd>{{ object.atualizado_em|date:"d/m/Y H:i" }}</dd></div>
+    </dl>
   </div>
 </section>
+</div>
 {% endblock %}

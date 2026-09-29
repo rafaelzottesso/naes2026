@@ -3,7 +3,7 @@ from decimal import Decimal
 from django import forms
 from django.db.models import Q
 
-from .models import ZERO, Categoria, FormaPagamento, Lancamento, Parcela, Pessoa
+from .models import ZERO, Categoria, Centro, FormaPagamento, Lancamento, Parcela, Pessoa
 
 
 def _opcoes_ativas(modelo, usuario, atual_id=None):
@@ -25,28 +25,52 @@ class LancamentoForm(AjusteMonetarioMixin, forms.ModelForm):
     class Meta:
         model = Lancamento
         fields = [
-            'tipo', 'data', 'categoria', 'pessoa', 'forma_pagamento', 'descricao',
-            'valor', 'desconto', 'acrescimo', 'parcelas', 'intervalo_parcelas', 'status',
+            'tipo', 'data', 'numero', 'categoria', 'centro', 'pessoa', 'forma_pagamento', 'descricao',
+            'valor', 'desconto', 'acrescimo', 'parcelas', 'intervalo_parcelas',
+            'declara_ir', 'agrupado',
         ]
+        # rótulos curtos: não quebram a linha nem desalinham os campos na grade
+        labels = {
+            'data': '1º vencimento',
+            'centro': 'Centro de lançamento',
+            'pessoa': 'Cliente/Fornecedor',
+            'intervalo_parcelas': 'Intervalo (dias)',
+            'declara_ir': 'Declara no imposto de renda',
+            'agrupado': 'Lançamento agrupado',
+        }
+        help_texts = {
+            'forma_pagamento': 'As parcelas nascem com esta forma.',
+            'parcelas': 'Mínimo 1. À vista usa 1.',
+            'intervalo_parcelas': 'Obrigatório com mais de 1 parcela.',
+            'centro': 'Opcional. Viagem, reforma, projeto.',
+            'numero': 'Nota, boleto ou documento. Opcional.',
+            'declara_ir': 'Entra na declaração do imposto de renda.',
+            'agrupado': 'Junta várias notas em um só lançamento.',
+        }
 
     def __init__(self, *args, user=None, **kwargs):
         self.user = user
         super().__init__(*args, **kwargs)
-        self.fields['data'].widget = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
-        self.fields['data'].input_formats = ['%Y-%m-%d']
-        self.fields['parcelas'].initial = 1
-        self.fields['parcelas'].widget.attrs['min'] = 1
-        self.fields['intervalo_parcelas'].widget.attrs['min'] = 1
-        self.fields['valor'].widget.attrs.update({'step': '0.01', 'min': '0.01'})
-        self.fields['desconto'].widget.attrs.update({'step': '0.01', 'min': '0'})
-        self.fields['acrescimo'].widget.attrs.update({'step': '0.01', 'min': '0'})
-        self.fields['desconto'].required = False
-        self.fields['acrescimo'].required = False
+        if 'data' in self.fields:
+            self.fields['data'].widget = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
+            self.fields['data'].input_formats = ['%Y-%m-%d']
+        if 'parcelas' in self.fields:
+            self.fields['parcelas'].initial = 1
+            self.fields['parcelas'].widget.attrs['min'] = 1
+            self.fields['intervalo_parcelas'].widget.attrs['min'] = 1
+            self.fields['valor'].widget.attrs.update({'step': '0.01', 'min': '0.01'})
+            self.fields['desconto'].widget.attrs.update({'step': '0.01', 'min': '0'})
+            self.fields['acrescimo'].widget.attrs.update({'step': '0.01', 'min': '0'})
+            self.fields['desconto'].required = False
+            self.fields['acrescimo'].required = False
 
         if user is not None:
             atual = self.instance
             self.fields['categoria'].queryset = _opcoes_ativas(
                 Categoria, user, atual.categoria_id if atual.pk else None,
+            )
+            self.fields['centro'].queryset = _opcoes_ativas(
+                Centro, user, atual.centro_id if atual.pk else None,
             )
             self.fields['pessoa'].queryset = _opcoes_ativas(
                 Pessoa, user, atual.pessoa_id if atual.pk else None,
@@ -66,7 +90,21 @@ class LancamentoUpdateForm(LancamentoForm):
     """Edição cadastral. Valor, quantidade e vencimentos ficam nas parcelas já geradas."""
 
     class Meta(LancamentoForm.Meta):
-        fields = ['descricao', 'tipo', 'categoria', 'pessoa', 'forma_pagamento', 'status']
+        fields = [
+            'numero', 'descricao', 'tipo', 'categoria', 'centro', 'pessoa', 'forma_pagamento',
+            'declara_ir', 'agrupado',
+        ]
+
+
+class PessoaForm(forms.ModelForm):
+    class Meta:
+        model = Pessoa
+        fields = ['nome', 'documento', 'cep', 'endereco', 'cidade', 'status']
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user is not None and not self.instance.criado_por_id:
+            self.instance.criado_por = user
 
 
 class ParcelaForm(AjusteMonetarioMixin, forms.ModelForm):
@@ -74,7 +112,7 @@ class ParcelaForm(AjusteMonetarioMixin, forms.ModelForm):
         model = Parcela
         fields = [
             'data', 'forma_pagamento', 'valor', 'desconto', 'acrescimo',
-            'valor_pago', 'data_pagamento', 'status',
+            'valor_pago', 'data_pagamento',
         ]
 
     def __init__(self, *args, user=None, **kwargs):

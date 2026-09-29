@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Categoria, FormaPagamento, Lancamento, Parcela, Pessoa
+from .models import Categoria, Centro, FormaPagamento, Lancamento, Parcela, Pessoa
 from .services import dividir_valor
 
 
@@ -86,7 +86,6 @@ class LancamentoParcelasTests(TestCase):
             'desconto': '0',
             'acrescimo': '0',
             'parcelas': '1',
-            'status': 'on',
         }
         dados.update(extras)
         return self.client.post(reverse('lancamento-create'), dados)
@@ -152,7 +151,6 @@ class LancamentoParcelasTests(TestCase):
             'acrescimo': '0',
             'valor_pago': '100.00',
             'data_pagamento': '2026-09-12',
-            'status': 'on',
         })
         self.assertRedirects(edicao, reverse('lancamento-detail', args=[parcela.lancamento_id]))
         parcela.refresh_from_db()
@@ -167,7 +165,6 @@ class LancamentoParcelasTests(TestCase):
             'forma_pagamento': self.forma.pk,
             'valor': '100.00',
             'valor_pago': '100.00',
-            'status': 'on',
         })
         self.assertEqual(resposta.status_code, 200)
         parcela.refresh_from_db()
@@ -192,3 +189,162 @@ class LancamentoParcelasTests(TestCase):
         self.assertContains(detalhe, 'Parcela 2')
         self.assertContains(detalhe, reverse('parcela-update', args=[lancamento.itens.get(numero=1).pk]))
         self.assertNotContains(detalhe, 'excluir/parcela')
+
+
+    def test_grava_numero_centro_ir_e_agrupado(self):
+        centro = Centro.objects.create(nome='Reforma', criado_por=self.user)
+        self._post_lancamento(
+            numero='NF-123', centro=centro.pk, declara_ir='on', agrupado='on',
+        )
+        lancamento = Lancamento.objects.get()
+        self.assertEqual(lancamento.numero, 'NF-123')
+        self.assertEqual(lancamento.centro, centro)
+        self.assertTrue(lancamento.declara_ir)
+        self.assertTrue(lancamento.agrupado)
+        detalhe = self.client.get(reverse('lancamento-detail', args=[lancamento.pk]))
+        self.assertContains(detalhe, 'Reforma')
+
+    def test_centro_e_ir_sao_opcionais(self):
+        self._post_lancamento()
+        lancamento = Lancamento.objects.get()
+        self.assertIsNone(lancamento.centro)
+        self.assertFalse(lancamento.declara_ir)
+        self.assertFalse(lancamento.agrupado)
+
+    def test_centro_inativo_ou_de_outro_usuario_nao_e_aceito(self):
+        inativo = Centro.objects.create(nome='Antigo', status=False, criado_por=self.user)
+        alheio = Centro.objects.create(nome='Alheio', criado_por=self.outro)
+        for centro in (inativo, alheio):
+            resposta = self._post_lancamento(centro=centro.pk)
+            self.assertEqual(resposta.status_code, 200)
+        self.assertFalse(Lancamento.objects.exists())
+
+
+class CentroTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='centro-dono', password='senha-teste')
+        self.client.force_login(self.user)
+
+    def test_cria_lista_e_exclui_centro(self):
+        resposta = self.client.post(reverse('centro-create'), {'nome': 'Viagem', 'status': 'on'})
+        self.assertRedirects(resposta, reverse('centro-list'))
+        centro = Centro.objects.get()
+        self.assertEqual(centro.criado_por, self.user)
+        self.assertContains(self.client.get(reverse('centro-list')), 'Viagem')
+        self.assertContains(self.client.get(reverse('centro-detail', args=[centro.pk])), 'Viagem')
+        self.client.post(reverse('centro-delete', args=[centro.pk]))
+        self.assertFalse(Centro.objects.exists())
+
+    def test_outro_usuario_nao_ve_o_centro(self):
+        centro = Centro.objects.create(nome='Privado', criado_por=self.user)
+        outro = get_user_model().objects.create_user(username='centro-outro', password='senha-teste')
+        self.client.force_login(outro)
+        self.assertEqual(self.client.get(reverse('centro-detail', args=[centro.pk])).status_code, 404)
+        self.assertNotContains(self.client.get(reverse('centro-list')), 'Privado')
+
+
+class DocumentoDaPessoaTests(TestCase):
+    dados = {
+        'nome': 'Fornecedor', 'documento': '12345678901', 'cep': '87020000',
+        'endereco': 'Rua A', 'cidade': 'Maringá', 'status': 'on',
+    }
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='doc-dono', password='senha-teste')
+        self.outro = get_user_model().objects.create_user(username='doc-outro', password='senha-teste')
+        self.client.force_login(self.user)
+
+    def test_documento_repetido_no_mesmo_usuario_e_recusado(self):
+        self.client.post(reverse('pessoa-create'), self.dados)
+        resposta = self.client.post(reverse('pessoa-create'), self.dados)
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, 'já cadastrou')
+        self.assertEqual(Pessoa.objects.count(), 1)
+
+    def test_outro_usuario_pode_usar_o_mesmo_documento(self):
+        self.client.post(reverse('pessoa-create'), self.dados)
+        self.client.force_login(self.outro)
+        resposta = self.client.post(reverse('pessoa-create'), self.dados)
+        self.assertRedirects(resposta, reverse('pessoa-list'))
+        self.assertEqual(Pessoa.objects.filter(documento='12345678901').count(), 2)
+
+
+class TelasTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='telas', password='senha-teste')
+        self.client.force_login(self.user)
+        self.categoria = Categoria.objects.create(nome='Lazer', criado_por=self.user)
+        self.pessoa = Pessoa.objects.create(
+            nome='Loja', documento='11122233344', cep='87020000',
+            endereco='Rua C', cidade='Maringá', criado_por=self.user,
+        )
+        self.forma = FormaPagamento.objects.create(nome='Cartão', criado_por=self.user)
+        hoje = timezone.localdate()
+        self.lancamento = Lancamento.objects.create(
+            tipo='despesa', data=hoje - timedelta(days=40), categoria=self.categoria,
+            pessoa=self.pessoa, forma_pagamento=self.forma, descricao='Notebook',
+            valor=Decimal('300.00'), parcelas=3, intervalo_parcelas=30, criado_por=self.user,
+        )
+        from .services import gerar_parcelas
+        gerar_parcelas(self.lancamento)
+        primeira, segunda, terceira = self.lancamento.itens.order_by('numero')
+        primeira.valor_pago = primeira.valor_liquido
+        primeira.data_pagamento = hoje - timedelta(days=39)
+        primeira.save()
+        # segunda venceu há 10 dias e continua em aberto; terceira vence daqui a 20 dias
+
+    def test_detalhe_mostra_cada_parcela_com_a_situacao_padrao(self):
+        detalhe = self.client.get(reverse('lancamento-detail', args=[self.lancamento.pk]))
+        self.assertContains(detalhe, 'fin-linha-paga')
+        self.assertContains(detalhe, 'fin-linha-atrasada')
+        self.assertContains(detalhe, 'fin-linha-a_vencer')
+        self.assertContains(detalhe, 'text-bg-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>Vencida')
+        self.assertContains(detalhe, 'text-bg-info"><i class="bi bi-hourglass-split me-1"></i>Em aberto')
+        resumo = detalhe.context['resumo']
+        self.assertEqual((resumo['qtd_pagas'], resumo['qtd_vencidas'], resumo['qtd_abertas']), (1, 1, 1))
+        self.assertEqual(resumo['pago'], Decimal('100.00'))
+        self.assertEqual(resumo['vencido'], Decimal('100.00'))
+
+    def test_lista_de_lancamentos_mostra_situacao_e_valor(self):
+        lista = self.client.get(reverse('lancamento-list'))
+        self.assertContains(lista, 'Parcela vencida')
+        self.assertContains(lista, '1/3 pagas')
+
+    def test_todas_as_telas_abrem(self):
+        centro = Centro.objects.create(nome='Reforma', criado_por=self.user)
+        parcela = self.lancamento.itens.first()
+        urls = [
+            reverse('index'), reverse('financeiro-dashboard'), reverse('lancamento-list'),
+            reverse('lancamento-create'), reverse('lancamento-update', args=[self.lancamento.pk]),
+            reverse('lancamento-delete', args=[self.lancamento.pk]),
+            reverse('parcela-detail', args=[parcela.pk]), reverse('parcela-update', args=[parcela.pk]),
+            reverse('categoria-list'), reverse('categoria-detail', args=[self.categoria.pk]),
+            reverse('categoria-create'), reverse('centro-list'),
+            reverse('centro-detail', args=[centro.pk]), reverse('pessoa-list'),
+            reverse('pessoa-detail', args=[self.pessoa.pk]), reverse('forma-pagamento-list'),
+            reverse('forma-pagamento-detail', args=[self.forma.pk]), reverse('login'),
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_editar_lancamento_grava_os_campos_cadastrais(self):
+        resposta = self.client.post(reverse('lancamento-update', args=[self.lancamento.pk]), {
+            'numero': 'NF-9', 'descricao': 'Notebook novo', 'tipo': 'despesa',
+            'categoria': self.categoria.pk, 'pessoa': self.pessoa.pk,
+            'forma_pagamento': self.forma.pk, 'declara_ir': 'on',
+        })
+        self.assertRedirects(resposta, reverse('lancamento-detail', args=[self.lancamento.pk]))
+        self.lancamento.refresh_from_db()
+        self.assertEqual((self.lancamento.numero, self.lancamento.descricao), ('NF-9', 'Notebook novo'))
+        self.assertTrue(self.lancamento.declara_ir)
+        self.assertEqual(self.lancamento.itens.count(), 3)
+
+
+    def test_formularios_usam_botoes_padrao_com_carregando(self):
+        for url in (reverse('categoria-create'), reverse('lancamento-create'), reverse('login')):
+            with self.subTest(url=url):
+                pagina = self.client.get(url)
+                self.assertContains(pagina, 'fin-form-acoes')
+                self.assertContains(pagina, 'data-texto-carregando')
+                self.assertContains(pagina, 'js/carregando.js')

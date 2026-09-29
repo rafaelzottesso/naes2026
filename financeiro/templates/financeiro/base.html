@@ -1,237 +1,101 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" data-bs-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Finanças{% endblock %}</title>
+  <meta name="theme-color" content="#2a6f9c">
+  <title>{% block title %}AnotAI{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="csrf-token" content="{{ csrf_token }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/responsive/3.0.3/css/responsive.bootstrap5.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/financeiro.css' %}">
 </head>
 <body class="fin-body">
-<div class="fin-shell">
 
-  <!-- ============ SIDEBAR DESKTOP ============ -->
-  <aside class="fin-sidebar d-none d-lg-flex flex-column">
-    <a class="fin-brand" href="{% url 'index' %}">
-      <span class="fin-brand-mark"><i class="bi bi-wallet2"></i></span>
-      <span class="fin-brand-text">Fluxo<small>controle financeiro</small></span>
+<!-- ============ NAVBAR FIXA NO TOPO ============ -->
+<div class="fin-navwrap" id="navTopo">
+  <nav class="navbar navbar-expand-lg fin-navbar" aria-label="Menu principal">
+    <a class="fin-brand navbar-brand" href="{% url 'index' %}">
+      <span class="fin-brand-mark"><i class="bi bi-journal-check"></i></span>
+      <span class="fin-brand-text">AnotAI</span>
     </a>
 
-    <p class="fin-menu-label">Menu</p>
-    <nav class="fin-nav nav flex-column">
-      <a class="fin-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">
-        <i class="bi bi-house"></i>
-        <span>Início</span>
-      </a>
-      {% if request.user.is_authenticated %}
-      <a class="fin-link {% if request.resolver_match.url_name == 'financeiro-dashboard' %}active{% endif %}" href="{% url 'financeiro-dashboard' %}">
-        <i class="bi bi-speedometer2"></i>
-        <span>Dashboard</span>
-      </a>
-      <a class="fin-link {% if 'create' not in request.resolver_match.url_name and 'lancamento' in request.resolver_match.url_name or 'parcela' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}">
-        <i class="bi bi-receipt-cutoff"></i>
-        <span>Lançamentos</span>
-      </a>
-      <a class="fin-link {% if 'categoria' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'categoria-list' %}">
-        <i class="bi bi-tags"></i>
-        <span>Categorias</span>
-      </a>
-      <a class="fin-link {% if 'pessoa' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'pessoa-list' %}">
-        <i class="bi bi-person-vcard"></i>
-        <span>Pessoas</span>
-      </a>
-      <a class="fin-link {% if 'forma-pagamento' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'forma-pagamento-list' %}">
-        <i class="bi bi-credit-card"></i>
-        <span>Formas de pagamento</span>
-      </a>
-      {% else %}
-      <a class="fin-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
-        <i class="bi bi-box-arrow-in-right"></i>
-        <span>Entrar</span>
-      </a>
-      {% endif %}
-    </nav>
-
-    {% if request.user.is_authenticated %}
-    <p class="fin-menu-label">Cadastrar</p>
-    <nav class="fin-nav nav flex-column">
-      <a class="fin-link {% if request.resolver_match.url_name == 'lancamento-create' %}active{% endif %}" href="{% url 'lancamento-create' %}">
-        <i class="bi bi-plus-circle"></i>
-        <span>Novo lançamento</span>
-      </a>
-      <a class="fin-link {% if request.resolver_match.url_name == 'categoria-create' %}active{% endif %}" href="{% url 'categoria-create' %}">
-        <i class="bi bi-tag"></i>
-        <span>Nova categoria</span>
-      </a>
-      <a class="fin-link {% if request.resolver_match.url_name == 'pessoa-create' %}active{% endif %}" href="{% url 'pessoa-create' %}">
-        <i class="bi bi-person-plus"></i>
-        <span>Nova pessoa</span>
-      </a>
-      <a class="fin-link {% if request.resolver_match.url_name == 'forma-pagamento-create' %}active{% endif %}" href="{% url 'forma-pagamento-create' %}">
-        <i class="bi bi-credit-card"></i>
-        <span>Nova forma de pagamento</span>
-      </a>
-    </nav>
+    {% if not request.user.is_authenticated %}
+    <a href="{% url 'login' %}" class="btn btn-primary btn-sm ms-auto me-2 d-lg-none"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar</a>
     {% endif %}
+    <button class="navbar-toggler{% if request.user.is_authenticated %} ms-auto{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menu">
+      <i class="bi bi-list"></i>
+    </button>
 
-    <div class="fin-side-spacer"></div>
-
-    <div class="fin-user-card">
-      {% if request.user.is_authenticated %}
-      <div class="d-flex align-items-center gap-2">
-        <span class="fin-avatar">{{ request.user.username|slice:":1"|upper }}</span>
-        <div class="fin-user-meta">
-          <strong>{{ request.user.username }}</strong>
-          <small>Conta ativa</small>
-        </div>
-      </div>
-      <div class="fin-user-links">
-        <a href="{% url 'alterar-senha' %}"><i class="bi bi-key me-1"></i>Alterar senha</a>
-        <form action="{% url 'logout' %}" method="post" class="d-inline">
-          {% csrf_token %}
-          <button type="submit"><i class="bi bi-box-arrow-right me-1"></i>Sair</button>
-        </form>
-      </div>
-      {% else %}
-      <a href="{% url 'login' %}" class="fin-cta fin-cta-ghost"><i class="bi bi-box-arrow-in-right"></i> Entrar</a>
-      {% endif %}
-    </div>
-  </aside>
-
-  <!-- ============ SIDEBAR MOBILE (offcanvas) ============ -->
-  <div class="offcanvas offcanvas-start fin-offcanvas" tabindex="-1" id="menuFinanceiro" aria-labelledby="menuFinanceiroLabel">
-    <div class="offcanvas-header">
-      <a class="fin-brand" href="{% url 'index' %}" id="menuFinanceiroLabel">
-        <span class="fin-brand-mark"><i class="bi bi-wallet2"></i></span>
-        <span class="fin-brand-text">Fluxo<small>controle financeiro</small></span>
-      </a>
-      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
-    </div>
-    <div class="offcanvas-body d-flex flex-column">
-      <p class="fin-menu-label">Menu</p>
-      <nav class="fin-nav nav flex-column">
-        <a class="fin-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">
-          <i class="bi bi-house"></i><span>Início</span>
-        </a>
+    <div class="collapse navbar-collapse" id="menuPrincipal">
+      <ul class="navbar-nav me-auto gap-lg-1 mt-2 mt-lg-0">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}"><i class="bi bi-house-door"></i>Início</a>
+        </li>
         {% if request.user.is_authenticated %}
-        <a class="fin-link {% if request.resolver_match.url_name == 'financeiro-dashboard' %}active{% endif %}" href="{% url 'financeiro-dashboard' %}">
-          <i class="bi bi-speedometer2"></i><span>Dashboard</span>
-        </a>
-        <a class="fin-link {% if 'create' not in request.resolver_match.url_name and 'lancamento' in request.resolver_match.url_name or 'parcela' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}">
-          <i class="bi bi-receipt-cutoff"></i><span>Lançamentos</span>
-        </a>
-        <a class="fin-link {% if 'categoria' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'categoria-list' %}">
-          <i class="bi bi-tags"></i><span>Categorias</span>
-        </a>
-        <a class="fin-link {% if 'pessoa' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'pessoa-list' %}">
-          <i class="bi bi-person-vcard"></i><span>Pessoas</span>
-        </a>
-        <a class="fin-link {% if 'forma-pagamento' in request.resolver_match.url_name and 'create' not in request.resolver_match.url_name %}active{% endif %}" href="{% url 'forma-pagamento-list' %}">
-          <i class="bi bi-credit-card"></i><span>Formas de pagamento</span>
-        </a>
-        {% else %}
-        <a class="fin-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
-          <i class="bi bi-box-arrow-in-right"></i><span>Entrar</span>
-        </a>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'financeiro-dashboard' %}active{% endif %}" href="{% url 'financeiro-dashboard' %}"><i class="bi bi-speedometer2"></i>Dashboard</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle {% if 'lancamento' in request.resolver_match.url_name or 'parcela' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-receipt-cutoff"></i>Lançamentos<i class="bi bi-chevron-down fin-caret"></i></a>
+          <ul class="dropdown-menu fin-menu-rico">
+            <li><a class="dropdown-item" href="{% url 'lancamento-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-primary-soft);--k-strong:var(--fx-primary-strong)"><i class="bi bi-list-ul"></i></span><span><strong>Todos os lançamentos</strong><span class="d-block">Receitas, despesas e saldo</span></span></a></li>
+            <li><a class="dropdown-item" href="{% url 'lancamento-create' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-success-soft);--k-strong:var(--fx-success-strong)"><i class="bi bi-plus-circle"></i></span><span><strong>Novo lançamento</strong><span class="d-block">Já gera as parcelas</span></span></a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle {% if 'categoria' in request.resolver_match.url_name or 'centro' in request.resolver_match.url_name or 'pessoa' in request.resolver_match.url_name or 'forma-pagamento' in request.resolver_match.url_name %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-grid-1x2"></i>Cadastros<i class="bi bi-chevron-down fin-caret"></i></a>
+          <ul class="dropdown-menu fin-menu-rico">
+            <li><a class="dropdown-item" href="{% url 'categoria-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-warning-soft);--k-strong:var(--fx-warning-strong)"><i class="bi bi-tags"></i></span><span><strong>Categorias</strong><span class="d-block">Moradia, mercado, saúde…</span></span></a></li>
+            <li><a class="dropdown-item" href="{% url 'centro-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-danger-soft);--k-strong:var(--fx-danger-strong)"><i class="bi bi-bullseye"></i></span><span><strong>Centros de lançamento</strong><span class="d-block">Viagens, reformas, projetos</span></span></a></li>
+            <li><a class="dropdown-item" href="{% url 'pessoa-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-info-soft);--k-strong:var(--fx-info-strong)"><i class="bi bi-person-vcard"></i></span><span><strong>Pessoas</strong><span class="d-block">Clientes e fornecedores</span></span></a></li>
+            <li><a class="dropdown-item" href="{% url 'forma-pagamento-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-success-soft);--k-strong:var(--fx-success-strong)"><i class="bi bi-credit-card"></i></span><span><strong>Formas de pagamento</strong><span class="d-block">Pix, cartão, boleto…</span></span></a></li>
+          </ul>
+        </li>
         {% endif %}
-      </nav>
+      </ul>
 
-      {% if request.user.is_authenticated %}
-      <p class="fin-menu-label">Cadastrar</p>
-      <nav class="fin-nav nav flex-column">
-        <a class="fin-link {% if request.resolver_match.url_name == 'lancamento-create' %}active{% endif %}" href="{% url 'lancamento-create' %}">
-          <i class="bi bi-plus-circle"></i><span>Novo lançamento</span>
-        </a>
-        <a class="fin-link {% if request.resolver_match.url_name == 'categoria-create' %}active{% endif %}" href="{% url 'categoria-create' %}">
-          <i class="bi bi-tag"></i><span>Nova categoria</span>
-        </a>
-        <a class="fin-link {% if request.resolver_match.url_name == 'pessoa-create' %}active{% endif %}" href="{% url 'pessoa-create' %}">
-          <i class="bi bi-person-plus"></i><span>Nova pessoa</span>
-        </a>
-        <a class="fin-link {% if request.resolver_match.url_name == 'forma-pagamento-create' %}active{% endif %}" href="{% url 'forma-pagamento-create' %}">
-          <i class="bi bi-credit-card"></i><span>Nova forma de pagamento</span>
-        </a>
-      </nav>
-      {% endif %}
-
-      <div class="fin-side-spacer"></div>
-      <div class="fin-user-card">
+      <div class="d-flex align-items-center gap-2 pb-2 pb-lg-0">
         {% if request.user.is_authenticated %}
-        <div class="d-flex align-items-center gap-2">
-          <span class="fin-avatar">{{ request.user.username|slice:":1"|upper }}</span>
-          <div class="fin-user-meta"><strong>{{ request.user.username }}</strong><small>Conta ativa</small></div>
-        </div>
-        <div class="fin-user-links">
-          <a href="{% url 'alterar-senha' %}"><i class="bi bi-key me-1"></i>Alterar senha</a>
-          <form action="{% url 'logout' %}" method="post" class="d-inline">{% csrf_token %}<button type="submit"><i class="bi bi-box-arrow-right me-1"></i>Sair</button></form>
-        </div>
-        {% else %}
-        <a href="{% url 'login' %}" class="fin-cta fin-cta-ghost"><i class="bi bi-box-arrow-in-right"></i> Entrar</a>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-
-  <!-- ============ COLUNA PRINCIPAL ============ -->
-  <div class="fin-main-col">
-
-    <header class="fin-topbar sticky-top">
-      <button class="btn fin-icon-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuFinanceiro" aria-controls="menuFinanceiro" aria-label="Abrir menu">
-        <i class="bi bi-list"></i>
-      </button>
-
-      <nav aria-label="Você está em" class="fin-crumb-wrap">
-        <ol class="breadcrumb fin-crumb mb-0">
-          <li class="breadcrumb-item"><a href="{% url 'index' %}">Fluxo</a></li>
-          {% block breadcrumb %}{% endblock %}
-        </ol>
-      </nav>
-
-      <div class="fin-top-actions">
-        {% if request.user.is_authenticated %}
-        <div class="dropdown d-none d-md-inline-block">
-          <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-plus-lg me-1"></i>Cadastrar
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end shadow">
-            <li><a class="dropdown-item" href="{% url 'lancamento-create' %}"><i class="bi bi-receipt-cutoff me-2"></i>Novo Lançamento</a></li>
-            <li><a class="dropdown-item" href="{% url 'categoria-create' %}"><i class="bi bi-tags me-2"></i>Nova Categoria</a></li>
-            <li><a class="dropdown-item" href="{% url 'pessoa-create' %}"><i class="bi bi-person-plus me-2"></i>Nova Pessoa</a></li>
-            <li><a class="dropdown-item" href="{% url 'forma-pagamento-create' %}"><i class="bi bi-credit-card me-2"></i>Nova forma de pagamento</a></li>
+        <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-lg me-1"></i>Novo</button>
+          <ul class="dropdown-menu dropdown-menu-lg-end">
+            <li><a class="dropdown-item" href="{% url 'lancamento-create' %}"><i class="bi bi-receipt-cutoff"></i>Novo lançamento</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'categoria-create' %}"><i class="bi bi-tags"></i>Nova categoria</a></li>
+            <li><a class="dropdown-item" href="{% url 'centro-create' %}"><i class="bi bi-bullseye"></i>Novo centro</a></li>
+            <li><a class="dropdown-item" href="{% url 'pessoa-create' %}"><i class="bi bi-person-plus"></i>Nova pessoa</a></li>
+            <li><a class="dropdown-item" href="{% url 'forma-pagamento-create' %}"><i class="bi bi-credit-card"></i>Nova forma de pagamento</a></li>
           </ul>
         </div>
-        <a href="{% url 'lancamento-create' %}" class="btn btn-primary btn-sm d-md-none" aria-label="Novo lançamento">
-          <i class="bi bi-plus-lg"></i>
-        </a>
-        <div class="dropdown">
-          <button class="fin-avatar-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="{{ request.user.username }}">
-            {{ request.user.username|slice:":1"|upper }}
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end shadow">
+        <div class="dropdown ms-auto ms-lg-0">
+          <button class="fin-avatar-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu do usuário {{ request.user.username }}">{{ request.user.username|slice:":1"|upper }}</button>
+          <ul class="dropdown-menu dropdown-menu-end">
             <li><h6 class="dropdown-header">{{ request.user.username }}</h6></li>
-            <li><a class="dropdown-item" href="{% url 'alterar-senha' %}"><i class="bi bi-key me-2"></i>Alterar senha</a></li>
-            <li><a class="dropdown-item" href="{% url 'financeiro-dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+            <li><a class="dropdown-item" href="{% url 'alterar-senha' %}"><i class="bi bi-key"></i>Alterar senha</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
               <form action="{% url 'logout' %}" method="post">{% csrf_token %}
-                <button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Sair</button>
+                <button class="dropdown-item text-danger" type="submit" data-texto-carregando="Saindo..."><i class="bi bi-box-arrow-right"></i>Sair</button>
               </form>
             </li>
           </ul>
         </div>
         {% else %}
-        <a class="btn btn-primary btn-sm" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar</a>
+        <a class="btn btn-primary" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar</a>
         {% endif %}
       </div>
-    </header>
+    </div>
+  </nav>
+</div>
 
-    <main class="fin-main">
+<main class="fin-main">
       <div class="container-fluid fin-container">
         {% if messages %}
         <div class="mb-3">
@@ -245,40 +109,31 @@
         </div>
         {% endif %}
 
+        {% block breadcrumb %}{% endblock %}
         {% block content %}{% endblock %}
       </div>
     </main>
 
-    <footer class="fin-footer">
-      <div class="container-fluid fin-container d-flex flex-wrap gap-2 justify-content-between align-items-center">
-        <span><i class="bi bi-wallet2 me-1"></i>Fluxo · lançamentos, parcelas e categorias</span>
-        <span class="fin-footer-muted">Responsivo · Bootstrap 5</span>
-      </div>
-    </footer>
+<footer class="fin-footer">
+  <div class="container-fluid fin-container d-flex flex-wrap gap-2 justify-content-between align-items-center">
+    <span><i class="bi bi-journal-check me-1"></i>AnotAI · controle financeiro</span>
+    <span>Lançamentos, parcelas e cadastros</span>
   </div>
-</div>
+</footer>
+
+{% if request.user.is_authenticated %}
+<a href="{% url 'lancamento-create' %}" class="btn btn-primary fin-fab d-lg-none" aria-label="Novo lançamento"><i class="bi bi-plus-lg"></i></a>
+{% endif %}
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/6.0.0/bootbox.min.js"></script>
+<script src="{% static 'js/carregando.js' %}"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/3.0.3/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/3.0.3/js/responsive.bootstrap5.min.js"></script>
 <script>
-  document.addEventListener('submit', function (e) {
-    const form = e.target;
-    if (!form.classList.contains('btnLoading')) return;
-    const btn = form.querySelector('[type="submit"]');
-    if (!btn || btn.disabled) return;
-    btn.disabled = true;
-    const label = btn.innerHTML;
-    btn.dataset.label = label;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Salvando...';
-  });
-  window.addEventListener('pageshow', function (e) {
-    if (!e.persisted) return;
-    document.querySelectorAll('form.btnLoading [type="submit"]').forEach(function (btn) {
-      btn.disabled = false;
-      if (btn.dataset.label) btn.innerHTML = btn.dataset.label;
-    });
-  });
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
     new bootstrap.Tooltip(el);
   });
@@ -292,6 +147,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script src="{% static 'js/mascaras.js' %}"></script>
 <script src="{% static 'js/confirmacoes.js' %}"></script>
+<script src="{% static 'js/tabelas.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

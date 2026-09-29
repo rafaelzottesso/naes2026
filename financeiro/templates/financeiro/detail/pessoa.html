@@ -1,55 +1,76 @@
 {% extends "financeiro/base.html" %}
+{% load fin_tags %}
 
-{% block title %}{{ object.nome }} · Pessoas{% endblock %}
-
-{% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'pessoa-list' %}">Pessoas</a></li>
-<li class="breadcrumb-item active" aria-current="page">{{ object.nome }}</li>
-{% endblock %}
+{% block title %}{{ object.nome }} · AnotAI{% endblock %}
 
 {% block content %}
-<div class="fin-hero mb-3">
-  <small>Cliente/Fornecedor</small>
-  <h1 class="h2 text-white mb-2">{{ object.nome }}</h1>
-  <div class="fin-hero-meta">
-    <span class="badge fin-pill text-bg-light">{{ object.documento }}</span>
-    <span class="badge fin-pill {% if object.status %}text-bg-light{% else %}text-bg-secondary{% endif %}">{% if object.status %}Ativa{% else %}Inativa{% endif %}</span>
-  </div>
-  <div class="d-flex flex-wrap gap-2 mt-3">
-    <a href="{% url 'pessoa-update' object.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil me-1"></i>Editar</a>
-    <a href="{% url 'pessoa-delete' object.pk %}" class="btn btn-sm btn-outline-light js-excluir" data-titulo="Excluir pessoa" data-mensagem="Excluir a pessoa {{ object.nome }}?"><i class="bi bi-trash me-1"></i>Excluir</a>
-    <a href="{% url 'pessoa-list' %}" class="btn btn-sm btn-link text-white text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
-  </div>
-</div>
+<nav aria-label="Você está em" class="mb-3">
+  <a href="{% url 'pessoa-list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar para a lista</a>
+</nav>
 
-<section class="fin-panel">
-  <div class="fin-panel-head"><h2>Dados cadastrais</h2></div>
-  <div class="fin-panel-body">
-    <div class="fin-meta-grid">
-      <div class="fin-meta"><p class="fin-label">Nome</p><p>{{ object.nome }}</p></div>
-      <div class="fin-meta"><p class="fin-label">CPF/CNPJ</p><p>{{ object.documento }}</p></div>
-      <div class="fin-meta"><p class="fin-label">CEP</p><p>{{ object.cep }}</p></div>
-      <div class="fin-meta"><p class="fin-label">Endereço</p><p>{{ object.endereco }}</p></div>
-      <div class="fin-meta"><p class="fin-label">Cidade</p><p>{{ object.cidade }}</p></div>
-      <div class="fin-meta"><p class="fin-label">Status</p><p>{% if object.status %}Ativa{% else %}Inativa{% endif %}</p></div>
+<header class="fin-ficha-head">
+  <div>
+    <div class="fin-eyebrow">Cliente/Fornecedor</div>
+    <h1>{{ object.nome }}</h1>
+    <div class="fin-ficha-tags">
+      {% if object.status %}<span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Ativa</span>{% else %}<span class="badge fin-pill text-bg-secondary"><i class="bi bi-pause-circle-fill me-1"></i>Inativa</span>{% endif %}
+      <span class="badge fin-pill text-bg-light"><i class="bi bi-person-vcard me-1"></i>{{ object.documento }}</span>
     </div>
   </div>
+  <div class="fin-head-actions">
+    <a href="{% url 'pessoa-update' object.pk %}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>Editar</a>
+    <a href="{% url 'pessoa-delete' object.pk %}" class="btn btn-outline-danger js-excluir" data-titulo="Excluir pessoa" data-mensagem="Excluir a pessoa {{ object.nome }}?"><i class="bi bi-trash me-1"></i>Excluir</a>
+  </div>
+</header>
+
+<section class="fin-panel mb-3">
+  <div class="fin-panel-head"><h2>Movimentação</h2></div>
+  <dl class="fin-resumo">
+    <div><dt>Lançamentos</dt><dd>{{ qtd_lancamentos }}</dd></div>
+    <div><dt>Receitas</dt><dd class="text-receita">+ {{ total_receitas|brl }}</dd></div>
+    <div><dt>Despesas</dt><dd class="text-despesa">− {{ total_despesas|brl }}</dd></div>
+    <div><dt>Saldo</dt><dd class="{% if saldo >= 0 %}fin-positive{% else %}fin-negative{% endif %}">{{ saldo|brl }}</dd></div>
+  </dl>
 </section>
 
-<section class="fin-panel mt-3">
-  <div class="fin-panel-head"><h2>Lançamentos desta pessoa</h2></div>
-  <div class="fin-panel-body py-1">
-    {% for lancamento in lancamentos %}
-    <a class="fin-list-item" href="{% url 'lancamento-detail' lancamento.pk %}">
-      <span class="fin-list-text">
-        <span class="fin-list-title d-block text-truncate">{{ lancamento.descricao|default:lancamento.categoria.nome }}</span>
-        <small>{{ lancamento.data|date:"d/m/Y" }} · {{ lancamento.categoria.nome }}</small>
-      </span>
-      <span class="fin-money">{{ lancamento.get_tipo_display }}</span>
-    </a>
-    {% empty %}
-    <div class="fin-empty py-4 mb-0"><strong class="d-block text-dark">Nenhum lançamento com esta pessoa</strong></div>
-    {% endfor %}
+<div class="row g-3">
+  <div class="col-12 col-xl-5">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head"><h2>Informações</h2></div>
+      <div class="fin-panel-body">
+        <dl class="fin-dl">
+          <div><dt>CPF/CNPJ</dt><dd>{{ object.documento }}</dd></div>
+          <div><dt>CEP</dt><dd>{{ object.cep }}</dd></div>
+          <div><dt>Endereço</dt><dd>{{ object.endereco }}</dd></div>
+          <div><dt>Cidade</dt><dd>{{ object.cidade }}</dd></div>
+          <div><dt>Situação</dt><dd>{% if object.status %}Ativa{% else %}Inativa{% endif %}</dd></div>
+          <div><dt>Cadastrada por</dt><dd>{{ object.criado_por.get_username }}</dd></div>
+          <div><dt>Cadastrada em</dt><dd>{{ object.criado_em|date:"d/m/Y H:i" }}</dd></div>
+          <div><dt>Última edição</dt><dd>{{ object.atualizado_em|date:"d/m/Y H:i" }}</dd></div>
+        </dl>
+      </div>
+    </section>
   </div>
-</section>
+  <div class="col-12 col-xl-7">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <h2>Lançamentos desta pessoa</h2>
+        <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">Ver todos<i class="bi bi-arrow-right ms-1"></i></a>
+      </div>
+      <div class="fin-panel-body py-2">
+        {% for lancamento in lancamentos %}
+        <a class="fin-list-item" href="{% url 'lancamento-detail' lancamento.pk %}">
+          <span class="fin-list-text">
+            <span class="fin-list-title d-block text-truncate">{{ lancamento.descricao|default:lancamento.categoria.nome }}</span>
+            <small>{{ lancamento.data|date:"d/m/Y" }} · {{ lancamento.categoria.nome }} · {{ lancamento.pessoa.nome }}</small>
+          </span>
+          <span class="fin-money {% if lancamento.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}">{% if lancamento.tipo == "receita" %}+{% else %}−{% endif %} {{ lancamento.valor_total|brl }}</span>
+        </a>
+        {% empty %}
+        <div class="fin-empty py-4"><strong class="d-block">Nenhum lançamento com esta pessoa</strong></div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
 {% endblock %}

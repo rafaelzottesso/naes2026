@@ -3,44 +3,41 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %}{{ titulo }} · Finanças{% endblock %}
-
-{% block breadcrumb %}
-<li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
-{% endblock %}
+{% block title %}{{ titulo }} · AnotAI{% endblock %}
 
 {% block content %}
-<div class="fin-page-head justify-content-center text-center">
-  <div class="w-100">
-    <div class="fin-eyebrow">Autenticação</div>
-    <h1>{{ titulo }}</h1>
-    <p>Preencha os campos abaixo para continuar.</p>
-  </div>
-</div>
-
-<div class="fin-panel fin-form-card mx-auto" style="max-width: 520px;">
-  <div class="fin-panel-head">
-    <div class="d-flex align-items-center gap-3">
-      <span class="fin-form-head-icon">
-        <i class="bi bi-shield-lock"></i>
-      </span>
-      <div>
-        <h2 class="mb-0">{{ titulo }}</h2>
-        <p>Informe suas credenciais</p>
-      </div>
+<div class="row justify-content-center align-items-stretch g-4">
+  <div class="col-12 col-lg-5 d-none d-lg-block">
+    <div class="fin-landing-cartao h-100 d-flex flex-column justify-content-center">
+      <span class="fin-brand-mark mb-4" style="width:4rem;height:4rem;font-size:2rem"><i class="bi bi-journal-check"></i></span>
+      <h2 class="h1 mb-3">AnotAI</h2>
+      <p class="fs-5 text-muted mb-4">Controle financeiro pessoal e da família.</p>
+      <ul class="list-unstyled fs-5 mb-0 d-grid gap-3">
+        <li><i class="bi bi-check-circle-fill text-receita me-2"></i>Parcelas com a situação sempre à vista</li>
+        <li><i class="bi bi-people-fill me-2" style="color:var(--fx-primary-strong)"></i>Cadastros e lançamentos organizados</li>
+        <li><i class="bi bi-phone-fill me-2" style="color:var(--fx-info-strong)"></i>Uso confortável no celular e no computador</li>
+      </ul>
     </div>
   </div>
-  <div class="fin-panel-body">
-    <form method="post" class="btnLoading" novalidate>
-      {% csrf_token %}
-      {{ form|crispy }}
-      <div class="fin-actions mt-4">
-        <button type="submit" class="btn btn-primary flex-fill">
-          <i class="bi bi-check-lg me-1"></i>{{ botao }}
-        </button>
-        <a href="{% url 'index' %}" class="btn btn-outline-secondary flex-fill">Cancelar</a>
+  <div class="col-12 col-md-9 col-lg-6 col-xl-5">
+    <div class="fin-panel">
+      <div class="fin-panel-head">
+        <div class="d-flex align-items-center gap-3">
+          <span class="fin-form-head-icon"><i class="bi bi-shield-lock"></i></span>
+          <div>
+            <h1 class="h3 mb-0">{{ titulo }}</h1>
+            <p>Informe seus dados para continuar</p>
+          </div>
+        </div>
       </div>
-    </form>
+      <div class="fin-panel-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {{ form|crispy }}
+          {% include "financeiro/_form-acoes.html" %}
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

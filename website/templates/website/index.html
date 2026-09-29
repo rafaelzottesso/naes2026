@@ -2,233 +2,145 @@
 {% load static %}
 {% load fin_tags %}
 
-{% block title %}Início · Fluxo Finanças{% endblock %}
-
-{% block breadcrumb %}
-<li class="breadcrumb-item active" aria-current="page">Início</li>
-{% endblock %}
+{% block title %}Início · AnotAI{% endblock %}
 
 {% block content %}
 {% if request.user.is_authenticated %}
 <div class="fin-page-head">
   <div>
-    <div class="fin-eyebrow">Visão Geral · Controle Financeiro</div>
-    <h1>Fluxo Financeiro</h1>
-    <p>Acompanhe receitas, despesas, pessoas e lançamentos em um único ambiente integrado.</p>
+    <div class="fin-eyebrow">Início</div>
+    <h1>Início</h1>
+    <p>Acesso rápido aos lançamentos, ao painel do mês e aos cadastros.</p>
   </div>
   <div class="fin-head-actions">
-    <a href="{% url 'financeiro-dashboard' %}" class="btn btn-outline-secondary">
-      <i class="bi bi-speedometer2 me-1"></i>Ir ao Dashboard
+    <a href="{% url 'financeiro-dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-speedometer2 me-1"></i>Painel do mês</a>
+    <a href="{% url 'lancamento-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Novo lançamento</a>
+  </div>
+</div>
+
+<!-- ===== Atalhos-KPI: cada um leva ao cadastro ===== -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <a class="fin-kpi-link" href="{% url 'lancamento-list' %}">
+      <div class="fin-kpi saldo">
+        <div class="fin-kpi-top"><span class="fin-kpi-icon"><i class="bi bi-receipt-cutoff"></i></span><div><span class="fin-kpi-label">Lançamentos</span><span class="fin-kpi-sub">Registrados</span></div></div>
+        <span class="fin-kpi-value">{{ total_lancamentos }}</span>
+      </div>
     </a>
-    <a href="{% url 'lancamento-create' %}" class="btn btn-primary">
-      <i class="bi bi-plus-lg me-1"></i>Novo Lançamento
+  </div>
+  <div class="col-6 col-lg-3">
+    <a class="fin-kpi-link" href="{% url 'categoria-list' %}">
+      <div class="fin-kpi alerta">
+        <div class="fin-kpi-top"><span class="fin-kpi-icon"><i class="bi bi-tags"></i></span><div><span class="fin-kpi-label">Categorias</span><span class="fin-kpi-sub">Para organizar</span></div></div>
+        <span class="fin-kpi-value">{{ total_categorias }}</span>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a class="fin-kpi-link" href="{% url 'pessoa-list' %}">
+      <div class="fin-kpi neutra">
+        <div class="fin-kpi-top"><span class="fin-kpi-icon"><i class="bi bi-person-vcard"></i></span><div><span class="fin-kpi-label">Pessoas</span><span class="fin-kpi-sub">Clientes e fornecedores</span></div></div>
+        <span class="fin-kpi-value">{{ total_pessoas }}</span>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a class="fin-kpi-link" href="{% url 'forma-pagamento-list' %}">
+      <div class="fin-kpi receita">
+        <div class="fin-kpi-top"><span class="fin-kpi-icon"><i class="bi bi-credit-card"></i></span><div><span class="fin-kpi-label">Formas de pagamento</span><span class="fin-kpi-sub">Pix, cartão, boleto</span></div></div>
+        <span class="fin-kpi-value">{{ total_formas }}</span>
+      </div>
     </a>
   </div>
 </div>
 
-<!-- ===== KPIs Consolidados ===== -->
-<div class="row g-3 mb-4">
+<!-- ===== Últimos lançamentos ===== -->
+<section class="fin-panel">
+  <div class="fin-panel-head">
+    <div><h2>Últimos lançamentos</h2><p>Os cinco mais recentes</p></div>
+    <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">Ver todos<i class="bi bi-arrow-right ms-1"></i></a>
+  </div>
+  {% if ultimos_lancamentos %}
+  <div class="fin-table-wrap">
+    <table class="table fin-table align-middle js-tabela">
+      <thead>
+        <tr>
+          <th data-priority="1">Descrição</th>
+          <th data-priority="3">Data</th>
+          <th data-priority="4">Categoria</th>
+          <th data-priority="5">Pessoa</th>
+          <th data-priority="2" class="text-end">Valor</th>
+          <th class="all text-end">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in ultimos_lancamentos %}
+        <tr>
+          <td><a href="{% url 'lancamento-detail' l.pk %}" class="fw-bold text-decoration-none text-reset fin-trunca">{{ l.descricao|default:l.categoria.nome|truncatechars:48 }}</a></td>
+          <td class="text-nowrap">{{ l.data|date:"d/m/Y" }}</td>
+          <td><span class="badge fin-pill text-bg-light"><i class="bi bi-tag me-1"></i>{{ l.categoria.nome }}</span></td>
+          <td>{{ l.pessoa.nome }}</td>
+          <td class="text-end fin-money {% if l.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}">{% if l.tipo == 'receita' %}+{% else %}−{% endif %} {{ l.valor_total|brl }}</td>
+          <td class="text-end"><a href="{% url 'lancamento-detail' l.pk %}" class="btn btn-sm btn-outline-secondary" aria-label="Ver detalhes"><i class="bi bi-eye"></i></a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="fin-empty">
+    <div class="fin-empty-icon"><i class="bi bi-cash-stack"></i></div>
+    <strong class="d-block">Nenhum lançamento cadastrado ainda</strong>
+    <p class="mb-3">Comece registrando a primeira receita ou despesa.</p>
+    <a href="{% url 'lancamento-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Criar lançamento</a>
+  </div>
+  {% endif %}
+</section>
+
+{% else %}
+<!-- ===== Página pública ===== -->
+<section class="fin-landing mb-4">
+  <div class="row align-items-center g-4">
+    <div class="col-12 col-lg-7">
+      <div class="fin-eyebrow">Controle financeiro pessoal e da família</div>
+      <h1 class="fin-landing-titulo">Suas finanças, <span>organizadas</span> e sob controle.</h1>
+      <p class="fin-landing-texto">Registre receitas e despesas, acompanhe cada parcela e saiba, de relance, o que está pago, em aberto ou vencido.</p>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'login' %}" class="btn btn-primary btn-lg"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar no AnotAI</a>
+      </div>
+    </div>
+    <div class="col-12 col-lg-5">
+      <div class="fin-landing-cartao" aria-hidden="true">
+        <div class="fin-landing-linha"><span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Paga</span><span>Aluguel · 1/12</span><strong class="text-despesa">− R$ 1.800,00</strong></div>
+        <div class="fin-landing-linha"><span class="badge fin-pill text-bg-info"><i class="bi bi-hourglass-split me-1"></i>Em aberto</span><span>Notebook · 3/10</span><strong class="text-despesa">− R$ 420,00</strong></div>
+        <div class="fin-landing-linha"><span class="badge fin-pill text-bg-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>Vencida</span><span>Internet · 9/12</span><strong class="text-despesa">− R$ 119,90</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="row g-3">
   <div class="col-12 col-md-4">
     <div class="fin-kpi saldo">
-      <div class="fin-kpi-top">
-        <span class="fin-kpi-icon"><i class="bi bi-receipt-cutoff"></i></span>
-        <div>
-          <span class="fin-kpi-label">Lançamentos</span>
-          <span class="fin-kpi-sub">Total registrado</span>
-        </div>
-      </div>
-      <span class="fin-kpi-value fin-positive">{{ total_lancamentos }}</span>
+      <span class="fin-kpi-icon mb-3"><i class="bi bi-receipt-cutoff"></i></span>
+      <h2 class="h4">Lançamentos organizados</h2>
+      <p class="mb-0 text-muted">Receitas e despesas com categoria, pessoa, centro e forma de pagamento.</p>
     </div>
   </div>
-
   <div class="col-12 col-md-4">
     <div class="fin-kpi receita">
-      <div class="fin-kpi-top">
-        <span class="fin-kpi-icon"><i class="bi bi-tags"></i></span>
-        <div>
-          <span class="fin-kpi-label">Categorias</span>
-          <span class="fin-kpi-sub">Centros de custo</span>
-        </div>
-      </div>
-      <span class="fin-kpi-value">{{ total_categorias }}</span>
-    </div>
-  </div>
-
-  <div class="col-12 col-md-4">
-    <div class="fin-kpi neutra">
-      <div class="fin-kpi-top">
-        <span class="fin-kpi-icon"><i class="bi bi-person-vcard"></i></span>
-        <div>
-          <span class="fin-kpi-label">Pessoas / Fornecedores</span>
-          <span class="fin-kpi-sub">Contatos cadastrados</span>
-        </div>
-      </div>
-      <span class="fin-kpi-value">{{ total_pessoas }}</span>
-    </div>
-  </div>
-</div>
-
-<!-- ===== Painel de Lançamentos Recentes ===== -->
-<div class="fin-panel mb-4">
-  <div class="fin-panel-head">
-    <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2">
-      <div>
-        <h2 class="mb-0">Últimos Lançamentos</h2>
-        <p>Lançamentos financeiros mais recentes no sistema</p>
-      </div>
-      <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">
-        Ver todos <i class="bi bi-arrow-right ms-1"></i>
-      </a>
-    </div>
-  </div>
-
-  <div class="fin-panel-body p-0">
-    <div class="table-responsive">
-      <table class="table fin-table align-middle mb-0">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Descrição</th>
-            <th>Categoria</th>
-            <th>Pessoa</th>
-            <th class="text-end">Valor</th>
-            <th class="text-end">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for l in ultimos_lancamentos %}
-          <tr>
-            <td>
-              <span class="text-nowrap">{{ l.data|date:"d/m/Y" }}</span>
-            </td>
-            <td>
-              <a href="{% url 'lancamento-detail' l.pk %}" class="fw-semibold text-decoration-none text-dark">
-                {{ l.descricao }}
-              </a>
-            </td>
-            <td>
-              <span class="badge rounded-pill bg-light text-dark border">
-                <i class="bi bi-tag me-1"></i>{{ l.categoria.nome }}
-              </span>
-            </td>
-            <td>
-              {% if l.pessoa %}
-                <span class="text-muted"><i class="bi bi-person me-1"></i>{{ l.pessoa.nome }}</span>
-              {% else %}
-                <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-            <td class="text-end fw-bold">
-              {% if l.tipo == 'receita' %}
-                <span class="text-success">+ {{ l.valor_total|brl }}</span>
-              {% else %}
-                <span class="text-danger">− {{ l.valor_total|brl }}</span>
-              {% endif %}
-            </td>
-            <td class="text-end">
-              <a href="{% url 'lancamento-detail' l.pk %}" class="btn btn-sm btn-outline-secondary" title="Ver detalhes">
-                <i class="bi bi-eye"></i>
-              </a>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="6" class="p-4 text-center">
-              <div class="fin-empty py-3">
-                <div class="fin-empty-icon mb-2"><i class="bi bi-cash-stack fs-2 text-muted"></i></div>
-                <strong class="d-block text-dark">Nenhum lançamento cadastrado ainda</strong>
-                <p class="text-muted mb-3">Comece criando o primeiro registro de receita ou despesa.</p>
-                <a href="{% url 'lancamento-create' %}" class="btn btn-primary btn-sm">
-                  <i class="bi bi-plus-lg me-1"></i>Criar lançamento
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ===== Ações Rápidas do Sistema ===== -->
-<div class="row g-3">
-  <div class="col-12 col-md-4">
-    <div class="fin-panel h-100 p-4 d-flex flex-column justify-content-between">
-      <div>
-        <div class="fin-kpi-icon mb-3" style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--fin-saldo-bg); color: var(--fin-saldo);">
-          <i class="bi bi-speedometer2 fs-5"></i>
-        </div>
-        <h4 class="h6 fw-bold">Dashboard Analítico</h4>
-        <p class="text-muted small">Acompanhe saldos, total a pagar e a receber do mês com indicadores consolidados.</p>
-      </div>
-      <a href="{% url 'financeiro-dashboard' %}" class="btn btn-sm btn-outline-secondary mt-3">Acessar dashboard</a>
-    </div>
-  </div>
-
-  <div class="col-12 col-md-4">
-    <div class="fin-panel h-100 p-4 d-flex flex-column justify-content-between">
-      <div>
-        <div class="fin-kpi-icon mb-3" style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--fin-receita-bg); color: var(--fin-receita);">
-          <i class="bi bi-tags fs-5"></i>
-        </div>
-        <h4 class="h6 fw-bold">Categorização</h4>
-        <p class="text-muted small">Classifique receitas e despesas com organização para relatórios assertivos.</p>
-      </div>
-      <a href="{% url 'categoria-list' %}" class="btn btn-sm btn-outline-secondary mt-3">Gerenciar categorias</a>
-    </div>
-  </div>
-
-  <div class="col-12 col-md-4">
-    <div class="fin-panel h-100 p-4 d-flex flex-column justify-content-between">
-      <div>
-        <div class="fin-kpi-icon mb-3" style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: #fef3c7; color: #b45309;">
-          <i class="bi bi-person-vcard fs-5"></i>
-        </div>
-        <h4 class="h6 fw-bold">Pessoas e Fornecedores</h4>
-        <p class="text-muted small">Centralize dados cadastrais e vínculos de compras, pagamentos e clientes.</p>
-      </div>
-      <a href="{% url 'pessoa-list' %}" class="btn btn-sm btn-outline-secondary mt-3">Ver pessoas</a>
-    </div>
-  </div>
-</div>
-{% else %}
-<div class="fin-page-head justify-content-center text-center">
-  <div class="w-100">
-    <div class="fin-eyebrow">Controle financeiro pessoal</div>
-    <h1>Seu dinheiro, em fluxo.</h1>
-    <p>Organize receitas, despesas, parcelas e compromissos em um só lugar.</p>
-    <div class="fin-head-actions justify-content-center">
-      <a href="{% url 'login' %}" class="btn btn-primary">
-        <i class="bi bi-box-arrow-in-right me-1"></i>Entrar no Fluxo
-      </a>
-    </div>
-  </div>
-</div>
-
-<div class="row g-3">
-  <div class="col-12 col-md-4">
-    <div class="fin-panel h-100 p-4">
-      <span class="fin-kpi-icon mb-3"><i class="bi bi-receipt-cutoff"></i></span>
-      <h2 class="h5 fw-bold">Lançamentos organizados</h2>
-      <p class="text-muted mb-0">Registre receitas e despesas com categorias e pessoas relacionadas.</p>
-    </div>
-  </div>
-  <div class="col-12 col-md-4">
-    <div class="fin-panel h-100 p-4">
       <span class="fin-kpi-icon mb-3"><i class="bi bi-calendar2-check"></i></span>
-      <h2 class="h5 fw-bold">Parcelas sob controle</h2>
-      <p class="text-muted mb-0">Acompanhe vencimentos, pagamentos e formas de pagamento por parcela.</p>
+      <h2 class="h4">Parcelas sob controle</h2>
+      <p class="mb-0 text-muted">Vencimentos, baixas e formas de pagamento parcela a parcela.</p>
     </div>
   </div>
   <div class="col-12 col-md-4">
-    <div class="fin-panel h-100 p-4">
+    <div class="fin-kpi alerta">
       <span class="fin-kpi-icon mb-3"><i class="bi bi-speedometer2"></i></span>
-      <h2 class="h5 fw-bold">Visão do mês</h2>
-      <p class="text-muted mb-0">Consulte saldos e compromissos em um painel financeiro direto ao ponto.</p>
+      <h2 class="h4">Visão do mês</h2>
+      <p class="mb-0 text-muted">Saldo, contas a pagar e atrasos em um painel direto ao ponto.</p>
     </div>
   </div>
 </div>
 {% endif %}
 {% endblock %}
-

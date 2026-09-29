@@ -1,9 +1,9 @@
 {% load crispy_forms_tags %}
 
-<div class="accordion mb-4" id="filtrosFinanceiro">
-    <div class="accordion-item border rounded-3 shadow-sm">
+<div class="accordion fin-filtros mb-4" id="filtrosFinanceiro">
+    <div class="accordion-item">
         <h2 class="accordion-header" id="tituloFiltrosFinanceiro">
-                <button class="accordion-button {% if not request.GET %}collapsed{% endif %} rounded-3" type="button" data-bs-toggle="collapse"
+                <button class="accordion-button {% if not request.GET %}collapsed{% endif %}" type="button" data-bs-toggle="collapse"
                     data-bs-target="#conteudoFiltrosFinanceiro" aria-expanded="{% if request.GET %}true{% else %}false{% endif %}"
                     aria-controls="conteudoFiltrosFinanceiro">
                 <i class="bi bi-funnel me-2" aria-hidden="true"></i>Filtros
@@ -18,7 +18,7 @@
                     {{ filter.form|crispy }}
 
                     <div class="col d-flex flex-wrap gap-2 mb-3">
-                        <button type="submit" class="btn btn-outline-primary">
+                        <button type="submit" class="btn btn-outline-primary" data-texto-carregando="Filtrando...">
                             <i class="bi bi-search me-1"></i> Filtrar
                         </button>
                         {# O botão "Limpar" volta para a mesma página, sem os parâmetros da busca #}

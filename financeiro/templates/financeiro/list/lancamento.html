@@ -1,43 +1,40 @@
 {% extends "financeiro/base.html" %}
 {% load fin_tags %}
 
-{% block title %}Lançamentos · Finanças{% endblock %}
-
-{% block breadcrumb %}
-<li class="breadcrumb-item active" aria-current="page">Lançamentos</li>
-{% endblock %}
+{% block title %}Lançamentos · AnotAI{% endblock %}
 
 {% block content %}
 <div class="fin-page-head">
   <div>
-    <div class="fin-eyebrow">Visão geral</div>
+    <div class="fin-eyebrow">Extrato</div>
     <h1>Lançamentos</h1>
-    <p>Receitas, despesas e saldo dos lançamentos ativos.</p>
+    <p>Tudo o que entrou e saiu, com a situação das parcelas de cada um.</p>
   </div>
   <div class="fin-head-actions">
-    <a href="{% url "categoria-list" %}" class="btn btn-outline-secondary"><i class="bi bi-tags me-1"></i>Categorias</a>
-    <a href="{% url "lancamento-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Novo</a>
+    <a href="{% url "financeiro-dashboard" %}" class="btn btn-outline-secondary"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+    <a href="{% url "lancamento-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Novo lançamento</a>
   </div>
 </div>
+
 {% include "financeiro/form-filter.html" %}
 
 <div class="row g-3 mb-4">
-  <div class="col-12 col-md-4">
+  <div class="col-6 col-md-4">
     <div class="fin-kpi receita">
       <div class="fin-kpi-top">
-        <span class="fin-kpi-icon"><i class="bi bi-arrow-down-circle"></i></span>
-        <div><span class="fin-kpi-label">Receitas</span><span class="fin-kpi-sub">Entradas ativas</span></div>
+        <span class="fin-kpi-icon"><i class="bi bi-arrow-down-left-circle"></i></span>
+        <div><span class="fin-kpi-label">Receitas</span><span class="fin-kpi-sub">Entradas</span></div>
       </div>
-      <span class="fin-kpi-value">{{ total_receitas|brl }}</span>
+      <span class="fin-kpi-value">+ {{ total_receitas|brl }}</span>
     </div>
   </div>
-  <div class="col-12 col-md-4">
+  <div class="col-6 col-md-4">
     <div class="fin-kpi despesa">
       <div class="fin-kpi-top">
-        <span class="fin-kpi-icon"><i class="bi bi-arrow-up-circle"></i></span>
-        <div><span class="fin-kpi-label">Despesas</span><span class="fin-kpi-sub">Saídas ativas</span></div>
+        <span class="fin-kpi-icon"><i class="bi bi-arrow-up-right-circle"></i></span>
+        <div><span class="fin-kpi-label">Despesas</span><span class="fin-kpi-sub">Saídas</span></div>
       </div>
-      <span class="fin-kpi-value">{{ total_despesas|brl }}</span>
+      <span class="fin-kpi-value">− {{ total_despesas|brl }}</span>
     </div>
   </div>
   <div class="col-12 col-md-4">
@@ -46,7 +43,7 @@
         <span class="fin-kpi-icon"><i class="bi bi-wallet2"></i></span>
         <div><span class="fin-kpi-label">Saldo</span><span class="fin-kpi-sub">Receitas − despesas</span></div>
       </div>
-      <span class="fin-kpi-value">{{ saldo|brl }}</span>
+      <span class="fin-kpi-value {% if saldo >= 0 %}fin-positive{% else %}fin-negative{% endif %}">{{ saldo|brl }}</span>
     </div>
   </div>
 </div>
@@ -55,64 +52,64 @@
   <div class="fin-panel-head">
     <div>
       <h2>Todos os lançamentos</h2>
-      <p>{{ page_obj.paginator.count }} registro(s) encontrado(s)</p>
+      <p>{{ page_obj.paginator.count }} encontrado(s) · toque no <strong>+</strong> para ver os detalhes no celular</p>
     </div>
-    <a href="{% url "lancamento-create" %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Adicionar</a>
+    <div class="d-flex flex-wrap gap-2 fin-legenda" aria-label="Legenda das situações">
+      <span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Quitado</span>
+      <span class="badge fin-pill text-bg-info"><i class="bi bi-hourglass-split me-1"></i>Em aberto</span>
+      <span class="badge fin-pill text-bg-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>Vencida</span>
+    </div>
   </div>
 
-  <!-- Tabela desktop -->
-  <div class="table-responsive d-none d-md-block">
-    <table class="table fin-table mb-0 align-middle">
+  {% if object_list %}
+  <div class="fin-table-wrap">
+    <table class="table fin-table align-middle js-tabela fin-tabela-lancamentos">
       <thead>
         <tr>
-          <th>Data</th>
-          <th>Descrição</th>
-          <th>Categoria</th>
-          <th>Cliente/Fornecedor</th>
-          <th>Tipo</th>
-          <th>Forma</th>
-          <th>Valor líquido</th>
-          <th class="text-end">Ações</th>
+          <th data-priority="1">Descrição</th>
+          <th data-priority="4">Data</th>
+          <th data-priority="6">Categoria</th>
+          <th data-priority="7">Cliente/Fornecedor</th>
+          <th data-priority="5">Tipo</th>
+          <th data-priority="3">Situação</th>
+          <th data-priority="2" class="text-end">Valor líquido</th>
+          <th class="all text-end">Ações</th>
         </tr>
       </thead>
       <tbody>
         {% for lancamento in object_list %}
         <tr>
+          <td>
+            <a class="fw-bold text-decoration-none text-reset fin-trunca" href="{% url "lancamento-detail" lancamento.pk %}">{{ lancamento.descricao|default:lancamento.categoria.nome|truncatechars:48 }}</a>
+            {% if lancamento.numero or lancamento.centro %}
+            <br><span class="text-muted">{% if lancamento.numero %}<i class="bi bi-hash"></i>{{ lancamento.numero }}{% endif %}{% if lancamento.numero and lancamento.centro %} · {% endif %}{% if lancamento.centro %}<i class="bi bi-bullseye"></i> {{ lancamento.centro.nome }}{% endif %}</span>
+            {% endif %}
+            <span class="fin-sub-mobile d-md-none">
+              <span class="fin-money {% if lancamento.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}">{% if lancamento.tipo == "receita" %}+{% else %}−{% endif %} {{ lancamento.valor_total|brl }}</span>
+              {% situacao_lancamento lancamento %}
+            </span>
+          </td>
           <td class="text-nowrap">{{ lancamento.data|date:"d/m/Y" }}</td>
-          <td class="fin-desc">{{ lancamento.descricao|default:"—" }}</td>
-          <td><span class="badge rounded-pill text-bg-light border">{{ lancamento.categoria.nome }}</span></td>
+          <td><span class="badge fin-pill text-bg-light"><i class="bi bi-tag me-1"></i>{{ lancamento.categoria.nome }}</span></td>
           <td>{{ lancamento.pessoa.nome }}</td>
           <td>
             {% if lancamento.tipo == "receita" %}
-            <span class="badge fin-pill text-bg-success"><i class="bi bi-arrow-down-short"></i> Receita</span>
+            <span class="badge fin-pill text-bg-success"><i class="bi bi-arrow-down-left me-1"></i>Receita</span>
             {% else %}
-            <span class="badge fin-pill text-bg-danger"><i class="bi bi-arrow-up-short"></i> Despesa</span>
+            <span class="badge fin-pill text-bg-danger"><i class="bi bi-arrow-up-right me-1"></i>Despesa</span>
             {% endif %}
           </td>
-          <td>{{ lancamento.forma_pagamento|default:"—" }}</td>
-          <td class="fin-money">{{ lancamento.valor_total|brl }}</td>
+          <td>{% situacao_lancamento lancamento %}</td>
+          <td class="text-end fin-money {% if lancamento.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}">{% if lancamento.tipo == "receita" %}+{% else %}−{% endif %} {{ lancamento.valor_total|brl }}</td>
           <td class="text-end">
             <div class="dropdown">
-              <button class="btn fin-row-actions" data-bs-toggle="dropdown" aria-label="Ações do lançamento">
-                <i class="bi bi-three-dots-vertical"></i>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end shadow">
-                <li><a class="dropdown-item" href="{% url "lancamento-detail" lancamento.pk %}"><i class="bi bi-eye me-2"></i>Ver</a></li>
-                <li><a class="dropdown-item" href="{% url "lancamento-update" lancamento.pk %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
+              <button class="btn fin-row-actions" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-label="Ações do lançamento"><i class="bi bi-three-dots-vertical"></i></button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{% url "lancamento-detail" lancamento.pk %}"><i class="bi bi-eye"></i>Ver e parcelas</a></li>
+                <li><a class="dropdown-item" href="{% url "lancamento-update" lancamento.pk %}"><i class="bi bi-pencil"></i>Editar</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger js-excluir" href="{% url "lancamento-delete" lancamento.pk %}" data-titulo="Excluir lançamento" data-mensagem="Excluir o lançamento {{ lancamento.descricao|default:lancamento.categoria.nome }}? As parcelas dele também serão excluídas."><i class="bi bi-trash me-2"></i>Excluir</a></li>
+                <li><a class="dropdown-item text-danger js-excluir" href="{% url "lancamento-delete" lancamento.pk %}" data-titulo="Excluir lançamento" data-mensagem="Excluir o lançamento {{ lancamento.descricao|default:lancamento.categoria.nome }}? As parcelas dele também serão excluídas."><i class="bi bi-trash"></i>Excluir</a></li>
               </ul>
-            </div>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="8">
-            <div class="fin-empty">
-              <div class="fin-empty-icon"><i class="bi bi-receipt"></i></div>
-              <strong class="d-block text-dark">Nenhum lançamento cadastrado</strong>
-              <p class="mb-3">Crie o primeiro lançamento para ver o saldo aqui.</p>
-              <a href="{% url "lancamento-create" %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar lançamento</a>
             </div>
           </td>
         </tr>
@@ -120,40 +117,14 @@
       </tbody>
     </table>
   </div>
-
-  <!-- Cards mobile -->
-  <div class="fin-panel-body d-md-none">
-    {% for lancamento in object_list %}
-    <article class="fin-m-card">
-      <div class="d-flex justify-content-between align-items-start gap-2">
-        <div class="min-w-0">
-          <strong class="d-block text-truncate">{{ lancamento.descricao|default:"Lançamento" }}</strong>
-          <small class="text-muted">{{ lancamento.data|date:"d/m/Y" }} · {{ lancamento.categoria.nome }} · {{ lancamento.pessoa.nome }}</small>
-        </div>
-        {% if lancamento.tipo == "receita" %}
-        <span class="badge fin-pill text-bg-success">Receita</span>
-        {% else %}
-        <span class="badge fin-pill text-bg-danger">Despesa</span>
-        {% endif %}
-      </div>
-      <div class="d-flex justify-content-between align-items-center mt-2">
-        <span class="fin-money">{{ lancamento.valor_total|brl }}</span>
-        <span class="d-flex gap-1">
-          <a class="btn btn-sm btn-outline-secondary" href="{% url "lancamento-detail" lancamento.pk %}" aria-label="Ver"><i class="bi bi-eye"></i></a>
-          <a class="btn btn-sm btn-outline-secondary" href="{% url "lancamento-update" lancamento.pk %}" aria-label="Editar"><i class="bi bi-pencil"></i></a>
-          <a class="btn btn-sm btn-outline-danger js-excluir" href="{% url "lancamento-delete" lancamento.pk %}" data-titulo="Excluir lançamento" data-mensagem="Excluir o lançamento {{ lancamento.descricao|default:lancamento.categoria.nome }}? As parcelas dele também serão excluídas." aria-label="Excluir"><i class="bi bi-trash"></i></a>
-        </span>
-      </div>
-    </article>
-    {% empty %}
-    <div class="fin-empty">
-      <div class="fin-empty-icon"><i class="bi bi-receipt"></i></div>
-      <strong class="d-block text-dark">Nenhum lançamento cadastrado</strong>
-      <p class="mb-3">Crie o primeiro lançamento para ver o saldo aqui.</p>
-      <a href="{% url "lancamento-create" %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Criar lançamento</a>
-    </div>
-    {% endfor %}
+  {% else %}
+  <div class="fin-empty">
+    <div class="fin-empty-icon"><i class="bi bi-receipt"></i></div>
+    <strong class="d-block">Nenhum lançamento encontrado</strong>
+    <p class="mb-3">Crie o primeiro lançamento para ver o saldo e as parcelas aqui.</p>
+    <a href="{% url "lancamento-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Criar lançamento</a>
   </div>
+  {% endif %}
 </section>
 {% include "financeiro/paginacao.html" %}
 {% endblock %}

@@ -1,0 +1,9 @@
+{# Botões padrão de todo formulário: Cancelar (contorno) à esquerda, ação principal à direita. No celular, a principal vem primeiro e ocupa a largura toda. #}
+<div class="fin-form-acoes">
+  <a href="#" class="btn btn-outline-secondary" onclick="window.history.back(); return false;"><i class="bi bi-x-lg me-1"></i>Cancelar</a>
+  {% if botao == "Sim, excluir!" %}
+  <button type="submit" class="btn btn-danger" data-texto-carregando="Excluindo..."><i class="bi bi-trash me-1"></i>{{ botao }}</button>
+  {% else %}
+  <button type="submit" class="btn btn-primary" data-texto-carregando="{% if botao == 'Entrar' %}Entrando...{% else %}Salvando...{% endif %}"><i class="bi bi-check-lg me-1"></i>{{ botao }}</button>
+  {% endif %}
+</div>

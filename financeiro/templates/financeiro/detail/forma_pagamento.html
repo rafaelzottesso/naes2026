@@ -1,35 +1,73 @@
 {% extends "financeiro/base.html" %}
+{% load fin_tags %}
 
-{% block title %}{{ object.nome }} · Finanças{% endblock %}
-
-{% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'forma-pagamento-list' %}">Formas de pagamento</a></li>
-<li class="breadcrumb-item active" aria-current="page">Detalhes</li>
-{% endblock %}
+{% block title %}{{ object.nome }} · AnotAI{% endblock %}
 
 {% block content %}
-<div class="fin-hero mb-3">
-  <small>Forma de pagamento</small>
-  <p class="fin-hero-value">{{ object.nome }}</p>
-  <div class="fin-hero-meta">
-    {% if object.status %}
-    <span class="badge fin-pill text-bg-success"><i class="bi bi-check-lg"></i> Ativa</span>
-    {% else %}
-    <span class="badge fin-pill text-bg-secondary">Inativa</span>
-    {% endif %}
+<nav aria-label="Você está em" class="mb-3">
+  <a href="{% url 'forma-pagamento-list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar para a lista</a>
+</nav>
+
+<header class="fin-ficha-head">
+  <div>
+    <div class="fin-eyebrow">Forma de pagamento</div>
+    <h1>{{ object.nome }}</h1>
+    <div class="fin-ficha-tags">
+      {% if object.status %}<span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Ativa</span>{% else %}<span class="badge fin-pill text-bg-secondary"><i class="bi bi-pause-circle-fill me-1"></i>Inativa</span>{% endif %}
+      
+    </div>
   </div>
-  <div class="d-flex flex-wrap gap-2 mt-3">
-    <a href="{% url 'forma-pagamento-update' object.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil me-1"></i>Editar</a>
-    <a href="{% url 'forma-pagamento-delete' object.pk %}" class="btn btn-sm btn-outline-light js-excluir" data-titulo="Excluir forma de pagamento" data-mensagem="Excluir a forma de pagamento {{ object.nome }}?"><i class="bi bi-trash me-1"></i>Excluir</a>
-    <a href="{% url 'forma-pagamento-list' %}" class="btn btn-sm btn-link text-white text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  <div class="fin-head-actions">
+    <a href="{% url 'forma-pagamento-update' object.pk %}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>Editar</a>
+    <a href="{% url 'forma-pagamento-delete' object.pk %}" class="btn btn-outline-danger js-excluir" data-titulo="Excluir forma de pagamento" data-mensagem="Excluir a forma de pagamento {{ object.nome }}?"><i class="bi bi-trash me-1"></i>Excluir</a>
+  </div>
+</header>
+
+<section class="fin-panel mb-3">
+  <div class="fin-panel-head"><h2>Movimentação</h2></div>
+  <dl class="fin-resumo">
+    <div><dt>Lançamentos</dt><dd>{{ qtd_lancamentos }}</dd></div>
+    <div><dt>Receitas</dt><dd class="text-receita">+ {{ total_receitas|brl }}</dd></div>
+    <div><dt>Despesas</dt><dd class="text-despesa">− {{ total_despesas|brl }}</dd></div>
+    <div><dt>Saldo</dt><dd class="{% if saldo >= 0 %}fin-positive{% else %}fin-negative{% endif %}">{{ saldo|brl }}</dd></div>
+  </dl>
+</section>
+
+<div class="row g-3">
+  <div class="col-12 col-xl-5">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head"><h2>Informações</h2></div>
+      <div class="fin-panel-body">
+        <dl class="fin-dl">
+          <div><dt>Descrição</dt><dd>{{ object.descricao|default:"—" }}</dd></div>
+          <div><dt>Situação</dt><dd>{% if object.status %}Ativa{% else %}Inativa{% endif %}</dd></div>
+          <div><dt>Cadastrada por</dt><dd>{{ object.criado_por.get_username }}</dd></div>
+          <div><dt>Cadastrada em</dt><dd>{{ object.criado_em|date:"d/m/Y H:i" }}</dd></div>
+          <div><dt>Última edição</dt><dd>{{ object.atualizado_em|date:"d/m/Y H:i" }}</dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+  <div class="col-12 col-xl-7">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <h2>Lançamentos com esta forma</h2>
+        <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">Ver todos<i class="bi bi-arrow-right ms-1"></i></a>
+      </div>
+      <div class="fin-panel-body py-2">
+        {% for lancamento in lancamentos %}
+        <a class="fin-list-item" href="{% url 'lancamento-detail' lancamento.pk %}">
+          <span class="fin-list-text">
+            <span class="fin-list-title d-block text-truncate">{{ lancamento.descricao|default:lancamento.categoria.nome }}</span>
+            <small>{{ lancamento.data|date:"d/m/Y" }} · {{ lancamento.categoria.nome }} · {{ lancamento.pessoa.nome }}</small>
+          </span>
+          <span class="fin-money {% if lancamento.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}">{% if lancamento.tipo == "receita" %}+{% else %}−{% endif %} {{ lancamento.valor_total|brl }}</span>
+        </a>
+        {% empty %}
+        <div class="fin-empty py-4"><strong class="d-block">Nenhum lançamento com esta forma</strong></div>
+        {% endfor %}
+      </div>
+    </section>
   </div>
 </div>
-
-<section class="fin-panel">
-  <div class="fin-panel-head"><h2>Informações</h2></div>
-  <div class="fin-panel-body">
-    <div class="fin-meta"><p class="fin-label">Descrição</p><p class="mb-0">{{ object.descricao|default:"—" }}</p></div>
-    <a href="{% url 'forma-pagamento-list' %}" class="btn btn-outline-secondary mt-4"><i class="bi bi-arrow-left me-1"></i>Voltar para formas de pagamento</a>
-  </div>
-</section>
 {% endblock %}

@@ -41,7 +41,6 @@ def gerar_parcelas(lancamento):
                 desconto=Decimal('0.00'),
                 acrescimo=Decimal('0.00'),
                 forma_pagamento=lancamento.forma_pagamento,
-                status=True,
                 criado_por=lancamento.criado_por,
             ))
 

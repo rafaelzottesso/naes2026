@@ -1,67 +1,61 @@
 {% extends "financeiro/base.html" %}
-
 {% load crispy_forms_tags %}
 
-{% block title %}{{ titulo }} · Finanças{% endblock %}
-
-{% block breadcrumb %}
-<li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
-{% endblock %}
+{% block title %}{{ titulo }} · AnotAI{% endblock %}
 
 {% block content %}
-<div class="fin-page-head justify-content-center text-center">
-  <div class="w-100">
-    <div class="fin-eyebrow">Finanças</div>
-    <h1>{{ titulo }}</h1>
-    <p>Preencha os campos abaixo para continuar.</p>
-  </div>
-</div>
+<div class="fin-form-card">
+  <nav aria-label="Você está em" class="mb-3">
+    <a href="#" class="btn btn-sm btn-outline-secondary" onclick="window.history.back(); return false;"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  </nav>
 
-<div class="fin-panel fin-form-card">
-  <div class="fin-panel-head">
-    <div class="d-flex align-items-center gap-3">
-      <span class="fin-form-head-icon">
-        {% if botao == "Sim, excluir!" %}<i class="bi bi-trash"></i>
-        {% elif "Categoria" in titulo %}<i class="bi bi-tags"></i>
-        {% elif "Pessoa" in titulo %}<i class="bi bi-person-vcard"></i>
-        {% elif "Forma" in titulo %}<i class="bi bi-credit-card"></i>
-        {% elif "arcela" in titulo %}<i class="bi bi-layers"></i>
-        {% else %}<i class="bi bi-receipt-cutoff"></i>{% endif %}
-      </span>
-      <div>
-        <h2 class="mb-0">{{ titulo }}</h2>
-        <p>Os campos marcados com * são obrigatórios</p>
+  <div class="fin-panel">
+    <div class="fin-panel-head">
+      <div class="d-flex align-items-center gap-3">
+        <span class="fin-form-head-icon {% if botao == 'Sim, excluir!' %}fin-form-head-danger{% endif %}">
+          {% if botao == "Sim, excluir!" %}<i class="bi bi-trash"></i>
+          {% elif "Categoria" in titulo %}<i class="bi bi-tags"></i>
+          {% elif "Centro" in titulo %}<i class="bi bi-bullseye"></i>
+          {% elif "Pessoa" in titulo %}<i class="bi bi-person-vcard"></i>
+          {% elif "Forma" in titulo %}<i class="bi bi-credit-card"></i>
+          {% elif "arcela" in titulo %}<i class="bi bi-cash-coin"></i>
+          {% else %}<i class="bi bi-receipt-cutoff"></i>{% endif %}
+        </span>
+        <div>
+          <h1 class="h3 mb-0">{{ titulo }}</h1>
+          <p>{% if botao == "Sim, excluir!" %}Confirme para continuar.{% else %}Os campos com * são obrigatórios.{% endif %}</p>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="fin-panel-body">
-    <form method="post" class="btnLoading" novalidate>
-      {% csrf_token %}
-      {% if aviso %}
-      <div class="alert alert-info d-flex align-items-start" role="status">
-        <i class="bi bi-info-circle-fill me-2 mt-1"></i>
-        <div>{{ aviso }}</div>
-      </div>
-      {% endif %}
-      {{ form|crispy }}
-      <div class="fin-actions mt-4">
-        {% if botao == "Sim, excluir!" %}
-        <div class="w-100">
-          <div class="alert alert-danger d-flex align-items-center" role="alert">
-            <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
-            <div>Deseja realmente excluir <strong>{{ object }}</strong>? Esta ação não pode ser desfeita.</div>
-          </div>
-          <div class="fin-actions">
-            <button type="submit" class="btn btn-danger flex-fill"><i class="bi bi-trash me-1"></i>{{ botao }}</button>
-            <a href="#" class="btn btn-outline-secondary flex-fill" onclick="window.history.back(); return false;">Cancelar</a>
-          </div>
+    <div class="fin-panel-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if aviso %}
+        <div class="alert alert-info d-flex align-items-start" role="status">
+          <i class="bi bi-info-circle-fill me-2 mt-1"></i>
+          <div>{{ aviso }}</div>
         </div>
-        {% else %}
-        <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-check-lg me-1"></i>{{ botao }}</button>
-        <a href="#" class="btn btn-outline-secondary flex-fill" onclick="window.history.back(); return false;">Cancelar</a>
         {% endif %}
-      </div>
-    </form>
+
+        {% if botao == "Sim, excluir!" %}
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+          <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
+          <div>Deseja realmente excluir <strong>{{ object }}</strong>? Esta ação não pode ser desfeita.</div>
+        </div>
+        {% include "financeiro/_form-acoes.html" %}
+        {% else %}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="row g-3">
+          {% for field in form %}
+          <div class="{% if field.widget_type == 'textarea' or field.widget_type == 'checkbox' %}col-12{% else %}col-12 col-md-6{% endif %}">
+            {{ field|as_crispy_field }}
+          </div>
+          {% endfor %}
+        </div>
+        {% include "financeiro/_form-acoes.html" %}
+        {% endif %}
+      </form>
+    </div>
   </div>
 </div>
 {% endblock %}

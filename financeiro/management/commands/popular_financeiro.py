@@ -89,13 +89,13 @@ class Command(BaseCommand):
         for nome, documento, cep, endereco, cidade in PESSOAS:
             pessoas[nome], _ = Pessoa.objects.get_or_create(
                 documento=documento,
+                criado_por=admin,
                 defaults={
                     'nome': nome,
                     'cep': cep,
                     'endereco': endereco,
                     'cidade': cidade,
                     'status': True,
-                    'criado_por': admin,
                 },
             )
 

@@ -1,17 +1,17 @@
 {% extends "financeiro/base.html" %}
 
-{% block title %}Categorias · AnotAI{% endblock %}
+{% block title %}Centros de lançamento · AnotAI{% endblock %}
 
 {% block content %}
 <div class="fin-page-head">
   <div>
-    <div class="fin-eyebrow">Organização</div>
-    <h1>Categorias</h1>
-    <p>Agrupe seus lançamentos por assunto: moradia, mercado, saúde…</p>
+    <div class="fin-eyebrow">Acompanhamento</div>
+    <h1>Centros de lançamento</h1>
+    <p>Acompanhe atividades específicas: viagens, reformas e projetos pessoais.</p>
   </div>
   <div class="fin-head-actions">
     <a href="{% url "lancamento-list" %}" class="btn btn-outline-secondary"><i class="bi bi-receipt-cutoff me-1"></i>Lançamentos</a>
-    <a href="{% url "categoria-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nova categoria</a>
+    <a href="{% url "centro-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Novo centro</a>
   </div>
 </div>
 
@@ -21,28 +21,28 @@
   <div class="col-12 col-sm-4">
     <div class="fin-kpi neutra">
       <div class="fin-kpi-top">
-        <span class="fin-kpi-icon"><i class="bi bi-tags"></i></span>
-        <div><span class="fin-kpi-label">Total</span><span class="fin-kpi-sub">Categorias cadastradas</span></div>
+        <span class="fin-kpi-icon"><i class="bi bi-bullseye"></i></span>
+        <div><span class="fin-kpi-label">Total</span><span class="fin-kpi-sub">Centros de lançamento cadastrados</span></div>
       </div>
-      <span class="fin-kpi-value">{{ total_categorias }}</span>
+      <span class="fin-kpi-value">{{ total_centros }}</span>
     </div>
   </div>
   <div class="col-6 col-sm-4">
     <div class="fin-kpi receita">
       <div class="fin-kpi-top">
         <span class="fin-kpi-icon"><i class="bi bi-check-circle"></i></span>
-        <div><span class="fin-kpi-label">Ativas</span><span class="fin-kpi-sub">Aparecem nos lançamentos</span></div>
+        <div><span class="fin-kpi-label">Ativos</span><span class="fin-kpi-sub">Aparecem nos lançamentos</span></div>
       </div>
-      <span class="fin-kpi-value">{{ total_ativas }}</span>
+      <span class="fin-kpi-value">{{ total_ativos }}</span>
     </div>
   </div>
   <div class="col-6 col-sm-4">
     <div class="fin-kpi alerta">
       <div class="fin-kpi-top">
         <span class="fin-kpi-icon"><i class="bi bi-pause-circle"></i></span>
-        <div><span class="fin-kpi-label">Inativas</span><span class="fin-kpi-sub">Guardadas, sem uso novo</span></div>
+        <div><span class="fin-kpi-label">Inativos</span><span class="fin-kpi-sub">Guardados, sem uso novo</span></div>
       </div>
-      <span class="fin-kpi-value">{{ total_inativas }}</span>
+      <span class="fin-kpi-value">{{ total_inativos }}</span>
     </div>
   </div>
 </div>
@@ -53,7 +53,7 @@
       <h2>Todos os registros</h2>
       <p>{{ page_obj.paginator.count }} encontrado(s)</p>
     </div>
-    <a href="{% url "categoria-create" %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Adicionar</a>
+    <a href="{% url "centro-create" %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Adicionar</a>
   </div>
 
   {% if object_list %}
@@ -70,19 +70,19 @@
       <tbody>
         {% for obj in object_list %}
         <tr>
-          <td><a class="fw-bold text-decoration-none text-reset fin-trunca" href="{% url "categoria-detail" obj.pk %}">{{ obj.nome }}</a><br><span class="text-muted">{{ obj.descricao|default:"Sem descrição"|truncatechars:70 }}</span></td>
+          <td><a class="fw-bold text-decoration-none text-reset fin-trunca" href="{% url "centro-detail" obj.pk %}">{{ obj.nome }}</a><br><span class="text-muted">{{ obj.descricao|default:"Sem descrição"|truncatechars:70 }}</span></td>
           <td><span class="badge fin-pill text-bg-light"><i class="bi bi-receipt me-1"></i>{{ obj.qtd_lancamentos }}</span></td>
           <td>
-            {% if obj.status %}<span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Ativa</span>{% else %}<span class="badge fin-pill text-bg-secondary"><i class="bi bi-pause-circle-fill me-1"></i>Inativa</span>{% endif %}
+            {% if obj.status %}<span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Ativo</span>{% else %}<span class="badge fin-pill text-bg-secondary"><i class="bi bi-pause-circle-fill me-1"></i>Inativo</span>{% endif %}
           </td>
           <td class="text-end">
             <div class="dropdown">
               <button class="btn fin-row-actions" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-label="Ações de {{ obj.nome }}"><i class="bi bi-three-dots-vertical"></i></button>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{% url "categoria-detail" obj.pk %}"><i class="bi bi-eye"></i>Ver</a></li>
-                <li><a class="dropdown-item" href="{% url "categoria-update" obj.pk %}"><i class="bi bi-pencil"></i>Editar</a></li>
+                <li><a class="dropdown-item" href="{% url "centro-detail" obj.pk %}"><i class="bi bi-eye"></i>Ver</a></li>
+                <li><a class="dropdown-item" href="{% url "centro-update" obj.pk %}"><i class="bi bi-pencil"></i>Editar</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger js-excluir" href="{% url "categoria-delete" obj.pk %}" data-titulo="Excluir categoria" data-mensagem="Excluir a categoria {{ obj.nome }}?"><i class="bi bi-trash"></i>Excluir</a></li>
+                <li><a class="dropdown-item text-danger js-excluir" href="{% url "centro-delete" obj.pk %}" data-titulo="Excluir centro" data-mensagem="Excluir o centro {{ obj.nome }}?"><i class="bi bi-trash"></i>Excluir</a></li>
               </ul>
             </div>
           </td>
@@ -93,10 +93,10 @@
   </div>
   {% else %}
   <div class="fin-empty">
-    <div class="fin-empty-icon"><i class="bi bi-tags"></i></div>
+    <div class="fin-empty-icon"><i class="bi bi-bullseye"></i></div>
     <strong class="d-block">Nada por aqui ainda</strong>
-    <p class="mb-3">Crie categorias como Alimentação, Transporte e Moradia.</p>
-    <a href="{% url "categoria-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Criar categoria</a>
+    <p class="mb-3">Crie centros como Viagem de julho, Reforma da cozinha ou Projeto pessoal.</p>
+    <a href="{% url "centro-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Criar centro</a>
   </div>
   {% endif %}
 </section>

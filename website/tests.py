@@ -7,7 +7,7 @@ class IndexTests(TestCase):
 	def test_visitante_ve_inicio_publico_e_menu_de_visitante(self):
 		response = self.client.get(reverse('index'))
 
-		self.assertContains(response, 'Seu dinheiro, em fluxo.')
+		self.assertContains(response, 'Suas finanças,')
 		self.assertContains(response, reverse('login'))
 		self.assertNotContains(response, reverse('financeiro-dashboard'))
 		self.assertNotContains(response, reverse('lancamento-list'))

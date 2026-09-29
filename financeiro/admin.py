@@ -1,11 +1,18 @@
 from django.contrib import admin
 
-from .models import Categoria, FormaPagamento, Lancamento, Parcela, Pessoa
+from .models import Categoria, Centro, FormaPagamento, Lancamento, Parcela, Pessoa
 from .services import gerar_parcelas
 
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'status', 'criado_por')
+    list_filter = ('status',)
+    search_fields = ('nome',)
+
+
+@admin.register(Centro)
+class CentroAdmin(admin.ModelAdmin):
     list_display = ('nome', 'status', 'criado_por')
     list_filter = ('status',)
     search_fields = ('nome',)
@@ -28,11 +35,11 @@ class FormaPagamentoAdmin(admin.ModelAdmin):
 @admin.register(Lancamento)
 class LancamentoAdmin(admin.ModelAdmin):
     list_display = (
-        'descricao', 'pessoa', 'tipo', 'forma_pagamento', 'data',
-        'valor', 'parcelas', 'status', 'criado_por',
+        'numero', 'descricao', 'pessoa', 'tipo', 'centro', 'data',
+        'valor', 'parcelas', 'declara_ir', 'agrupado', 'criado_por',
     )
-    list_filter = ('tipo', 'status')
-    search_fields = ('descricao',)
+    list_filter = ('tipo', 'declara_ir', 'agrupado')
+    search_fields = ('numero', 'descricao')
 
     def save_model(self, request, obj, form, change):
         if not obj.criado_por_id:
@@ -48,8 +55,7 @@ class ParcelaAdmin(admin.ModelAdmin):
         'lancamento', 'numero', 'data', 'forma_pagamento',
         'valor', 'valor_pago', 'data_pagamento',
     )
-    list_filter = ('status',)
-
+    
     def has_add_permission(self, request):
         return False
 

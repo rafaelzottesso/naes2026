@@ -1,0 +1,118 @@
+{% extends "financeiro/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ titulo }} · AnotAI{% endblock %}
+
+{% block content %}
+<div class="fin-form-card">
+  <nav aria-label="Você está em" class="mb-3">
+    <a href="#" class="btn btn-sm btn-outline-secondary" onclick="window.history.back(); return false;"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  </nav>
+
+  <div class="fin-page-head mb-3">
+    <div>
+      <div class="fin-eyebrow">{% if form.valor %}Novo registro{% else %}Ajuste cadastral{% endif %}</div>
+      <h1>{{ titulo }}</h1>
+    </div>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if aviso %}
+    <div class="alert alert-info d-flex align-items-start" role="status">
+      <i class="bi bi-info-circle-fill me-2 mt-1"></i><div>{{ aviso }}</div>
+    </div>
+    {% endif %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+    <section class="fin-panel mb-3">
+      <div class="fin-panel-head"><h2><i class="bi bi-1-circle me-2"></i>O que é</h2></div>
+      <div class="fin-panel-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-6">{{ form.tipo|as_crispy_field }}</div>
+          <div class="col-12 col-md-6">{{ form.numero|as_crispy_field }}</div>
+          <div class="col-12">{{ form.descricao|as_crispy_field }}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="fin-panel mb-3">
+      <div class="fin-panel-head"><h2><i class="bi bi-2-circle me-2"></i>Classificação</h2></div>
+      <div class="fin-panel-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-6">{{ form.categoria|as_crispy_field }}</div>
+          <div class="col-12 col-md-6">{{ form.centro|as_crispy_field }}</div>
+          <div class="col-12 col-md-6">{{ form.pessoa|as_crispy_field }}</div>
+          <div class="col-12 col-md-6">{{ form.forma_pagamento|as_crispy_field }}</div>
+        </div>
+      </div>
+    </section>
+
+    {% if form.valor %}
+    <section class="fin-panel mb-3">
+      <div class="fin-panel-head"><h2><i class="bi bi-3-circle me-2"></i>Valores e parcelas</h2></div>
+      <div class="fin-panel-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-6 col-xl-3">{{ form.data|as_crispy_field }}</div>
+          <div class="col-12 col-md-6 col-xl-3">{{ form.valor|as_crispy_field }}</div>
+          <div class="col-6 col-xl-3">{{ form.desconto|as_crispy_field }}</div>
+          <div class="col-6 col-xl-3">{{ form.acrescimo|as_crispy_field }}</div>
+          <div class="col-6 col-xl-3">{{ form.parcelas|as_crispy_field }}</div>
+          <div class="col-6 col-xl-3">{{ form.intervalo_parcelas|as_crispy_field }}</div>
+          <div class="col-12 col-xl-6">
+            <div class="fin-previa" id="previaParcelas" aria-live="polite">
+              <span class="fin-previa-icone"><i class="bi bi-calculator"></i></span>
+              <div>
+                <strong id="previaLiquido">Informe o valor</strong>
+                <span class="d-block text-muted" id="previaParcela">A divisão em parcelas aparece aqui.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="fin-panel mb-4">
+      <div class="fin-panel-head"><h2><i class="bi bi-{% if form.valor %}4{% else %}3{% endif %}-circle me-2"></i>Controle</h2></div>
+      <div class="fin-panel-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-6">{{ form.declara_ir|as_crispy_field }}</div>
+          <div class="col-12 col-md-6">{{ form.agrupado|as_crispy_field }}</div>
+        </div>
+      </div>
+    </section>
+
+    {% include "financeiro/_form-acoes.html" %}
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    var valor = document.getElementById('id_valor');
+    if (!valor) return;
+    var desconto = document.getElementById('id_desconto');
+    var acrescimo = document.getElementById('id_acrescimo');
+    var parcelas = document.getElementById('id_parcelas');
+    var liquido = document.getElementById('previaLiquido');
+    var parcela = document.getElementById('previaParcela');
+    var brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+    function n(campo) { return parseFloat((campo.value || '0').replace(',', '.')) || 0; }
+    function atualizar() {
+      var total = n(valor) - n(desconto) + n(acrescimo);
+      var qtd = Math.max(parseInt(parcelas.value, 10) || 1, 1);
+      if (n(valor) <= 0) { liquido.textContent = 'Informe o valor'; parcela.textContent = 'A divisão em parcelas aparece aqui.'; return; }
+      liquido.textContent = 'Valor líquido: ' + brl.format(total);
+      if (total <= 0) { parcela.textContent = 'O líquido precisa ser maior que zero.'; return; }
+      var cada = Math.floor(total / qtd * 100) / 100;
+      var ultima = Math.round((total - cada * (qtd - 1)) * 100) / 100;
+      parcela.textContent = qtd === 1 ? 'À vista, em 1 parcela.' :
+        (qtd - 1) + ' parcela(s) de ' + brl.format(cada) + ' e a última de ' + brl.format(ultima) + '.';
+    }
+    [valor, desconto, acrescimo, parcelas].forEach(function (c) { c && c.addEventListener('input', atualizar); });
+    atualizar();
+  })();
+</script>
+{% endblock %}
