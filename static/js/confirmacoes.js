@@ -20,6 +20,7 @@
       },
       callback: function (confirmado) {
         if (!confirmado) return;
+        if (window.AnotAI && window.AnotAI.carregando) window.AnotAI.carregando.iniciar(link, 'Excluindo...');
         var form = document.createElement('form');
         form.method = 'post';
         form.action = destino;
