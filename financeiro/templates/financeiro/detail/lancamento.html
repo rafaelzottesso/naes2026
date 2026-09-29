@@ -1,5 +1,5 @@
 {% extends "financeiro/base.html" %}
-{% load fin_tags %}
+{% load fin_tags l10n %}
 
 {% block title %}{{ object.descricao|default:"Lançamento" }} · AnotAI{% endblock %}
 
@@ -104,21 +104,21 @@
           <th data-priority="5" class="text-end">Valor pago</th>
           <th data-priority="6">Pago em</th>
           <th data-priority="7">Forma</th>
-          <th class="all text-end">Ações</th>
+          <th class="all text-end" data-orderable="false">Ações</th>
         </tr>
       </thead>
       <tbody>
         {% for parcela in parcelas %}
         <tr class="fin-linha-{{ parcela.situacao }}">
-          <td>
-            <a class="fw-semibold text-decoration-none text-reset" href="{% url 'parcela-detail' parcela.pk %}">Parcela {{ parcela.numero }}</a>
+          <td data-order="{{ parcela.numero }}">
+            <a class="fw-semibold text-decoration-none text-reset fin-trunca" href="{% url 'parcela-detail' parcela.pk %}">Parcela {{ parcela.numero }}</a>
             <span class="fin-sub-mobile d-md-none"><span class="fin-money">{{ parcela.valor_liquido|brl }}</span><br>{% situacao_parcela parcela %}</span>
           </td>
-          <td class="text-nowrap">{{ parcela.data|date:"d/m/Y" }}</td>
-          <td>{% situacao_parcela parcela True %}</td>
-          <td class="text-end fin-money">{{ parcela.valor_liquido|brl }}</td>
-          <td class="text-end fin-money">{% if parcela.valor_pago %}{{ parcela.valor_pago|brl }}{% else %}—{% endif %}</td>
-          <td class="text-nowrap">{{ parcela.data_pagamento|date:"d/m/Y"|default:"—" }}</td>
+          <td class="text-nowrap" data-order="{{ parcela.data|date:"Y-m-d" }}">{{ parcela.data|date:"d/m/Y" }}</td>
+          <td data-order="{% if parcela.situacao == 'atrasada' %}1{% elif parcela.situacao == 'a_vencer' %}2{% else %}3{% endif %}">{% situacao_parcela parcela True %}</td>
+          <td class="text-end fin-money" data-order="{{ parcela.valor_liquido|unlocalize }}">{{ parcela.valor_liquido|brl }}</td>
+          <td class="text-end fin-money" data-order="{{ parcela.valor_pago|default_if_none:0|unlocalize }}">{% if parcela.valor_pago %}{{ parcela.valor_pago|brl }}{% else %}—{% endif %}</td>
+          <td class="text-nowrap" data-order="{{ parcela.data_pagamento|date:"Y-m-d" }}">{{ parcela.data_pagamento|date:"d/m/Y"|default:"—" }}</td>
           <td>{{ parcela.forma_pagamento|default:"—" }}</td>
           <td class="text-end text-nowrap">
             <a class="btn btn-sm btn-outline-secondary" href="{% url 'parcela-detail' parcela.pk %}" aria-label="Ver parcela {{ parcela.numero }}"><i class="bi bi-eye"></i></a>

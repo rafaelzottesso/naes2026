@@ -36,21 +36,21 @@
     <div class="collapse navbar-collapse" id="menuPrincipal">
       <ul class="navbar-nav me-auto gap-lg-1 mt-2 mt-lg-0">
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}"><i class="bi bi-house-door"></i>Início</a>
+          <a class="nav-link" href="{% url 'index' %}"><i class="bi bi-house-door"></i>Início</a>
         </li>
         {% if request.user.is_authenticated %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'financeiro-dashboard' %}"><i class="bi bi-speedometer2"></i>Dashboard</a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle {% if 'lancamento' in request.resolver_match.url_name or 'parcela' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'lancamento-list' %}" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-receipt-cutoff"></i>Lançamentos<i class="bi bi-chevron-down fin-caret"></i></a>
+          <a class="nav-link dropdown-toggle" href="{% url 'lancamento-list' %}" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-receipt-cutoff"></i>Lançamentos<i class="bi bi-chevron-down fin-caret"></i></a>
           <ul class="dropdown-menu fin-menu-rico">
             <li><a class="dropdown-item" href="{% url 'lancamento-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-primary-soft);--k-strong:var(--fx-primary-strong)"><i class="bi bi-list-ul"></i></span><span><strong>Todos os lançamentos</strong><span class="d-block">Receitas, despesas e saldo</span></span></a></li>
             <li><a class="dropdown-item" href="{% url 'lancamento-create' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-success-soft);--k-strong:var(--fx-success-strong)"><i class="bi bi-plus-circle"></i></span><span><strong>Novo lançamento</strong><span class="d-block">Já gera as parcelas</span></span></a></li>
           </ul>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle {% if 'categoria' in request.resolver_match.url_name or 'centro' in request.resolver_match.url_name or 'pessoa' in request.resolver_match.url_name or 'forma-pagamento' in request.resolver_match.url_name %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-grid-1x2"></i>Cadastros<i class="bi bi-chevron-down fin-caret"></i></a>
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-grid-1x2"></i>Cadastros<i class="bi bi-chevron-down fin-caret"></i></a>
           <ul class="dropdown-menu fin-menu-rico">
             <li><a class="dropdown-item" href="{% url 'categoria-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-warning-soft);--k-strong:var(--fx-warning-strong)"><i class="bi bi-tags"></i></span><span><strong>Categorias</strong><span class="d-block">Moradia, mercado, saúde…</span></span></a></li>
             <li><a class="dropdown-item" href="{% url 'centro-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-danger-soft);--k-strong:var(--fx-danger-strong)"><i class="bi bi-bullseye"></i></span><span><strong>Centros de lançamento</strong><span class="d-block">Viagens, reformas, projetos</span></span></a></li>

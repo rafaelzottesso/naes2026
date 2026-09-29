@@ -65,16 +65,16 @@
           <th data-priority="4">Cidade</th>
           <th data-priority="3">Lançamentos</th>
           <th data-priority="2">Situação</th>
-          <th class="all text-end">Ações</th>
+          <th class="all text-end" data-orderable="false">Ações</th>
         </tr>
       </thead>
       <tbody>
         {% for obj in object_list %}
         <tr>
-          <td><a class="fw-bold text-decoration-none text-reset fin-trunca" href="{% url "pessoa-detail" obj.pk %}">{{ obj.nome }}</a><br><span class="text-muted">{{ obj.documento }}</span></td>
+          <td data-order="{{ obj.nome|lower }}"><a class="fw-bold text-decoration-none text-reset fin-trunca" href="{% url "pessoa-detail" obj.pk %}">{{ obj.nome }}</a><br><span class="text-muted">{{ obj.documento }}</span></td>
           <td>{{ obj.cidade }}</td>
-          <td><span class="badge fin-pill text-bg-light"><i class="bi bi-receipt me-1"></i>{{ obj.qtd_lancamentos }}</span></td>
-          <td>
+          <td data-order="{{ obj.qtd_lancamentos }}"><span class="badge fin-pill text-bg-light"><i class="bi bi-receipt me-1"></i>{{ obj.qtd_lancamentos }}</span></td>
+          <td data-order="{% if obj.status %}0{% else %}1{% endif %}">
             {% if obj.status %}<span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Ativa</span>{% else %}<span class="badge fin-pill text-bg-secondary"><i class="bi bi-pause-circle-fill me-1"></i>Inativa</span>{% endif %}
           </td>
           <td class="text-end">

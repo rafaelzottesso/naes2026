@@ -29,7 +29,7 @@ class LancamentoForm(AjusteMonetarioMixin, forms.ModelForm):
             'valor', 'desconto', 'acrescimo', 'parcelas', 'intervalo_parcelas',
             'declara_ir', 'agrupado',
         ]
-        # rótulos curtos: não quebram a linha nem desalinham os campos na grade
+        # rótulos curtos (não quebram a linha na grade); os textos de ajuda vêm dos modelos
         labels = {
             'data': '1º vencimento',
             'centro': 'Centro de lançamento',
@@ -37,15 +37,6 @@ class LancamentoForm(AjusteMonetarioMixin, forms.ModelForm):
             'intervalo_parcelas': 'Intervalo (dias)',
             'declara_ir': 'Declara no imposto de renda',
             'agrupado': 'Lançamento agrupado',
-        }
-        help_texts = {
-            'forma_pagamento': 'As parcelas nascem com esta forma.',
-            'parcelas': 'Mínimo 1. À vista usa 1.',
-            'intervalo_parcelas': 'Obrigatório com mais de 1 parcela.',
-            'centro': 'Opcional. Viagem, reforma, projeto.',
-            'numero': 'Nota, boleto ou documento. Opcional.',
-            'declara_ir': 'Entra na declaração do imposto de renda.',
-            'agrupado': 'Junta várias notas em um só lançamento.',
         }
 
     def __init__(self, *args, user=None, **kwargs):

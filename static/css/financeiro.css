@@ -319,15 +319,15 @@ table.fin-table tbody tr { transition: background-color 0.12s; }
 table.fin-table tbody tr:hover > td { background: var(--fx-primary-soft); }
 table.fin-table tbody tr:hover > td:first-child { box-shadow: inset 4px 0 0 var(--fx-primary); }
 table.fin-table tbody tr:last-child td { border-bottom: 0; }
-table.fin-table.dtr-inline.collapsed > tbody > tr > td.dtr-control::before,
-table.fin-table.dtr-inline.collapsed > tbody > tr > th.dtr-control::before {
-  content: "+"; display: inline-flex; align-items: center; justify-content: center;
-  width: 1.6rem; height: 1.6rem; margin-right: 0.6rem; border-radius: 0.4rem;
-  background: var(--fx-primary-soft); color: var(--fx-primary-strong); border: 1.5px solid var(--fx-primary);
-  font-weight: 700; line-height: 1; box-shadow: none; transition: background-color 0.15s, color 0.15s;
-}
-table.fin-table.dtr-inline.collapsed > tbody > tr > td.dtr-control:hover::before { background: var(--fx-primary); color: #fff; }
-table.fin-table.dtr-inline.collapsed > tbody > tr.dtr-expanded > td.dtr-control::before { content: "−"; background: var(--fx-primary); color: #fff; }
+/* sem ícone de +/−: quando há colunas escondidas, tocar na linha abre os detalhes */
+table.fin-table.collapsed > tbody > tr:not(.child) { cursor: pointer; }
+table.fin-table.collapsed .fin-trunca { pointer-events: none; }
+table.fin-table > tbody > tr.dtr-expanded > td { background: var(--fx-primary-soft); }
+.fin-dica-toque { margin: 0.5rem 1rem 0; color: var(--fx-muted); font-size: 0.95rem; }
+/* ordenação por coluna */
+table.fin-table thead th.dt-orderable-asc, table.fin-table thead th.dt-orderable-desc { cursor: pointer; }
+table.fin-table thead th.dt-orderable-asc:hover, table.fin-table thead th.dt-orderable-desc:hover { color: var(--fx-primary-strong); }
+table.fin-table thead th.dt-ordering-asc, table.fin-table thead th.dt-ordering-desc { color: var(--fx-primary-strong); }
 table.fin-table > tbody > tr.child td.child { padding: 0.5rem 0.9rem 1rem; background: var(--fx-surface-2); }
 table.fin-table > tbody > tr.child ul.dtr-details { display: block; width: 100%; }
 table.fin-table > tbody > tr.child ul.dtr-details > li {

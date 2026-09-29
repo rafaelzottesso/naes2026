@@ -4,15 +4,26 @@
   if (!$.fn.DataTable) return;
 
   $('table.js-tabela').each(function () {
-    $(this).DataTable({
-      responsive: true,
+    var tabela = $(this);
+    var api = tabela.DataTable({
+      // tipo próprio + alvo: nenhum ícone de +/−. Tocar na primeira célula da linha abre e fecha os detalhes.
+      responsive: { details: { type: 'toque', target: 'td:first-child' } },
       paging: false,
       searching: false,
-      ordering: false,
+      ordering: true,      // ordena só os registros da página atual; use data-order nas células (datas, valores)
+      order: [],           // mantém a ordem que veio do servidor até o usuário clicar em um título
+      orderMulti: false,
       info: false,
       autoWidth: false,
       layout: { topStart: null, topEnd: null, bottomStart: null, bottomEnd: null }
     });
+
+    // dica só enquanto houver colunas escondidas (celular)
+    var dica = $('<p class="fin-dica-toque" hidden><i class="bi bi-hand-index-thumb me-1"></i>Toque em uma linha para ver mais detalhes.</p>');
+    tabela.closest('.fin-table-wrap').before(dica);
+    var atualizar = function () { dica.prop('hidden', !tabela.hasClass('collapsed')); };
+    api.on('responsive-resize', atualizar);
+    atualizar();
   });
 
   // a barra do topo ganha mais sombra quando a página rola

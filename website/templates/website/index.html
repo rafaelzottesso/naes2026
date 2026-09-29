@@ -1,6 +1,6 @@
 {% extends "financeiro/base.html" %}
 {% load static %}
-{% load fin_tags %}
+{% load fin_tags l10n %}
 
 {% block title %}Início · AnotAI{% endblock %}
 
@@ -70,17 +70,17 @@
           <th data-priority="4">Categoria</th>
           <th data-priority="5">Pessoa</th>
           <th data-priority="2" class="text-end">Valor</th>
-          <th class="all text-end">Ações</th>
+          <th class="all text-end" data-orderable="false">Ações</th>
         </tr>
       </thead>
       <tbody>
         {% for l in ultimos_lancamentos %}
         <tr>
-          <td><a href="{% url 'lancamento-detail' l.pk %}" class="fw-bold text-decoration-none text-reset fin-trunca">{{ l.descricao|default:l.categoria.nome|truncatechars:48 }}</a></td>
-          <td class="text-nowrap">{{ l.data|date:"d/m/Y" }}</td>
+          <td data-order="{{ l.descricao|default:l.categoria.nome|lower }}"><a href="{% url 'lancamento-detail' l.pk %}" class="fw-bold text-decoration-none text-reset fin-trunca">{{ l.descricao|default:l.categoria.nome|truncatechars:48 }}</a></td>
+          <td class="text-nowrap" data-order="{{ l.data|date:"Y-m-d" }}">{{ l.data|date:"d/m/Y" }}</td>
           <td><span class="badge fin-pill text-bg-light"><i class="bi bi-tag me-1"></i>{{ l.categoria.nome }}</span></td>
           <td>{{ l.pessoa.nome }}</td>
-          <td class="text-end fin-money {% if l.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}">{% if l.tipo == 'receita' %}+{% else %}−{% endif %} {{ l.valor_total|brl }}</td>
+          <td class="text-end fin-money {% if l.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}" data-order="{% if l.tipo == 'despesa' %}-{% endif %}{{ l.valor_total|unlocalize }}">{% if l.tipo == 'receita' %}+{% else %}−{% endif %} {{ l.valor_total|brl }}</td>
           <td class="text-end"><a href="{% url 'lancamento-detail' l.pk %}" class="btn btn-sm btn-outline-secondary" aria-label="Ver detalhes"><i class="bi bi-eye"></i></a></td>
         </tr>
         {% endfor %}

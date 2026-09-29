@@ -1,5 +1,5 @@
 {% extends "financeiro/base.html" %}
-{% load fin_tags %}
+{% load fin_tags l10n %}
 
 {% block title %}Lançamentos · AnotAI{% endblock %}
 
@@ -52,7 +52,7 @@
   <div class="fin-panel-head">
     <div>
       <h2>Todos os lançamentos</h2>
-      <p>{{ page_obj.paginator.count }} encontrado(s) · toque no <strong>+</strong> para ver os detalhes no celular</p>
+      <p>{{ page_obj.paginator.count }} encontrado(s) · clique no título da coluna para ordenar esta página</p>
     </div>
     <div class="d-flex flex-wrap gap-2 fin-legenda" aria-label="Legenda das situações">
       <span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Quitado</span>
@@ -73,13 +73,13 @@
           <th data-priority="5">Tipo</th>
           <th data-priority="3">Situação</th>
           <th data-priority="2" class="text-end">Valor líquido</th>
-          <th class="all text-end">Ações</th>
+          <th class="all text-end" data-orderable="false">Ações</th>
         </tr>
       </thead>
       <tbody>
         {% for lancamento in object_list %}
         <tr>
-          <td>
+          <td data-order="{{ lancamento.descricao|default:lancamento.categoria.nome|lower }}">
             <a class="fw-bold text-decoration-none text-reset fin-trunca" href="{% url "lancamento-detail" lancamento.pk %}">{{ lancamento.descricao|default:lancamento.categoria.nome|truncatechars:48 }}</a>
             {% if lancamento.numero or lancamento.centro %}
             <br><span class="text-muted">{% if lancamento.numero %}<i class="bi bi-hash"></i>{{ lancamento.numero }}{% endif %}{% if lancamento.numero and lancamento.centro %} · {% endif %}{% if lancamento.centro %}<i class="bi bi-bullseye"></i> {{ lancamento.centro.nome }}{% endif %}</span>
@@ -89,7 +89,7 @@
               {% situacao_lancamento lancamento %}
             </span>
           </td>
-          <td class="text-nowrap">{{ lancamento.data|date:"d/m/Y" }}</td>
+          <td class="text-nowrap" data-order="{{ lancamento.data|date:"Y-m-d" }}">{{ lancamento.data|date:"d/m/Y" }}</td>
           <td><span class="badge fin-pill text-bg-light"><i class="bi bi-tag me-1"></i>{{ lancamento.categoria.nome }}</span></td>
           <td>{{ lancamento.pessoa.nome }}</td>
           <td>
@@ -99,8 +99,8 @@
             <span class="badge fin-pill text-bg-danger"><i class="bi bi-arrow-up-right me-1"></i>Despesa</span>
             {% endif %}
           </td>
-          <td>{% situacao_lancamento lancamento %}</td>
-          <td class="text-end fin-money {% if lancamento.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}">{% if lancamento.tipo == "receita" %}+{% else %}−{% endif %} {{ lancamento.valor_total|brl }}</td>
+          <td data-order="{% if lancamento.n_vencidas %}1{% elif lancamento.n_pagas == lancamento.n_parcelas %}3{% else %}2{% endif %}">{% situacao_lancamento lancamento %}</td>
+          <td class="text-end fin-money {% if lancamento.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}" data-order="{% if lancamento.tipo == 'despesa' %}-{% endif %}{{ lancamento.valor_total|unlocalize }}">{% if lancamento.tipo == "receita" %}+{% else %}−{% endif %} {{ lancamento.valor_total|brl }}</td>
           <td class="text-end">
             <div class="dropdown">
               <button class="btn fin-row-actions" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-label="Ações do lançamento"><i class="bi bi-three-dots-vertical"></i></button>
