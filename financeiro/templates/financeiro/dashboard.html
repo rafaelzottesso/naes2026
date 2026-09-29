@@ -111,7 +111,7 @@
         <div><h2>Próximos vencimentos</h2><p>Parcelas em aberto, das mais antigas</p></div>
         <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">Ver todos</a>
       </div>
-      <div class="fin-panel-body py-2">
+      <div class="fin-panel-body fin-panel-lista">
         {% for parcela in proximos %}
         <a class="fin-list-item fin-linha-{{ parcela.situacao }}" href="{% url 'parcela-detail' parcela.pk %}">
           <span class="fin-list-text">
@@ -134,7 +134,7 @@
         <div><h2>Últimos lançamentos</h2><p>O que foi cadastrado recentemente</p></div>
         <a href="{% url 'lancamento-list' %}" class="btn btn-sm btn-outline-secondary">Ver todos</a>
       </div>
-      <div class="fin-panel-body py-2">
+      <div class="fin-panel-body fin-panel-lista">
         {% for lancamento in ultimos %}
         <a class="fin-list-item" href="{% url 'lancamento-detail' lancamento.pk %}">
           <span class="fin-list-text">

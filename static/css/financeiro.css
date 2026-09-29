@@ -229,10 +229,10 @@ h1, h2, h3, h4, h5, .fin-display { font-weight: 600; letter-spacing: -0.01em; }
 .fin-avatar-btn {
   width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 2px solid var(--fx-border); padding: 0;
   font-weight: 700; font-size: 1.05rem; color: #fff;
-  background: var(--fx-primary);
+  background: linear-gradient(135deg, #1f8f72 0%, #2585b0 100%);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
-.fin-avatar-btn:hover, .fin-avatar-btn[aria-expanded="true"] { border-color: var(--fx-primary); box-shadow: 0 0 0 3px var(--fx-primary-soft); }
+.fin-avatar-btn:hover, .fin-avatar-btn[aria-expanded="true"] { border-color: var(--fx-success); box-shadow: 0 0 0 3px var(--fx-success-soft); }
 
 .fin-fab {
   position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 1030;
@@ -260,11 +260,12 @@ h1, h2, h3, h4, h5, .fin-display { font-weight: 600; letter-spacing: -0.01em; }
   position: relative; overflow: hidden; height: 100%;
   padding: 1.05rem 1.2rem 1.15rem;
   background: var(--fx-surface);
-  border: 1px solid var(--fx-border); border-top: 4px solid var(--k);
-  border-radius: var(--fx-radius);
+  border: 1px solid var(--fx-border);
+  border-radius: var(--fx-radius) var(--fx-radius) 0 0;
   box-shadow: var(--fx-shadow-sm);
   transition: transform 0.2s var(--fx-ease), box-shadow 0.2s var(--fx-ease);
 }
+.fin-kpi::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--k); }
 .fin-kpi:hover { transform: translateY(-3px); box-shadow: var(--fx-shadow); }
 .fin-kpi.receita { --k: var(--fx-success); --k-soft: var(--fx-success-soft); --k-strong: var(--fx-success-strong); }
 .fin-kpi.despesa { --k: var(--fx-danger);  --k-soft: var(--fx-danger-soft);  --k-strong: var(--fx-danger-strong); }
@@ -293,7 +294,7 @@ h1, h2, h3, h4, h5, .fin-display { font-weight: 600; letter-spacing: -0.01em; }
 .fin-kpi-link { display: block; height: 100%; text-decoration: none; color: inherit; }
 
 /* ===== Painéis ===== */
-.fin-panel { background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-radius); box-shadow: var(--fx-shadow-sm); }
+.fin-panel { background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-radius) var(--fx-radius) 0 0; box-shadow: var(--fx-shadow-sm); }
 .fin-panel-head {
   display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; justify-content: space-between;
   padding: 0.95rem 1.25rem; border-bottom: 1px solid var(--fx-border);
@@ -550,3 +551,12 @@ tr.fin-linha-a_vencer > td:first-child, .fin-list-item.fin-linha-a_vencer { box-
 
 /* campos de texto longos: altura compacta, ajustável na vertical */
 textarea.form-control { height: 6.5rem; min-height: 6.5rem; resize: vertical; }
+
+/* listas dentro de painéis (dashboard): sem margem à esquerda, a faixa de situação encosta na borda */
+.fin-panel-lista { padding: 0.25rem 0; }
+.fin-panel-lista .fin-list-item { margin: 0; padding: 0.8rem 1.25rem; border-radius: 0; }
+.fin-panel-lista .fin-list-item[class*="fin-linha-"] { padding-left: 1.25rem; }
+
+/* valores dentro de KPI: a cor de receita/despesa vence a cor padrão do KPI */
+.fin-kpi .fin-kpi-value.text-receita { color: var(--fx-success-strong); }
+.fin-kpi .fin-kpi-value.text-despesa { color: var(--fx-danger-strong); }

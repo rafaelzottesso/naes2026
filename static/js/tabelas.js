@@ -24,21 +24,20 @@
   }
 })(window.jQuery);
 
-// menus do topo abrem ao passar o mouse (só no desktop com mouse). Usa a API do Bootstrap,
-// então o posicionamento é o mesmo do clique; os menus da direita (Novo e usuário) abrem só no clique.
+// menus da navbar: abrem no clique e fecham quando o mouse sai de cima (desktop com mouse).
+// Vale para todos: Lançamentos, Cadastros, Novo e usuário. No celular seguem só o toque.
 (function () {
   var mq = window.matchMedia('(min-width: 992px) and (hover: hover)');
-  document.querySelectorAll('.fin-navbar .navbar-nav .dropdown').forEach(function (item) {
+  document.querySelectorAll('.fin-navbar .dropdown').forEach(function (item) {
     var toggle = item.querySelector('[data-bs-toggle="dropdown"]');
     var timer;
-    item.addEventListener('mouseenter', function () {
-      if (!mq.matches) return;
-      window.clearTimeout(timer);
-      bootstrap.Dropdown.getOrCreateInstance(toggle).show();
-    });
+    item.addEventListener('mouseenter', function () { window.clearTimeout(timer); });
     item.addEventListener('mouseleave', function () {
       if (!mq.matches) return;
-      timer = window.setTimeout(function () { bootstrap.Dropdown.getOrCreateInstance(toggle).hide(); }, 150);
+      timer = window.setTimeout(function () {
+        var menu = bootstrap.Dropdown.getInstance(toggle);
+        if (menu) menu.hide();
+      }, 200);
     });
   });
 })();
