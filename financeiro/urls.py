@@ -7,7 +7,7 @@ from .views import (
     FormaPagamentoCreate, FormaPagamentoUpdate, FormaPagamentoDelete,
     FormaPagamentoList, FormaPagamentoDetail,
     LancamentoCreate, LancamentoUpdate, LancamentoDelete, LancamentoList, LancamentoDetail,
-    ParcelaUpdate, ParcelaDetail,
+    ParcelaUpdate, ParcelaDetail, ParcelaList,
     FinanceiroDashboard,
 )
 
@@ -47,4 +47,5 @@ urlpatterns = [
 
     path('atualizar/parcela/<int:pk>/', ParcelaUpdate.as_view(), name='parcela-update'),
     path('detalhar/parcela/<int:pk>/', ParcelaDetail.as_view(), name='parcela-detail'),
+    path('listar/parcela/', ParcelaList.as_view(), name='parcela-list'),
 ]

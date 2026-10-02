@@ -1,0 +1,103 @@
+{% extends "financeiro/base.html" %}
+{% load fin_tags l10n %}
+
+{% block title %}Parcelas · AnotAI{% endblock %}
+
+{% block content %}
+<div class="fin-page-head">
+  <div>
+    <div class="fin-eyebrow">Contas a pagar e receber</div>
+    <h1>Parcelas</h1>
+    <p>Consulte vencimentos, pagamentos e formas de pagamento de cada lançamento.</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url "lancamento-list" %}" class="btn btn-outline-secondary"><i class="bi bi-receipt-cutoff me-1"></i>Lançamentos</a>
+    <a href="{% url "lancamento-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Novo lançamento</a>
+  </div>
+</div>
+
+{% include "financeiro/form-filter.html" %}
+
+<section class="fin-panel">
+  <div class="fin-panel-head">
+    <div>
+      <h2>{% if request.GET.vencidas %}Parcelas vencidas{% else %}Todas as parcelas{% endif %}</h2>
+      <p>{{ page_obj.paginator.count }} encontrada(s) · clique no título da coluna para ordenar esta página</p>
+    </div>
+    {% if request.GET.vencidas %}
+    <span class="badge fin-pill text-bg-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>Vencidas e não pagas</span>
+    {% endif %}
+  </div>
+
+  {% if object_list %}
+  <div class="fin-table-wrap">
+    <table class="table fin-table align-middle js-tabela fin-tabela-lancamentos">
+      <thead>
+        <tr>
+          <th data-priority="1">Lançamento</th>
+          <th data-priority="3">Parcela</th>
+          <th data-priority="2">Vencimento</th>
+          <th data-priority="7">Cliente/Fornecedor</th>
+          <th data-priority="6">Tipo</th>
+          <th data-priority="8">Forma de pagamento</th>
+          <th data-priority="4">Situação</th>
+          <th data-priority="5" class="text-end">Valor líquido</th>
+          <th class="all text-end" data-orderable="false">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for parcela in object_list %}
+        <tr>
+          <td data-order="{{ parcela.lancamento.descricao|default:parcela.lancamento.categoria.nome|lower }}">
+            <a class="fw-bold text-decoration-none text-reset fin-trunca" href="{% url "lancamento-detail" parcela.lancamento_id %}">{{ parcela.lancamento.descricao|default:parcela.lancamento.categoria.nome|truncatechars:48 }}</a>
+            {% if parcela.lancamento.numero or parcela.lancamento.centro %}
+            <br><span class="text-muted">{% if parcela.lancamento.numero %}<i class="bi bi-hash"></i>{{ parcela.lancamento.numero }}{% endif %}{% if parcela.lancamento.numero and parcela.lancamento.centro %} · {% endif %}{% if parcela.lancamento.centro %}<i class="bi bi-bullseye"></i> {{ parcela.lancamento.centro.nome }}{% endif %}</span>
+            {% endif %}
+            <span class="fin-sub-mobile d-md-none">
+              <span class="fin-money {% if parcela.lancamento.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}">{% if parcela.lancamento.tipo == "receita" %}+{% else %}−{% endif %} {{ parcela.valor_liquido|brl }}</span>
+              {% situacao_parcela parcela %}
+            </span>
+          </td>
+          <td data-order="{{ parcela.numero|stringformat:'04d' }}">{{ parcela.numero }}ª</td>
+          <td class="text-nowrap" data-order="{{ parcela.data|date:"Y-m-d" }}">{{ parcela.data|date:"d/m/Y" }}</td>
+          <td>{{ parcela.lancamento.pessoa.nome }}</td>
+          <td>
+            {% if parcela.lancamento.tipo == "receita" %}
+            <span class="badge fin-pill text-bg-success"><i class="bi bi-arrow-down-left me-1"></i>Receita</span>
+            {% else %}
+            <span class="badge fin-pill text-bg-danger"><i class="bi bi-arrow-up-right me-1"></i>Despesa</span>
+            {% endif %}
+          </td>
+          <td><span class="badge fin-pill text-bg-light"><i class="bi bi-credit-card me-1"></i>{{ parcela.forma_pagamento.nome }}</span></td>
+          <td>{% situacao_parcela parcela %}</td>
+          <td class="text-end fin-money {% if parcela.lancamento.tipo == 'receita' %}text-receita{% else %}text-despesa{% endif %}" data-order="{% if parcela.lancamento.tipo == 'despesa' %}-{% endif %}{{ parcela.valor_liquido|unlocalize }}">{% if parcela.lancamento.tipo == "receita" %}+{% else %}−{% endif %} {{ parcela.valor_liquido|brl }}</td>
+          <td class="text-end">
+            <div class="dropdown">
+              <button class="btn fin-row-actions" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-label="Ações da parcela"><i class="bi bi-three-dots-vertical"></i></button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{% url "parcela-detail" parcela.pk %}"><i class="bi bi-eye"></i>Ver parcela</a></li>
+                <li><a class="dropdown-item" href="{% url "parcela-update" parcela.pk %}"><i class="bi bi-pencil"></i>Editar parcela</a></li>
+                <li><a class="dropdown-item" href="{% url "lancamento-detail" parcela.lancamento_id %}"><i class="bi bi-receipt"></i>Ver lançamento</a></li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="fin-empty">
+    <div class="fin-empty-icon"><i class="bi bi-calendar2-check"></i></div>
+    <strong class="d-block">{% if request.GET.vencidas %}Nenhuma parcela vencida{% else %}Nenhuma parcela encontrada{% endif %}</strong>
+    <p class="mb-3">{% if request.GET.vencidas %}Não há parcelas vencidas e não pagas com esses filtros.{% else %}Cadastre um lançamento para gerar parcelas e acompanhar os vencimentos.{% endif %}</p>
+    {% if request.GET.vencidas %}
+    <a href="{% url "parcela-list" %}" class="btn btn-outline-secondary"><i class="bi bi-list-ul me-1"></i>Ver todas as parcelas</a>
+    {% else %}
+    <a href="{% url "lancamento-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Novo lançamento</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+{% include "financeiro/paginacao.html" %}
+{% endblock %}

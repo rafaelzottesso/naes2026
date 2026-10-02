@@ -47,6 +47,9 @@
           <ul class="dropdown-menu fin-menu-rico">
             <li><a class="dropdown-item" href="{% url 'lancamento-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-primary-soft);--k-strong:var(--fx-primary-strong)"><i class="bi bi-list-ul"></i></span><span><strong>Todos os lançamentos</strong><span class="d-block">Receitas, despesas e saldo</span></span></a></li>
             <li><a class="dropdown-item" href="{% url 'lancamento-create' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-success-soft);--k-strong:var(--fx-success-strong)"><i class="bi bi-plus-circle"></i></span><span><strong>Novo lançamento</strong><span class="d-block">Já gera as parcelas</span></span></a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'parcela-list' %}"><span class="fin-item-icon" style="--k-soft:var(--fx-info-soft);--k-strong:var(--fx-info-strong)"><i class="bi bi-calendar2-week"></i></span><span><strong>Todas as parcelas</strong><span class="d-block">Vencimentos e pagamentos</span></span></a></li>
+            <li><a class="dropdown-item" href="{% url 'parcela-list' %}?vencidas=true"><span class="fin-item-icon" style="--k-soft:var(--fx-danger-soft);--k-strong:var(--fx-danger-strong)"><i class="bi bi-exclamation-octagon"></i></span><span><strong>Parcelas vencidas</strong><span class="d-block">Em atraso e não pagas</span></span></a></li>
           </ul>
         </li>
         <li class="nav-item dropdown">

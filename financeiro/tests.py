@@ -190,6 +190,38 @@ class LancamentoParcelasTests(TestCase):
         self.assertContains(detalhe, reverse('parcela-update', args=[lancamento.itens.get(numero=1).pk]))
         self.assertNotContains(detalhe, 'excluir/parcela')
 
+    def test_lista_de_parcelas_filtra_vencidas_nao_pagadas(self):
+        hoje = timezone.localdate()
+        self._post_lancamento(data=(hoje - timedelta(days=2)).isoformat(), descricao='Parcela vencida')
+        vencida = Parcela.objects.get()
+        self._post_lancamento(data=(hoje - timedelta(days=3)).isoformat(), descricao='Parcela paga')
+        paga = Parcela.objects.get(lancamento__descricao='Parcela paga')
+        Parcela.objects.filter(pk=paga.pk).update(
+            data_pagamento=hoje - timedelta(days=1), valor_pago=paga.valor,
+        )
+        self._post_lancamento(data=hoje.isoformat(), descricao='Vence hoje')
+        self._post_lancamento(data=(hoje + timedelta(days=2)).isoformat(), descricao='Vence depois')
+
+        lista = self.client.get(reverse('parcela-list'))
+        self.assertContains(lista, 'Parcela vencida')
+        self.assertContains(lista, 'Parcela paga')
+
+        vencimentos = self.client.get(reverse('parcela-list'), {'vencidas': 'true'})
+        self.assertContains(vencimentos, 'Parcela vencida')
+        self.assertNotContains(vencimentos, 'Parcela paga')
+        self.assertNotContains(vencimentos, 'Vence hoje')
+        self.assertNotContains(vencimentos, 'Vence depois')
+
+    def test_lista_de_parcelas_respeita_o_dono_e_navbar_tem_atalhos(self):
+        self._post_lancamento(descricao='Parcela privada')
+        resposta = self.client.get(reverse('parcela-list'))
+        self.assertContains(resposta, 'Parcela privada')
+        self.assertContains(resposta, reverse('parcela-list') + '?vencidas=true')
+
+        self.client.force_login(self.outro)
+        resposta_outro = self.client.get(reverse('parcela-list'))
+        self.assertNotContains(resposta_outro, 'Parcela privada')
+
 
     def test_grava_numero_centro_ir_e_agrupado(self):
         centro = Centro.objects.create(nome='Reforma', criado_por=self.user)

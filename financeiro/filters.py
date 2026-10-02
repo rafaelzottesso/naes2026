@@ -1,6 +1,7 @@
 import django_filters
+from django.utils import timezone
 
-from .models import TIPO_LANCAMENTO, Categoria, Centro, FormaPagamento, Lancamento, Pessoa
+from .models import TIPO_LANCAMENTO, Categoria, Centro, FormaPagamento, Lancamento, Parcela, Pessoa
 
 
 class CategoriaFilter(django_filters.FilterSet):
@@ -76,3 +77,42 @@ class LancamentoFilter(django_filters.FilterSet):
     class Meta:
         model = Lancamento
         fields = []
+
+
+class ParcelaFilter(django_filters.FilterSet):
+    descricao = django_filters.CharFilter(
+        field_name='lancamento__descricao', lookup_expr='icontains', label='Lançamento contém',
+    )
+    categoria = django_filters.ModelChoiceFilter(
+        field_name='lancamento__categoria',
+        queryset=lambda request: Categoria.objects.filter(criado_por=request.user).order_by('nome'),
+        label='Categoria',
+    )
+    pessoa = django_filters.ModelChoiceFilter(
+        field_name='lancamento__pessoa',
+        queryset=lambda request: Pessoa.objects.filter(criado_por=request.user).order_by('nome'),
+        label='Cliente/Fornecedor',
+    )
+    forma_pagamento = django_filters.ModelChoiceFilter(
+        queryset=lambda request: FormaPagamento.objects.filter(criado_por=request.user).order_by('nome'),
+        label='Forma de pagamento',
+    )
+    tipo = django_filters.ChoiceFilter(field_name='lancamento__tipo', choices=TIPO_LANCAMENTO, label='Tipo')
+    data = django_filters.DateFromToRangeFilter(
+        widget=django_filters.widgets.RangeWidget(attrs={'type': 'date'}),
+        label='Vencimento entre',
+    )
+    vencidas = django_filters.BooleanFilter(method='filtrar_vencidas', label='Somente vencidas e não pagas')
+
+    class Meta:
+        model = Parcela
+        fields = []
+
+    def filtrar_vencidas(self, queryset, name, value):
+        if value:
+            return queryset.filter(
+                data__lt=timezone.localdate(),
+                data_pagamento__isnull=True,
+                valor_pago__isnull=True,
+            )
+        return queryset

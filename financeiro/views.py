@@ -15,7 +15,7 @@ from django.views.generic import CreateView, TemplateView, UpdateView, DeleteVie
 from django.views.generic.detail import DetailView
 from django_filters.views import FilterView
 
-from .filters import CategoriaFilter, CentroFilter, FormaPagamentoFilter, LancamentoFilter, PessoaFilter
+from .filters import CategoriaFilter, CentroFilter, FormaPagamentoFilter, LancamentoFilter, ParcelaFilter, PessoaFilter
 from .forms import LancamentoForm, LancamentoUpdateForm, ParcelaForm, PessoaForm
 from .models import Categoria, Centro, FormaPagamento, Lancamento, Parcela, Pessoa
 from .services import gerar_parcelas
@@ -539,6 +539,19 @@ class ParcelaDetail(ParcelaDoUsuarioMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['hoje'] = timezone.localdate()
         return context
+
+
+class ParcelaList(ParcelaDoUsuarioMixin, FilterView):
+    model = Parcela
+    template_name = 'financeiro/list/parcela.html'
+    paginate_by = 30
+    ordering = ['data', 'lancamento__descricao', 'numero']
+    filterset_class = ParcelaFilter
+
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'lancamento__categoria', 'lancamento__pessoa', 'lancamento__centro', 'forma_pagamento',
+        ).order_by(*self.ordering)
 
 
 MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
