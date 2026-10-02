@@ -530,6 +530,12 @@ tr.fin-linha-a_vencer > td:first-child, .fin-list-item.fin-linha-a_vencer { box-
   .fin-kpi-sub { font-size: 0.85rem; }
   .fin-kpi-value { margin-top: 0.55rem; }
   .col-6 > .fin-kpi .fin-kpi-value, .col-6 > a > .fin-kpi .fin-kpi-value { font-size: 1.2rem; white-space: nowrap; }
+  .fin-kpi-row .fin-kpi { padding: 0.75rem 0.55rem; }
+  .fin-kpi-row .fin-kpi-top { display: block; }
+  .fin-kpi-row .fin-kpi-icon { width: 2rem; height: 2rem; margin-bottom: 0.35rem; font-size: 1rem; }
+  .fin-kpi-row .fin-kpi-label { font-size: 0.8rem; }
+  .fin-kpi-row .fin-kpi-sub { font-size: 0.72rem; line-height: 1.2; }
+  .fin-kpi-row .fin-kpi-value { font-size: 0.85rem; overflow-wrap: anywhere; }
   .fin-resumo dd { font-size: 1.15rem; }
 }
 

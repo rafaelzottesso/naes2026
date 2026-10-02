@@ -6,22 +6,61 @@
 {% block content %}
 <div class="fin-page-head">
   <div>
-    <div class="fin-eyebrow">Contas a pagar e receber</div>
+    <div class="fin-eyebrow">Extrato</div>
     <h1>Parcelas</h1>
-    <p>Consulte vencimentos, pagamentos e formas de pagamento de cada lançamento.</p>
+    <p>Todas as parcelas, com vencimentos, pagamentos e situação de cada lançamento.</p>
   </div>
   <div class="fin-head-actions">
-    <a href="{% url "lancamento-list" %}" class="btn btn-outline-secondary"><i class="bi bi-receipt-cutoff me-1"></i>Lançamentos</a>
+    <a href="{% url "financeiro-dashboard" %}" class="btn btn-outline-secondary"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
     <a href="{% url "lancamento-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Novo lançamento</a>
   </div>
 </div>
 
 {% include "financeiro/form-filter.html" %}
 
+<div class="row row-cols-3 g-3 mb-4 fin-kpi-row">
+  <div class="col">
+    <a href="{% url "parcela-list" %}?situacao=pagas" class="fin-kpi-link" aria-label="Filtrar parcelas pagas">
+      <div class="fin-kpi receita h-100">
+        <div class="fin-kpi-top">
+          <span class="fin-kpi-icon"><i class="bi bi-check-circle"></i></span>
+          <div><span class="fin-kpi-label">Pagas</span><span class="fin-kpi-sub">Valor efetivamente pago</span></div>
+        </div>
+        <span class="fin-kpi-value">{{ kpis.total_pago|brl }}</span>
+        <span class="fin-kpi-sub">{{ kpis.quantidade_pagas }} parcela(s)</span>
+      </div>
+    </a>
+  </div>
+  <div class="col">
+    <a href="{% url "parcela-list" %}?situacao=abertas" class="fin-kpi-link" aria-label="Filtrar parcelas em aberto">
+      <div class="fin-kpi saldo h-100">
+        <div class="fin-kpi-top">
+          <span class="fin-kpi-icon"><i class="bi bi-hourglass-split"></i></span>
+          <div><span class="fin-kpi-label">Em aberto</span><span class="fin-kpi-sub">A vencer ou vence hoje</span></div>
+        </div>
+        <span class="fin-kpi-value">{{ kpis.valor_aberto|brl }}</span>
+        <span class="fin-kpi-sub">{{ kpis.quantidade_abertas }} parcela(s)</span>
+      </div>
+    </a>
+  </div>
+  <div class="col">
+    <a href="{% url "parcela-list" %}?vencidas=true" class="fin-kpi-link" aria-label="Filtrar parcelas vencidas e não pagas">
+      <div class="fin-kpi despesa h-100">
+        <div class="fin-kpi-top">
+          <span class="fin-kpi-icon"><i class="bi bi-exclamation-octagon"></i></span>
+          <div><span class="fin-kpi-label">Vencidas</span><span class="fin-kpi-sub">Não pagas e em atraso</span></div>
+        </div>
+        <span class="fin-kpi-value">{{ kpis.valor_vencido|brl }}</span>
+        <span class="fin-kpi-sub">{{ kpis.quantidade_vencidas }} parcela(s)</span>
+      </div>
+    </a>
+  </div>
+</div>
+
 <section class="fin-panel">
   <div class="fin-panel-head">
     <div>
-      <h2>{% if request.GET.vencidas %}Parcelas vencidas{% else %}Todas as parcelas{% endif %}</h2>
+      <h2>{% if request.GET.vencidas %}Parcelas vencidas{% elif request.GET.situacao == 'pagas' %}Parcelas pagas{% elif request.GET.situacao == 'abertas' %}Parcelas em aberto{% else %}Todas as parcelas{% endif %}</h2>
       <p>{{ page_obj.paginator.count }} encontrada(s) · clique no título da coluna para ordenar esta página</p>
     </div>
     {% if request.GET.vencidas %}

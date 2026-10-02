@@ -205,6 +205,17 @@ class LancamentoParcelasTests(TestCase):
         lista = self.client.get(reverse('parcela-list'))
         self.assertContains(lista, 'Parcela vencida')
         self.assertContains(lista, 'Parcela paga')
+        self.assertEqual(lista.content.count(b'class="fin-kpi-link"'), 3)
+        self.assertContains(lista, 'row row-cols-3 g-3 mb-4 fin-kpi-row')
+        self.assertContains(lista, reverse('parcela-list') + '?situacao=pagas')
+        self.assertContains(lista, reverse('parcela-list') + '?situacao=abertas')
+        kpis = lista.context['kpis']
+        self.assertEqual(kpis['quantidade_pagas'], 1)
+        self.assertEqual(kpis['total_pago'], Decimal('100.00'))
+        self.assertEqual(kpis['quantidade_abertas'], 2)
+        self.assertEqual(kpis['valor_aberto'], Decimal('200.00'))
+        self.assertEqual(kpis['quantidade_vencidas'], 1)
+        self.assertEqual(kpis['valor_vencido'], Decimal('100.00'))
 
         vencimentos = self.client.get(reverse('parcela-list'), {'vencidas': 'true'})
         self.assertContains(vencimentos, 'Parcela vencida')
@@ -212,10 +223,24 @@ class LancamentoParcelasTests(TestCase):
         self.assertNotContains(vencimentos, 'Vence hoje')
         self.assertNotContains(vencimentos, 'Vence depois')
 
+        abertas = self.client.get(reverse('parcela-list'), {'situacao': 'abertas'})
+        self.assertContains(abertas, 'Vence hoje')
+        self.assertContains(abertas, 'Vence depois')
+        self.assertNotContains(abertas, 'Parcela vencida')
+        self.assertNotContains(abertas, 'Parcela paga')
+
+        pagas = self.client.get(reverse('parcela-list'), {'situacao': 'pagas'})
+        self.assertContains(pagas, 'Parcela paga')
+        self.assertNotContains(pagas, 'Parcela vencida')
+
     def test_lista_de_parcelas_respeita_o_dono_e_navbar_tem_atalhos(self):
         self._post_lancamento(descricao='Parcela privada')
         resposta = self.client.get(reverse('parcela-list'))
         self.assertContains(resposta, 'Parcela privada')
+        self.assertContains(resposta, '<div class="fin-eyebrow">Extrato</div>', html=True)
+        self.assertContains(resposta, reverse('financeiro-dashboard'))
+        self.assertContains(resposta, reverse('lancamento-create'))
+        self.assertContains(resposta, 'Novo lançamento')
         self.assertContains(resposta, reverse('parcela-list') + '?vencidas=true')
 
         self.client.force_login(self.outro)

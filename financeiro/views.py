@@ -553,6 +553,27 @@ class ParcelaList(ParcelaDoUsuarioMixin, FilterView):
             'lancamento__categoria', 'lancamento__pessoa', 'lancamento__centro', 'forma_pagamento',
         ).order_by(*self.ordering)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        hoje = timezone.localdate()
+        zero = Value(Decimal('0.00'), output_field=DecimalField(max_digits=12, decimal_places=2))
+        valor_liquido = ExpressionWrapper(
+            F('valor') - Coalesce(F('desconto'), zero) + Coalesce(F('acrescimo'), zero),
+            output_field=DecimalField(max_digits=12, decimal_places=2),
+        )
+        pagas = Q(data_pagamento__isnull=False, valor_pago__isnull=False)
+        abertas = Q(data__gte=hoje, data_pagamento__isnull=True, valor_pago__isnull=True)
+        vencidas = Q(data__lt=hoje, data_pagamento__isnull=True, valor_pago__isnull=True)
+        context['kpis'] = self.get_queryset().aggregate(
+            quantidade_pagas=Count('pk', filter=pagas),
+            total_pago=Coalesce(Sum('valor_pago', filter=pagas), zero),
+            quantidade_abertas=Count('pk', filter=abertas),
+            valor_aberto=Coalesce(Sum(valor_liquido, filter=abertas), zero),
+            quantidade_vencidas=Count('pk', filter=vencidas),
+            valor_vencido=Coalesce(Sum(valor_liquido, filter=vencidas), zero),
+        )
+        return context
+
 
 MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 MESES_EXT = [

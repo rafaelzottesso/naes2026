@@ -102,11 +102,27 @@ class ParcelaFilter(django_filters.FilterSet):
         widget=django_filters.widgets.RangeWidget(attrs={'type': 'date'}),
         label='Vencimento entre',
     )
+    situacao = django_filters.ChoiceFilter(
+        choices=(('pagas', 'Pagas'), ('abertas', 'Em aberto')),
+        method='filtrar_situacao',
+        label='Situação',
+    )
     vencidas = django_filters.BooleanFilter(method='filtrar_vencidas', label='Somente vencidas e não pagas')
 
     class Meta:
         model = Parcela
         fields = []
+
+    def filtrar_situacao(self, queryset, name, value):
+        if value == 'pagas':
+            return queryset.filter(data_pagamento__isnull=False, valor_pago__isnull=False)
+        if value == 'abertas':
+            return queryset.filter(
+                data__gte=timezone.localdate(),
+                data_pagamento__isnull=True,
+                valor_pago__isnull=True,
+            )
+        return queryset
 
     def filtrar_vencidas(self, queryset, name, value):
         if value:
