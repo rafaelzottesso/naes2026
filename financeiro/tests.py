@@ -247,6 +247,20 @@ class LancamentoParcelasTests(TestCase):
         resposta_outro = self.client.get(reverse('parcela-list'))
         self.assertNotContains(resposta_outro, 'Parcela privada')
 
+    def test_modal_de_filtros_conta_filtros_ativos_sem_contar_pagina(self):
+        resposta = self.client.get(reverse('parcela-list'), {
+            'descricao': 'Aluguel', 'vencidas': 'true', 'page': '1',
+        })
+        self.assertContains(resposta, 'aria-label="Filtros, 2 em uso"')
+        self.assertContains(resposta, 'id="filtrosListaTemplate"')
+        self.assertEqual(resposta.content.count(b'id="filtrosListaTemplate"'), 1)
+        self.assertEqual(resposta.content.count(b'class="btn btn-outline-secondary position-relative fin-filtro-botao"'), 1)
+        self.assertNotContains(resposta, 'accordion fin-filtros')
+
+        sem_filtros = self.client.get(reverse('parcela-list'), {'page': '1'})
+        self.assertContains(sem_filtros, 'aria-label="Abrir filtros"')
+        self.assertNotContains(sem_filtros, 'fin-filtro-badge')
+
 
     def test_grava_numero_centro_ir_e_agrupado(self):
         centro = Centro.objects.create(nome='Reforma', criado_por=self.user)
@@ -405,3 +419,39 @@ class TelasTests(TestCase):
                 self.assertContains(pagina, 'fin-form-acoes')
                 self.assertContains(pagina, 'data-texto-carregando')
                 self.assertContains(pagina, 'js/carregando.js')
+
+    def test_kpis_refletem_os_registros_filtrados_da_lista(self):
+        Categoria.objects.create(nome='Filtro KPI', status=False, criado_por=self.user)
+        Centro.objects.create(nome='Filtro KPI', status=False, criado_por=self.user)
+        Pessoa.objects.create(
+            nome='Filtro KPI', documento='22233344455', cep='87020000',
+            endereco='Rua D', cidade='Maringá', status=False, criado_por=self.user,
+        )
+        FormaPagamento.objects.create(nome='Filtro KPI', status=False, criado_por=self.user)
+
+        listas_cadastrais = (
+            ('categoria-list', 'total_categorias', 'total_ativas', 'total_inativas'),
+            ('centro-list', 'total_centros', 'total_ativos', 'total_inativos'),
+            ('pessoa-list', 'total_pessoas', 'total_ativas', 'total_inativas'),
+            ('forma-pagamento-list', 'total_formas', 'total_ativas', 'total_inativas'),
+        )
+        for rota, total_key, ativos_key, inativos_key in listas_cadastrais:
+            with self.subTest(rota=rota):
+                resposta = self.client.get(reverse(rota), {'nome': 'Filtro KPI'})
+                self.assertEqual(resposta.context[total_key], 1)
+                self.assertEqual(resposta.context[ativos_key], 0)
+                self.assertEqual(resposta.context[inativos_key], 1)
+
+        Lancamento.objects.create(
+            tipo='receita', data=self.lancamento.data, categoria=self.categoria,
+            pessoa=self.pessoa, forma_pagamento=self.forma, descricao='Reembolso',
+            valor=Decimal('50.00'), criado_por=self.user,
+        )
+        lancamentos = self.client.get(reverse('lancamento-list'), {'tipo': 'despesa'})
+        self.assertEqual(lancamentos.context['total_receitas'], Decimal('0.00'))
+        self.assertEqual(lancamentos.context['total_despesas'], Decimal('300.00'))
+        self.assertEqual(lancamentos.context['saldo'], Decimal('-300.00'))
+
+        parcelas = self.client.get(reverse('parcela-list'), {'vencidas': 'true'})
+        self.assertEqual(parcelas.context['kpis']['quantidade_vencidas'], 1)
+        self.assertEqual(parcelas.context['kpis']['valor_vencido'], Decimal('100.00'))

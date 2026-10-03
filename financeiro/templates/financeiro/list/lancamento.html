@@ -12,11 +12,10 @@
   </div>
   <div class="fin-head-actions">
     <a href="{% url "financeiro-dashboard" %}" class="btn btn-outline-secondary"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+    {% include "financeiro/form-filter.html" %}
     <a href="{% url "lancamento-create" %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Novo lançamento</a>
   </div>
 </div>
-
-{% include "financeiro/form-filter.html" %}
 
 <div class="row g-3 mb-4">
   <div class="col-6 col-md-4">

@@ -18,6 +18,21 @@ def brl(valor):
     texto = f"{abs(numero):,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
     return f"-R$ {texto}" if numero < 0 else f"R$ {texto}"
 
+@register.simple_tag
+def quantidade_filtros_ativos(query_params):
+    """Conta filtros preenchidos, agrupando parâmetros de intervalo e ignorando a página."""
+    sufixos_intervalo = ('_after', '_before', '_min', '_max', '_0', '_1')
+    filtros = set()
+    for nome, valores in query_params.lists():
+        if nome == 'page' or not any(str(valor).strip() for valor in valores):
+            continue
+        for sufixo in sufixos_intervalo:
+            if nome.endswith(sufixo):
+                nome = nome[:-len(sufixo)]
+                break
+        filtros.add(nome)
+    return len(filtros)
+
 
 SITUACOES_PARCELA = {
     'paga': ('Paga', 'bi-check-circle-fill', 'success'),

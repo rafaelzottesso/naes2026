@@ -1,33 +1,18 @@
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags fin_tags %}
+{% quantidade_filtros_ativos request.GET as total_filtros %}
 
-<div class="accordion fin-filtros mb-4" id="filtrosFinanceiro">
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="tituloFiltrosFinanceiro">
-                <button class="accordion-button {% if not request.GET %}collapsed{% endif %}" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#conteudoFiltrosFinanceiro" aria-expanded="{% if request.GET %}true{% else %}false{% endif %}"
-                    aria-controls="conteudoFiltrosFinanceiro">
-                <i class="bi bi-funnel me-2" aria-hidden="true"></i>Filtros
-            </button>
-        </h2>
-        <div id="conteudoFiltrosFinanceiro" class="accordion-collapse collapse{% if request.GET %} show{% endif %}"
-             aria-labelledby="tituloFiltrosFinanceiro">
-            <div class="accordion-body">
-                {# method="get": a busca vai para a URL, e não fica escondida em um POST #}
-                <form class="row row-cols-1 row-cols-md-auto g-3 align-items-end" action="" method="get">
-                    {# Sem csrf_token: ele só é necessário em formulários POST #}
-                    {{ filter.form|crispy }}
+<button type="button" class="btn btn-outline-secondary position-relative fin-filtro-botao"
+        aria-label="{% if total_filtros %}Filtros, {{ total_filtros }} em uso{% else %}Abrir filtros{% endif %}"
+        title="Filtros" aria-haspopup="dialog" data-bs-toggle="tooltip"
+        data-template-filtros="filtrosListaTemplate" data-url-limpar="{{ request.path }}">
+    <i class="bi bi-funnel" aria-hidden="true"></i>
+    {% if total_filtros %}
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger fin-filtro-badge" aria-hidden="true">{{ total_filtros }}</span>
+    {% endif %}
+</button>
 
-                    <div class="col d-flex flex-wrap gap-2 mb-3">
-                        <button type="submit" class="btn btn-outline-primary" data-texto-carregando="Filtrando...">
-                            <i class="bi bi-search me-1"></i> Filtrar
-                        </button>
-                        {# O botão "Limpar" volta para a mesma página, sem os parâmetros da busca #}
-                        <a href="{{ request.path }}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-lg me-1"></i> Limpar
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<template id="filtrosListaTemplate">
+    <form id="formFiltrosLista" class="row row-cols-1 row-cols-md-auto g-3 align-items-end" action="" method="get">
+        {{ filter.form|crispy }}
+    </form>
+</template>

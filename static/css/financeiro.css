@@ -253,6 +253,8 @@ h1, h2, h3, h4, h5, .fin-display { font-weight: 600; letter-spacing: -0.01em; }
 .fin-page-head h1 { margin: 0; font-size: clamp(1.7rem, 2.6vw, 2.2rem); line-height: 1.15; }
 .fin-page-head p { margin: 0.4rem 0 0; color: var(--fx-muted); max-width: 46rem; }
 .fin-head-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.fin-filtro-botao { min-width: 2.75rem; aspect-ratio: 1; padding: 0.45rem; }
+.fin-filtros-modal { max-height: 70vh; overflow-y: auto; padding: 0.25rem; }
 
 /* ===== KPIs (listas e dashboard) ===== */
 .fin-kpi {
