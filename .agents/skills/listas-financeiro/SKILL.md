@@ -12,6 +12,8 @@ Use `financeiro/templates/financeiro/list/lancamento.html` e `LancamentoList` co
 1. Para listagem com filtros, use `FilterView` com `filterset_class`, `paginate_by` e `ordering`. Mantenha os mixins de login e escopo por usuário antes de `FilterView`.
 2. Se sobrescrever `get_queryset`, comece por `super().get_queryset()` para preservar o escopo existente. Inclua `select_related` para todas as relações acessadas na tabela; use `prefetch_related` para relações múltiplas.
 3. Calcule os valores de KPI no banco com `aggregate`, `Count`, `Sum` e filtros condicionais. Não materialize todos os registros nem some valores em Python para montar os cards.
+   Sempre agregue sobre o queryset já filtrado da listagem (`filterset.qs`), preservando o escopo do usuário. Considere todos os resultados filtrados, não apenas a página atual nem todos os registros do período; KPIs e contagem da tabela devem representar o mesmo conjunto.
+   Se o queryset tiver anotações que juntem relações múltiplas, evite somar valores do modelo principal diretamente sobre essa junção, pois cada registro pode ser repetido. Agregue os IDs filtrados sobre um queryset sem essas anotações.
 4. Use `django-filter` em `financeiro/filters.py`. Confirme os campos e escolhas reais antes de construir filtros ou links; filtros de relações devem limitar as opções aos dados do usuário autenticado.
 
 ## Cabeçalho e conteúdo

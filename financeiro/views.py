@@ -140,10 +140,10 @@ class CategoriaList(RegistroDoUsuarioMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        minhas = Categoria.objects.filter(criado_por=self.request.user)
-        context['total_categorias'] = minhas.count()
-        context['total_ativas'] = minhas.filter(status=True).count()
-        context['total_inativas'] = minhas.filter(status=False).count()
+        categorias = self.filterset.qs
+        context['total_categorias'] = categorias.count()
+        context['total_ativas'] = categorias.filter(status=True).count()
+        context['total_inativas'] = categorias.filter(status=False).count()
         return context
 
 
@@ -210,10 +210,10 @@ class CentroList(RegistroDoUsuarioMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        meus = Centro.objects.filter(criado_por=self.request.user)
-        context['total_centros'] = meus.count()
-        context['total_ativos'] = meus.filter(status=True).count()
-        context['total_inativos'] = meus.filter(status=False).count()
+        centros = self.filterset.qs
+        context['total_centros'] = centros.count()
+        context['total_ativos'] = centros.filter(status=True).count()
+        context['total_inativos'] = centros.filter(status=False).count()
         return context
 
 
@@ -282,10 +282,10 @@ class PessoaList(RegistroDoUsuarioMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        minhas = Pessoa.objects.filter(criado_por=self.request.user)
-        context['total_pessoas'] = minhas.count()
-        context['total_ativas'] = minhas.filter(status=True).count()
-        context['total_inativas'] = minhas.filter(status=False).count()
+        pessoas = self.filterset.qs
+        context['total_pessoas'] = pessoas.count()
+        context['total_ativas'] = pessoas.filter(status=True).count()
+        context['total_inativas'] = pessoas.filter(status=False).count()
         return context
 
 
@@ -351,10 +351,10 @@ class FormaPagamentoList(RegistroDoUsuarioMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        minhas = FormaPagamento.objects.filter(criado_por=self.request.user)
-        context['total_formas'] = minhas.count()
-        context['total_ativas'] = minhas.filter(status=True).count()
-        context['total_inativas'] = minhas.filter(status=False).count()
+        formas = self.filterset.qs
+        context['total_formas'] = formas.count()
+        context['total_ativas'] = formas.filter(status=True).count()
+        context['total_inativas'] = formas.filter(status=False).count()
         return context
 
 
@@ -461,7 +461,7 @@ class LancamentoList(RegistroDoUsuarioMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        lancamentos = self.get_queryset()
+        lancamentos = Lancamento.objects.filter(pk__in=self.filterset.qs.values('pk'))
         context['total_receitas'] = _soma_liquida(lancamentos.filter(tipo='receita'))
         context['total_despesas'] = _soma_liquida(lancamentos.filter(tipo='despesa'))
         context['saldo'] = context['total_receitas'] - context['total_despesas']
@@ -564,7 +564,7 @@ class ParcelaList(ParcelaDoUsuarioMixin, FilterView):
         pagas = Q(data_pagamento__isnull=False, valor_pago__isnull=False)
         abertas = Q(data__gte=hoje, data_pagamento__isnull=True, valor_pago__isnull=True)
         vencidas = Q(data__lt=hoje, data_pagamento__isnull=True, valor_pago__isnull=True)
-        context['kpis'] = self.get_queryset().aggregate(
+        context['kpis'] = self.filterset.qs.aggregate(
             quantidade_pagas=Count('pk', filter=pagas),
             total_pago=Coalesce(Sum('valor_pago', filter=pagas), zero),
             quantidade_abertas=Count('pk', filter=abertas),
