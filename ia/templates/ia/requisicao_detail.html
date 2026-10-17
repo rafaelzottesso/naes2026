@@ -1,0 +1,83 @@
+{% extends "financeiro/base.html" %}
+
+{% block title %}Requisição {{ requisicao.pk }} · AnotAI{% endblock %}
+
+{% block content %}
+<div class="fin-page-head">
+  <div>
+    <div class="fin-eyebrow">Administração · IA</div>
+    <h1>Requisição #{{ requisicao.pk }}</h1>
+    <p>{{ requisicao.finalidade }} · {{ requisicao.criado_em|date:"d/m/Y H:i" }}</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url "ia:requisicao-list" %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar às requisições</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head"><div><h2>Chamada</h2></div></div>
+      <div class="fin-panel-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">Usuário</dt><dd class="col-sm-7">{{ requisicao.usuario.username }}</dd>
+          <dt class="col-sm-5">Origem</dt><dd class="col-sm-7">{{ requisicao.get_origem_display }}</dd>
+          <dt class="col-sm-5">Situação</dt><dd class="col-sm-7">{{ requisicao.get_situacao_display }}</dd>
+          <dt class="col-sm-5">Motivo do fim</dt><dd class="col-sm-7">{{ requisicao.motivo_fim|default:"-" }}</dd>
+          <dt class="col-sm-5">Tentativa</dt><dd class="col-sm-7">{{ requisicao.tentativa }}</dd>
+          <dt class="col-sm-5">Provedor</dt><dd class="col-sm-7">{{ requisicao.provedor }}</dd>
+          <dt class="col-sm-5">Modelo</dt><dd class="col-sm-7">{{ requisicao.modelo|default:"-" }}</dd>
+          <dt class="col-sm-5">Versão do prompt</dt><dd class="col-sm-7">{{ requisicao.versao_prompt|default:"-" }}</dd>
+          <dt class="col-sm-5">Duração</dt><dd class="col-sm-7">{{ requisicao.duracao_ms }} ms</dd>
+          <dt class="col-sm-5">Referência</dt>
+          <dd class="col-sm-7">{% if requisicao.referencia %}{{ requisicao.referencia }}{% else %}-{% endif %}</dd>
+        </dl>
+      </div>
+    </section>
+  </div>
+  <div class="col-12 col-lg-6">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head"><div><h2>Tokens e custo</h2></div></div>
+      <div class="fin-panel-body">
+        <dl class="row mb-3">
+          <dt class="col-sm-5">Entrada</dt><dd class="col-sm-7">{{ requisicao.tokens_entrada }}</dd>
+          <dt class="col-sm-5">Saída</dt><dd class="col-sm-7">{{ requisicao.tokens_saida }}</dd>
+          <dt class="col-sm-5">Raciocínio</dt><dd class="col-sm-7">{{ requisicao.tokens_raciocinio }}</dd>
+          <dt class="col-sm-5">Total</dt><dd class="col-sm-7">{{ requisicao.tokens_total }}</dd>
+          <dt class="col-sm-5">Custo estimado</dt><dd class="col-sm-7 text-despesa fin-money">US$ {{ requisicao.custo_estimado|floatformat:6 }}</dd>
+        </dl>
+        <h3 class="h6">Arquivo enviado</h3>
+        <dl class="row mb-3">
+          <dt class="col-sm-5">Tipo</dt><dd class="col-sm-7">{{ requisicao.arquivo_mime|default:"-" }}</dd>
+          <dt class="col-sm-5">Tamanho</dt><dd class="col-sm-7">{% if requisicao.arquivo_tamanho %}{{ requisicao.arquivo_tamanho }} bytes{% else %}-{% endif %}</dd>
+          <dt class="col-sm-5">Hash</dt><dd class="col-sm-7 text-break"><small>{{ requisicao.arquivo_hash|default:"-" }}</small></dd>
+        </dl>
+        <h3 class="h6">Hash do contexto</h3>
+        <p class="text-break mb-0"><small>{{ requisicao.contexto_hash|default:"-" }}</small></p>
+      </div>
+    </section>
+  </div>
+  <div class="col-12">
+    <section class="fin-panel">
+      <div class="fin-panel-head"><div><h2>Resposta</h2><p>Cortada em 20 mil caracteres. O texto enviado não é guardado.</p></div></div>
+      <div class="fin-panel-body">
+        {% if requisicao.resposta %}
+        <pre class="mb-0 p-3 bg-light rounded text-wrap"><code>{{ requisicao.resposta }}</code></pre>
+        {% else %}
+        <p class="text-muted mb-0">Sem resposta registrada.</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+  {% if requisicao.erro %}
+  <div class="col-12">
+    <section class="fin-panel">
+      <div class="fin-panel-head"><div><h2>Erro</h2></div></div>
+      <div class="fin-panel-body">
+        <div class="alert alert-danger mb-0" role="alert">{{ requisicao.erro }}</div>
+      </div>
+    </section>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

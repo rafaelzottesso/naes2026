@@ -1,0 +1,171 @@
+{% extends "financeiro/base.html" %}
+
+{% block title %}Requisições de IA · AnotAI{% endblock %}
+
+{% block content %}
+<div class="fin-page-head">
+  <div>
+    <div class="fin-eyebrow">Administração · IA</div>
+    <h1>Requisições de IA</h1>
+    <p>Cada chamada feita à IA, com tokens, custo estimado e situação. Os números do topo são do mês corrente e não mudam com os filtros.</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url "ia:configuracao" %}" class="btn btn-outline-secondary"><i class="bi bi-sliders me-1"></i>Configuração da IA</a>
+    {% include "financeiro/form-filter.html" %}
+  </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-3 mb-4">
+  <div class="col">
+    <a class="fin-kpi-link" href="{{ url_tokens }}" aria-label="Ver todas as requisições do mês">
+      <div class="fin-kpi neutra h-100">
+        <div class="fin-kpi-top">
+          <span class="fin-kpi-icon"><i class="bi bi-cpu"></i></span>
+          <div><span class="fin-kpi-label">Tokens no mês</span><span class="fin-kpi-sub">Mês {{ mes|date:"m/Y" }}</span></div>
+        </div>
+        <span class="fin-kpi-value">{{ resumo.tokens }}</span>
+      </div>
+    </a>
+  </div>
+  <div class="col">
+    <a class="fin-kpi-link" href="{{ url_tokens }}" aria-label="Ver todas as requisições do mês">
+      <div class="fin-kpi saldo h-100">
+        <div class="fin-kpi-top">
+          <span class="fin-kpi-icon"><i class="bi bi-currency-dollar"></i></span>
+          <div><span class="fin-kpi-label">Custo estimado</span><span class="fin-kpi-sub">Em dólar, pelo preço configurado</span></div>
+        </div>
+        <span class="fin-kpi-value text-despesa">US$ {{ resumo.custo|floatformat:4 }}</span>
+      </div>
+    </a>
+  </div>
+  <div class="col">
+    <a class="fin-kpi-link" href="{{ url_erros }}" aria-label="Ver as requisições com erro do mês">
+      <div class="fin-kpi alerta h-100">
+        <div class="fin-kpi-top">
+          <span class="fin-kpi-icon"><i class="bi bi-exclamation-triangle"></i></span>
+          <div><span class="fin-kpi-label">Com erro</span><span class="fin-kpi-sub">Tudo que não foi sucesso</span></div>
+        </div>
+        <span class="fin-kpi-value">{{ resumo.erros }}</span>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-12 col-lg-6">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <div>
+          <h2>Maiores consumidores</h2>
+          <p>Top 5 por tokens no mês</p>
+        </div>
+      </div>
+      {% if top_usuarios %}
+      <div class="fin-table-wrap">
+        <table class="table fin-table align-middle">
+          <thead><tr><th>Usuário</th><th class="text-end">Tokens</th><th class="text-end">Custo (US$)</th></tr></thead>
+          <tbody>
+            {% for item in top_usuarios %}
+            <tr>
+              <td>{{ item.nome }}</td>
+              <td class="text-end">{{ item.tokens }}</td>
+              <td class="text-end text-despesa fin-money">{{ item.custo|floatformat:4 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="fin-empty"><p class="mb-0">Nenhum consumo registrado neste mês.</p></div>
+      {% endif %}
+    </section>
+  </div>
+  <div class="col-12 col-lg-6">
+    <section class="fin-panel h-100">
+      <div class="fin-panel-head">
+        <div>
+          <h2>Maiores referências</h2>
+          <p>Top 5 por tokens no mês, para os pedidos ligados a um registro</p>
+        </div>
+      </div>
+      {% if top_referencias %}
+      <div class="fin-table-wrap">
+        <table class="table fin-table align-middle">
+          <thead><tr><th>Registro</th><th class="text-end">Tokens</th><th class="text-end">Custo (US$)</th></tr></thead>
+          <tbody>
+            {% for item in top_referencias %}
+            <tr>
+              <td>{{ item.nome }}</td>
+              <td class="text-end">{{ item.tokens }}</td>
+              <td class="text-end text-despesa fin-money">{{ item.custo|floatformat:4 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="fin-empty"><p class="mb-0">Nenhuma referência consumiu IA neste mês.</p></div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+
+<section class="fin-panel">
+  <div class="fin-panel-head">
+    <div>
+      <h2>Todas as requisições</h2>
+      <p>{{ page_obj.paginator.count|default:0 }} encontrada(s) · mais recentes primeiro</p>
+    </div>
+  </div>
+
+  {% if object_list %}
+  <div class="fin-table-wrap">
+    <table class="table fin-table align-middle js-tabela">
+      <thead>
+        <tr>
+          <th data-priority="1">Criada em</th>
+          <th data-priority="2">Usuário</th>
+          <th data-priority="3">Finalidade</th>
+          <th data-priority="5">Origem</th>
+          <th data-priority="2">Situação</th>
+          <th data-priority="4" class="text-end">Tokens</th>
+          <th data-priority="6" class="text-end">Custo (US$)</th>
+          <th class="all text-end" data-orderable="false">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for requisicao in object_list %}
+        <tr>
+          <td class="text-nowrap">{{ requisicao.criado_em|date:"d/m/Y H:i" }}</td>
+          <td>{{ requisicao.usuario.username }}</td>
+          <td>{{ requisicao.finalidade }}</td>
+          <td>{{ requisicao.get_origem_display }}</td>
+          <td>
+            {% if requisicao.situacao == "sucesso" %}
+            <span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>{{ requisicao.get_situacao_display }}</span>
+            {% elif requisicao.situacao == "bloqueada_cota" or requisicao.situacao == "bloqueada_seguranca" %}
+            <span class="badge fin-pill text-bg-warning"><i class="bi bi-shield-lock me-1"></i>{{ requisicao.get_situacao_display }}</span>
+            {% else %}
+            <span class="badge fin-pill text-bg-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>{{ requisicao.get_situacao_display }}</span>
+            {% endif %}
+          </td>
+          <td class="text-end">{{ requisicao.tokens_total }}</td>
+          <td class="text-end text-despesa fin-money">{{ requisicao.custo_estimado|floatformat:4 }}</td>
+          <td class="text-end">
+            <a class="btn fin-row-actions" href="{% url "ia:requisicao-detail" requisicao.pk %}" aria-label="Ver requisição {{ requisicao.pk }}"><i class="bi bi-eye"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="fin-empty">
+    <div class="fin-empty-icon"><i class="bi bi-journal-text"></i></div>
+    <strong class="d-block">Nenhuma requisição encontrada</strong>
+    <p class="mb-0">Ajuste os filtros ou aguarde o primeiro uso da IA.</p>
+  </div>
+  {% endif %}
+</section>
+{% include "financeiro/paginacao.html" %}
+{% endblock %}

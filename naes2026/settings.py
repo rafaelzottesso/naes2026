@@ -16,6 +16,8 @@ import os
 import sys
 from urllib.parse import urlparse, parse_qsl
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     # Ativar meus apps
     'website.apps.WebsiteConfig',
     'financeiro.apps.FinanceiroConfig',
+    'ia.apps.IaConfig',
 
     # Ativar o crispy forms para renderiar os forms
     'crispy_forms',
@@ -154,6 +157,18 @@ STATICFILES_DIRS = [ BASE_DIR / "static" ]
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Variáveis já definidas no ambiente (App Engine) têm prioridade sobre o .env.
+load_dotenv(BASE_DIR / '.env')
+
+# Gemini: enterprise (Vertex AI) quando GOOGLE_GENAI_USE_ENTERPRISE=true; senão, API Key.
+GOOGLE_GENAI_USE_ENTERPRISE = os.environ.get('GOOGLE_GENAI_USE_ENTERPRISE', '').strip().lower() == 'true'
+GOOGLE_CLOUD_PROJECT = os.environ.get('GOOGLE_CLOUD_PROJECT', '')
+GOOGLE_CLOUD_LOCATION = os.environ.get('GOOGLE_CLOUD_LOCATION', 'global')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+
+# Segredo do endpoint de manutenção /ia/manutencao/ (cabeçalho X-Tarefas-Segredo). Vazio desliga o endpoint.
+TAREFAS_SEGREDO = os.environ.get('TAREFAS_SEGREDO', '')
 
 # Testes usam SQLite em memória para não escrever no banco de desenvolvimento.
 if 'test' in sys.argv:

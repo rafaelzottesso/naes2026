@@ -1,0 +1,84 @@
+{% extends "financeiro/base.html" %}
+
+{% block title %}IA por usuário · AnotAI{% endblock %}
+
+{% block content %}
+<div class="fin-page-head">
+  <div>
+    <div class="fin-eyebrow">Administração · IA</div>
+    <h1>IA por usuário</h1>
+    <p>Limite mensal e acesso à IA de cada usuário. Sem exceção, vale o padrão do sistema.</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url "ia:configuracao" %}" class="btn btn-outline-secondary"><i class="bi bi-sliders me-1"></i>Configuração da IA</a>
+  </div>
+</div>
+
+<section class="fin-panel">
+  <div class="fin-panel-head">
+    <div>
+      <h2>Usuários</h2>
+      <p>{{ page_obj.paginator.count|default:0 }} usuário(s) · uso do mês {{ mes|date:"m/Y" }}</p>
+    </div>
+  </div>
+
+  {% if linhas %}
+  <div class="fin-table-wrap">
+    <table class="table fin-table align-middle js-tabela">
+      <thead>
+        <tr>
+          <th data-priority="1">Usuário</th>
+          <th data-priority="2">IA</th>
+          <th data-priority="3" class="text-end">Limite mensal</th>
+          <th data-priority="4" class="text-end">Uso no mês</th>
+          <th class="all text-end" data-orderable="false">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for linha in linhas %}
+        <tr>
+          <td>
+            <span class="fw-bold">{{ linha.usuario.username }}</span>
+            {% if linha.usuario.is_superuser %}<span class="badge fin-pill text-bg-light ms-1">Admin</span>{% endif %}
+          </td>
+          <td>
+            {% if linha.ia_habilitada %}
+            <span class="badge fin-pill text-bg-success"><i class="bi bi-check-circle-fill me-1"></i>Habilitada</span>
+            {% else %}
+            <span class="badge fin-pill text-bg-danger"><i class="bi bi-slash-circle me-1"></i>Desligada</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            {{ linha.limite }}
+            <br><small class="text-muted">{% if linha.origem == "próprio" %}Limite próprio{% else %}Padrão do sistema{% endif %}</small>
+          </td>
+          <td class="text-end">
+            {{ linha.uso }}
+            {% if linha.limite %}<br><small class="text-muted">{% widthratio linha.uso linha.limite 100 %}% do limite</small>{% endif %}
+          </td>
+          <td class="text-end">
+            <div class="dropdown">
+              <button class="btn fin-row-actions" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-label="Ações de {{ linha.usuario.username }}"><i class="bi bi-three-dots-vertical"></i></button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{% url "ia:usuario-update" linha.usuario.pk %}"><i class="bi bi-pencil"></i>Editar IA</a></li>
+                {% if linha.tem_excecao %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger js-excluir" href="{% url "ia:usuario-resetar" linha.usuario.pk %}" data-titulo="Voltar ao padrão" data-mensagem="Remover a configuração própria de {{ linha.usuario.username }}? Ele volta ao limite padrão e a IA fica habilitada." data-confirmar="Sim, voltar ao padrão"><i class="bi bi-arrow-counterclockwise"></i>Voltar ao padrão</a></li>
+                {% endif %}
+              </ul>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="fin-empty">
+    <div class="fin-empty-icon"><i class="bi bi-people"></i></div>
+    <strong class="d-block">Nenhum usuário cadastrado</strong>
+  </div>
+  {% endif %}
+</section>
+{% include "financeiro/paginacao.html" %}
+{% endblock %}

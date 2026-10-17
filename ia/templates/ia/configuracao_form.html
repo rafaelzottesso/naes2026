@@ -1,0 +1,54 @@
+{% extends "financeiro/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Configuração da IA · AnotAI{% endblock %}
+
+{% block content %}
+<div class="fin-page-head">
+  <div>
+    <div class="fin-eyebrow">Administração · IA</div>
+    <h1>Configuração da IA</h1>
+    <p>Modelo, limites e proteções. As mudanças valem na próxima chamada, sem deploy.</p>
+  </div>
+  <div class="fin-head-actions">
+    <a href="{% url "ia:requisicao-list" %}" class="btn btn-outline-secondary"><i class="bi bi-journal-text me-1"></i>Requisições</a>
+    <form method="post" action="{% url "ia:configuracao-testar" %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-primary" data-texto-carregando="Testando..."><i class="bi bi-plug me-1"></i>Testar conexão</button>
+    </form>
+  </div>
+</div>
+
+<section class="fin-panel mb-4">
+  <div class="fin-panel-head">
+    <div>
+      <h2>Modo de acesso</h2>
+      <p>Definido pelo arquivo <code>.env</code>. Não é editável aqui.</p>
+    </div>
+  </div>
+  <div class="fin-panel-body">
+    <span class="fw-bold">{{ modo_acesso }}</span>
+  </div>
+</section>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% for titulo, campos in form.grupos %}
+  <section class="fin-panel mb-4">
+    <div class="fin-panel-head">
+      <div>
+        <h2>{{ titulo }}</h2>
+      </div>
+    </div>
+    <div class="fin-panel-body">
+      <div class="row g-3">
+        {% for campo in campos %}
+        <div class="col-12 col-md-6">{{ campo|as_crispy_field }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endfor %}
+  {% include "financeiro/_form-acoes.html" with botao="Salvar configuração" %}
+</form>
+{% endblock %}

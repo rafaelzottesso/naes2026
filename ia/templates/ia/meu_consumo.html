@@ -1,0 +1,114 @@
+{% extends "financeiro/base.html" %}
+
+{% block title %}Meu consumo de IA · AnotAI{% endblock %}
+
+{% block content %}
+<div class="fin-page-head">
+  <div>
+    <div class="fin-eyebrow">Conta</div>
+    <h1>Meu consumo de IA</h1>
+    <p>Quanto da sua cota mensal de tokens já foi usada. A cota renova no dia 1 de cada mês.</p>
+  </div>
+</div>
+
+{% if situacao.esgotada %}
+<div class="alert alert-danger d-flex align-items-start" role="alert">
+  <i class="bi bi-exclamation-octagon-fill me-2 mt-1"></i>
+  <div>{{ situacao.mensagem_esgotada }}</div>
+</div>
+{% elif situacao.em_alerta %}
+<div class="alert alert-warning d-flex align-items-start" role="status">
+  <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
+  <div>Você já usou {{ situacao.percentual }}% da sua cota deste mês.</div>
+</div>
+{% endif %}
+
+<div class="row row-cols-1 row-cols-md-3 g-3 mb-4">
+  <div class="col">
+    <div class="fin-kpi neutra h-100">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-cpu"></i></span>
+        <div><span class="fin-kpi-label">Usado</span><span class="fin-kpi-sub">Tokens no mês</span></div>
+      </div>
+      <span class="fin-kpi-value">{{ situacao.usado }}</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="fin-kpi saldo h-100">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-speedometer"></i></span>
+        <div><span class="fin-kpi-label">Limite</span><span class="fin-kpi-sub">Cota mensal</span></div>
+      </div>
+      <span class="fin-kpi-value">{{ situacao.limite }}</span>
+    </div>
+  </div>
+  <div class="col">
+    <div class="fin-kpi {% if situacao.esgotada %}despesa{% else %}receita{% endif %} h-100">
+      <div class="fin-kpi-top">
+        <span class="fin-kpi-icon"><i class="bi bi-hourglass-split"></i></span>
+        <div><span class="fin-kpi-label">Restante</span><span class="fin-kpi-sub">Renova em {{ situacao.renova_em|date:"d/m/Y" }}</span></div>
+      </div>
+      <span class="fin-kpi-value">{{ situacao.restante }}</span>
+    </div>
+  </div>
+</div>
+
+<section class="fin-panel mb-4">
+  <div class="fin-panel-head">
+    <div>
+      <h2>Uso da cota</h2>
+      <p>{{ situacao.percentual }}% usado</p>
+    </div>
+  </div>
+  <div class="fin-panel-body">
+    <div class="progress" role="progressbar" aria-label="Uso da cota de IA" aria-valuenow="{{ situacao.percentual }}" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar {{ classe_barra }}" style="width: {{ situacao.percentual }}%"></div>
+    </div>
+  </div>
+</section>
+
+<section class="fin-panel">
+  <div class="fin-panel-head">
+    <div>
+      <h2>Últimas requisições</h2>
+      <p>As 20 mais recentes feitas com a sua conta</p>
+    </div>
+  </div>
+  {% if requisicoes %}
+  <div class="fin-table-wrap">
+    <table class="table fin-table align-middle js-tabela">
+      <thead>
+        <tr>
+          <th data-priority="1">Criada em</th>
+          <th data-priority="2">Finalidade</th>
+          <th data-priority="3">Situação</th>
+          <th data-priority="4" class="text-end">Tokens</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for requisicao in requisicoes %}
+        <tr>
+          <td class="text-nowrap">{{ requisicao.criado_em|date:"d/m/Y H:i" }}</td>
+          <td>{{ requisicao.finalidade }}</td>
+          <td>
+            {% if requisicao.situacao == "sucesso" %}
+            <span class="badge fin-pill text-bg-success">{{ requisicao.get_situacao_display }}</span>
+            {% else %}
+            <span class="badge fin-pill text-bg-danger">{{ requisicao.get_situacao_display }}</span>
+            {% endif %}
+          </td>
+          <td class="text-end">{{ requisicao.tokens_total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="fin-empty">
+    <div class="fin-empty-icon"><i class="bi bi-chat-square-text"></i></div>
+    <strong class="d-block">Nenhuma requisição ainda</strong>
+    <p class="mb-0">Quando você usar a IA, o histórico aparece aqui.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
