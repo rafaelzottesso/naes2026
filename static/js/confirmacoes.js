@@ -15,7 +15,7 @@
       title: link.dataset.titulo || 'Excluir',
       message: link.dataset.mensagem || 'Excluir este registro?',
       buttons: {
-        confirm: { label: 'Sim, excluir', className: 'btn-danger' },
+        confirm: { label: link.dataset.confirmar || 'Sim, excluir', className: 'btn-danger' },
         cancel: { label: 'Cancelar', className: 'btn-outline-secondary' }
       },
       callback: function (confirmado) {
