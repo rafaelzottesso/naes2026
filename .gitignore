@@ -4,3 +4,6 @@
 
 # ignorar todos diretórios __pycache__ e seu conteúdo no projeto
 **/__pycache__/
+
+# segredos locais (o .env.example continua versionado)
+.env

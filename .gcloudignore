@@ -15,5 +15,9 @@
 
 # Python pycache:
 __pycache__/
+
+# Variáveis locais (no App Engine use app.yaml ou Secret Manager):
+.env
+
 # Ignored by the build system
 /setup.cfg
