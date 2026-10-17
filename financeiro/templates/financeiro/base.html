@@ -82,6 +82,14 @@
           <ul class="dropdown-menu dropdown-menu-end">
             <li><h6 class="dropdown-header">{{ request.user.username }}</h6></li>
             <li><a class="dropdown-item" href="{% url 'alterar-senha' %}"><i class="bi bi-key"></i>Alterar senha</a></li>
+            <li><a class="dropdown-item" href="{% url 'ia:meu-consumo' %}"><i class="bi bi-cpu"></i>Meu consumo de IA</a></li>
+            {% if request.user.is_superuser %}
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header">Administração da IA</h6></li>
+            <li><a class="dropdown-item" href="{% url 'ia:requisicao-list' %}"><i class="bi bi-journal-text"></i>Requisições de IA</a></li>
+            <li><a class="dropdown-item" href="{% url 'ia:configuracao' %}"><i class="bi bi-sliders"></i>Configuração da IA</a></li>
+            <li><a class="dropdown-item" href="{% url 'ia:usuario-list' %}"><i class="bi bi-people"></i>IA por usuário</a></li>
+            {% endif %}
             <li><hr class="dropdown-divider"></li>
             <li>
               <form action="{% url 'logout' %}" method="post">{% csrf_token %}
